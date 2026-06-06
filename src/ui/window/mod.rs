@@ -1,7 +1,9 @@
 mod imp;
 
 use gtk::glib;
+use gtk::subclass::prelude::*;
 
+use crate::canvas::Canvas;
 use crate::Application;
 
 glib::wrapper! {
@@ -15,5 +17,13 @@ impl MainWindow {
             .property("application", app)
             .property("title", "Screenshot Hero")
             .build()
+    }
+
+    pub fn canvas(&self) -> Canvas {
+        self.imp()
+            .canvas
+            .get()
+            .expect("canvas initialized in constructed")
+            .clone()
     }
 }
