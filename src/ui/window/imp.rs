@@ -13,10 +13,12 @@ use libadwaita::subclass::window::AdwWindowImpl;
 
 use crate::canvas::Canvas;
 use crate::capture::{CaptureError, CaptureService, FileLoader, LoadError};
+use crate::ui::ToolPalette;
 
 #[derive(Default)]
 pub struct MainWindow {
     pub(crate) canvas: OnceCell<Canvas>,
+    tool_palette: OnceCell<ToolPalette>,
     zoom_label: OnceCell<gtk::Label>,
 }
 
@@ -153,6 +155,30 @@ impl ObjectImpl for MainWindow {
         });
         actions.add_action(&zoom_100);
 
+        let undo = gio::SimpleAction::new("undo", None);
+        undo.set_enabled(false);
+        let canvas_for_undo = canvas.clone();
+        undo.connect_activate(move |_, _| {
+            canvas_for_undo.undo();
+        });
+        actions.add_action(&undo);
+
+        let redo = gio::SimpleAction::new("redo", None);
+        redo.set_enabled(false);
+        let canvas_for_redo = canvas.clone();
+        redo.connect_activate(move |_, _| {
+            canvas_for_redo.redo();
+        });
+        actions.add_action(&redo);
+
+        let undo_for_cb = undo.clone();
+        let redo_for_cb = redo.clone();
+        let canvas_for_annotation_cb = canvas.clone();
+        canvas.on_annotation_changed(move || {
+            undo_for_cb.set_enabled(canvas_for_annotation_cb.can_undo());
+            redo_for_cb.set_enabled(canvas_for_annotation_cb.can_redo());
+        });
+
         window.insert_action_group("win", Some(&actions));
 
         let header = libadwaita::HeaderBar::new();
@@ -193,9 +219,40 @@ impl ObjectImpl for MainWindow {
         header.pack_end(&zoom_out_button);
         header.pack_end(&zoom_in_button);
 
+        let tool_palette = ToolPalette::new();
+
+        let canvas_for_tool = canvas.clone();
+        tool_palette.on_tool_changed(move |tool| {
+            canvas_for_tool.set_active_tool(tool);
+        });
+
+        let canvas_for_color = canvas.clone();
+        tool_palette.on_color_changed(move |color| {
+            let mut style = canvas_for_color.current_style();
+            style.stroke_color = color;
+            canvas_for_color.set_current_style(style);
+        });
+
+        let canvas_for_stroke = canvas.clone();
+        tool_palette.on_stroke_changed(move |width| {
+            let mut style = canvas_for_stroke.current_style();
+            style.stroke_width = width;
+            canvas_for_stroke.set_current_style(style);
+        });
+
+        let palette_widget = tool_palette.widget().clone();
+        if self.tool_palette.set(tool_palette).is_err() {
+            panic!("tool_palette initialized once");
+        }
+
+        let content_box = gtk::Box::new(gtk::Orientation::Horizontal, 0);
+        content_box.append(&palette_widget);
+        canvas.set_hexpand(true);
+        content_box.append(&canvas);
+
         let toolbar_view = libadwaita::ToolbarView::new();
         toolbar_view.add_top_bar(&header);
-        toolbar_view.set_content(Some(&canvas));
+        toolbar_view.set_content(Some(&content_box));
 
         window.set_content(Some(&toolbar_view));
     }

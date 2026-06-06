@@ -1,4 +1,5 @@
 mod application;
+pub mod annotations;
 mod canvas;
 mod capture;
 pub mod models;

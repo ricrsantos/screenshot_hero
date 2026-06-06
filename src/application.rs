@@ -47,6 +47,8 @@ mod imp {
             app.set_accels_for_action("win.zoom-out", &["<Control>minus"]);
             app.set_accels_for_action("win.zoom-fit", &["<Control><Shift>f"]);
             app.set_accels_for_action("win.zoom-100", &["<Control>0"]);
+            app.set_accels_for_action("win.undo", &["<Control>z"]);
+            app.set_accels_for_action("win.redo", &["<Control>y", "<Control><Shift>z"]);
         }
 
         fn activate(&self) {
