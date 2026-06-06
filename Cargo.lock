@@ -1430,6 +1430,7 @@ dependencies = [
  "ashpd",
  "env_logger",
  "gdk-pixbuf",
+ "glib",
  "gtk4",
  "libadwaita",
  "log",
