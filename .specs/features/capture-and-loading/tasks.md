@@ -2,7 +2,7 @@
 
 **Design:** `.specs/features/capture-and-loading/design.md`  
 **Spec:** `.specs/features/capture-and-loading/spec.md`  
-**Status:** Approved
+**Status:** Complete
 
 ---
 
@@ -72,10 +72,10 @@ T3 ──→ T12 (independent of Phases 2-4, can run anytime after T3)
 - Skill: NONE
 
 **Done when:**
-- [ ] `Cargo.toml` has `[package]` with name `screenshot-hero`, edition 2021
-- [ ] Dependencies include `gtk4`, `libadwaita`, `ashpd`, `gdk-pixbuf`, `serde` + `serde_json`, `uuid`, `log`, `env_logger`
-- [ ] `cargo build` compiles without errors (empty project)
-- [ ] `src/`, `build/`, `tests/fixtures/` directories exist
+- [x] `Cargo.toml` has `[package]` with name `screenshot-hero`, edition 2021
+- [x] Dependencies include `gtk4`, `libadwaita`, `ashpd`, `gdk-pixbuf`, `serde` + `serde_json`, `uuid`, `log`, `env_logger`
+- [x] `cargo build` compiles without errors (empty project)
+- [x] `src/`, `build/`, `tests/fixtures/` directories exist
 
 **Tests:** none
 **Gate:** build → `cargo build`
@@ -97,10 +97,10 @@ T3 ──→ T12 (independent of Phases 2-4, can run anytime after T3)
 - Skill: NONE
 
 **Done when:**
-- [ ] `Application` is an `adw::Application` subclass (using `glib::subclass`)
-- [ ] `main.rs` creates the application and calls `.run()`
-- [ ] `activate` signal handler is wired (creates/presents `MainWindow`)
-- [ ] `cargo build` passes
+- [x] `Application` is an `adw::Application` subclass (using `glib::subclass`)
+- [x] `main.rs` creates the application and calls `.run()`
+- [x] `activate` signal handler is wired (creates/presents `MainWindow`)
+- [x] `cargo build` passes
 
 **Tests:** none
 **Gate:** build → `cargo build`
@@ -122,13 +122,13 @@ T3 ──→ T12 (independent of Phases 2-4, can run anytime after T3)
 - Skill: NONE
 
 **Done when:**
-- [ ] `MainWindow` is an `adw::ApplicationWindow` GObject subclass
-- [ ] Window structure: `adw::ToolbarView` → `adw::HeaderBar` (top) + placeholder widget (content)
-- [ ] Header bar has "New Screenshot" button, "Open File" button
-- [ ] `new-screenshot` and `open-file` GActions are registered with no-op handlers
-- [ ] Window title is "Screenshot Hero"
-- [ ] `cargo build` passes
-- [ ] `cargo run` shows the window visually (manual verification)
+- [x] `MainWindow` is an `adw::ApplicationWindow` GObject subclass
+- [x] Window structure: `adw::ToolbarView` → `adw::HeaderBar` (top) + placeholder widget (content)
+- [x] Header bar has "New Screenshot" button, "Open File" button
+- [x] `new-screenshot` and `open-file` GActions are registered with no-op handlers
+- [x] Window title is "Screenshot Hero"
+- [x] `cargo build` passes
+- [x] `cargo run` shows the window visually (manual verification)
 
 **Tests:** none
 **Gate:** build → `cargo build`
@@ -150,12 +150,12 @@ T3 ──→ T12 (independent of Phases 2-4, can run anytime after T3)
 - Skill: NONE
 
 **Done when:**
-- [ ] `ImageData` struct with `pixbuf: gdk_pixbuf::Pixbuf` and `source: SourceImage`
-- [ ] `SourceImage` struct with `path: PathBuf`, `width: i32`, `height: i32`
-- [ ] `ImageData::from_pixbuf(pixbuf, source)` constructor
-- [ ] Accessors: `pixbuf()`, `source()`, `width()`, `height()`
-- [ ] Unit tests: verify width/height accessors return correct values from a mocked pixbuf dimensions
-- [ ] Gate check passes: `cargo test --lib`
+- [x] `ImageData` struct with `pixbuf: gdk_pixbuf::Pixbuf` and `source: SourceImage`
+- [x] `SourceImage` struct with `path: PathBuf`, `width: i32`, `height: i32`
+- [x] `ImageData::from_pixbuf(pixbuf, source)` constructor
+- [x] Accessors: `pixbuf()`, `source()`, `width()`, `height()`
+- [x] Unit tests: verify width/height accessors return correct values from a mocked pixbuf dimensions
+- [x] Gate check passes: `cargo test --lib`
 
 **Tests:** unit
 **Gate:** quick → `cargo test --lib`
@@ -177,14 +177,14 @@ T3 ──→ T12 (independent of Phases 2-4, can run anytime after T3)
 - Skill: NONE
 
 **Done when:**
-- [ ] `Canvas` is a GObject subclass of `gtk4::DrawingArea`
-- [ ] `imp.rs` has `image: RefCell<Option<ImageData>>`
-- [ ] `Canvas::new()` creates widget, registers draw function via `set_draw_func`
-- [ ] `Canvas::set_image(&self, image: ImageData)` stores image, calls `queue_draw()`
-- [ ] `Canvas::clear(&self)` sets image to `None`, calls `queue_draw()`
-- [ ] Draw function: if image is set, paints pixbuf at (0, 0) via Cairo; otherwise paints nothing (empty/gray background)
-- [ ] `Canvas` replaces the placeholder in `MainWindow` content area
-- [ ] `cargo build` passes
+- [x] `Canvas` is a GObject subclass of `gtk4::DrawingArea`
+- [x] `imp.rs` has `image: RefCell<Option<ImageData>>`
+- [x] `Canvas::new()` creates widget, registers draw function via `set_draw_func`
+- [x] `Canvas::set_image(&self, image: ImageData)` stores image, calls `queue_draw()`
+- [x] `Canvas::clear(&self)` sets image to `None`, calls `queue_draw()`
+- [x] Draw function: if image is set, paints pixbuf at (0, 0) via Cairo; otherwise paints nothing (empty/gray background)
+- [x] `Canvas` replaces the placeholder in `MainWindow` content area
+- [x] `cargo build` passes
 
 **Tests:** none (GTK widget, requires display)
 **Gate:** build → `cargo build`
@@ -206,14 +206,14 @@ T3 ──→ T12 (independent of Phases 2-4, can run anytime after T3)
 - Skill: NONE
 
 **Done when:**
-- [ ] `CaptureError` enum: `PortalUnavailable(String)`, `PortalCancelled`, `ImageLoadFailed(String)`
-- [ ] `CaptureService::capture() -> Result<Option<ImageData>, CaptureError>` (async fn)
+- [x] `CaptureError` enum: `PortalUnavailable(String)`, `PortalCancelled`, `ImageLoadFailed(String)`
+- [x] `CaptureService::capture() -> Result<Option<ImageData>, CaptureError>` (async fn)
   - Returns `Ok(None)` on user cancellation (empty URI)
   - Returns `Ok(Some(image))` on success
   - Returns `Err(CaptureError::PortalUnavailable)` if portal fails to respond
-- [ ] Unit tests: test cancellation path (Ok(None) when URI is empty) and error path
+- [x] Unit tests: test cancellation path (Ok(None) when URI is empty) and error path
   - Note: actual portal call cannot be tested; test error handling logic around it
-- [ ] Gate check passes: `cargo test --lib`
+- [x] Gate check passes: `cargo test --lib`
 
 **Tests:** unit
 **Gate:** quick → `cargo test --lib`
@@ -235,24 +235,24 @@ T3 ──→ T12 (independent of Phases 2-4, can run anytime after T3)
 - Skill: NONE
 
 **Done when:**
-- [ ] `LoadError` enum: `FileNotFound(PathBuf)`, `UnsupportedFormat(PathBuf)`, `DecodeFailed(String)`, `InvalidUri(String)`
-- [ ] `FileLoader::load_from_path(path: &Path) -> Result<ImageData, LoadError>`
+- [x] `LoadError` enum: `FileNotFound(PathBuf)`, `UnsupportedFormat(PathBuf)`, `DecodeFailed(String)`, `InvalidUri(String)`
+- [x] `FileLoader::load_from_path(path: &Path) -> Result<ImageData, LoadError>`
   - Validates extension (`.png`, `.jpg`, `.jpeg`) → `UnsupportedFormat` if not matching
   - Checks file exists → `FileNotFound` if not
   - Calls `gdk_pixbuf::Pixbuf::from_file()` → `DecodeFailed` on error
   - Returns `ImageData` on success
-- [ ] `FileLoader::load_from_uri(uri: &str) -> Result<ImageData, LoadError>`
+- [x] `FileLoader::load_from_uri(uri: &str) -> Result<ImageData, LoadError>`
   - Converts `file://` URI to path → delegates to `load_from_path()`
   - Returns `InvalidUri` on malformed URI
-- [ ] Unit tests with fixture files in `tests/fixtures/`:
+- [x] Unit tests with fixture files in `tests/fixtures/`:
   - `test_load_png_valid_file` — loads a real PNG fixture, asserts Ok
   - `test_load_jpeg_valid_file` — loads a real JPEG fixture, asserts Ok
   - `test_load_unsupported_format` — `.bmp` extension → Err(UnsupportedFormat)
   - `test_load_nonexistent_file` — path doesn't exist → Err(FileNotFound)
   - `test_load_from_uri_valid` — file:// URI → asserts Ok
   - `test_load_from_uri_invalid` — bad URI → Err(InvalidUri)
-- [ ] Add sample PNG and JPEG fixtures to `tests/fixtures/`
-- [ ] Gate check passes: `cargo test --lib` (6 tests pass)
+- [x] Add sample PNG and JPEG fixtures to `tests/fixtures/`
+- [x] Gate check passes: `cargo test --lib` (6 tests pass)
 
 **Tests:** unit
 **Gate:** quick → `cargo test --lib`
@@ -274,14 +274,14 @@ T3 ──→ T12 (independent of Phases 2-4, can run anytime after T3)
 - Skill: NONE
 
 **Done when:**
-- [ ] `new-screenshot` action handler uses `glib::spawn_future_local` (or equivalent) to call `CaptureService::capture()` asynchronously
-- [ ] On `Ok(Some(image))` → calls `self.canvas.set_image(image)`
-- [ ] On `Ok(None)` (cancelled) → does nothing (no dialog)
-- [ ] On `Err(CaptureError::PortalUnavailable(msg))` → shows `adw::AlertDialog` with `msg`
-- [ ] On `Err(CaptureError::ImageLoadFailed(msg))` → shows `adw::AlertDialog` with `msg`
-- [ ] Log all errors at `Error` level before showing dialog
-- [ ] `cargo build` passes
-- [ ] Manual test: activate "New Screenshot", select region, image appears in canvas
+- [x] `new-screenshot` action handler uses `glib::spawn_future_local` (or equivalent) to call `CaptureService::capture()` asynchronously
+- [x] On `Ok(Some(image))` → calls `self.canvas.set_image(image)`
+- [x] On `Ok(None)` (cancelled) → does nothing (no dialog)
+- [x] On `Err(CaptureError::PortalUnavailable(msg))` → shows `adw::AlertDialog` with `msg`
+- [x] On `Err(CaptureError::ImageLoadFailed(msg))` → shows `adw::AlertDialog` with `msg`
+- [x] Log all errors at `Error` level before showing dialog
+- [x] `cargo build` passes
+- [x] Manual test: activate "New Screenshot", select region, image appears in canvas
 
 **Tests:** none (GTK widget + async + portal)
 **Gate:** build → `cargo build`
@@ -303,13 +303,13 @@ T3 ──→ T12 (independent of Phases 2-4, can run anytime after T3)
 - Skill: NONE
 
 **Done when:**
-- [ ] `open-file` action handler opens `gtk4::FileDialog` with PNG/JPEG filter
-- [ ] On file selected → calls `FileLoader::load_from_path()` → `canvas.set_image()` on `Ok`
-- [ ] On cancel → does nothing
-- [ ] On `Err` → shows `adw::AlertDialog` with the filename + reason
-- [ ] Log errors at `Error` level
-- [ ] `cargo build` passes
-- [ ] Manual test: open PNG → image appears; open JPEG → image appears; open corrupt file → error dialog
+- [x] `open-file` action handler opens `gtk4::FileDialog` with PNG/JPEG filter
+- [x] On file selected → calls `FileLoader::load_from_path()` → `canvas.set_image()` on `Ok`
+- [x] On cancel → does nothing
+- [x] On `Err` → shows `adw::AlertDialog` with the filename + reason
+- [x] Log errors at `Error` level
+- [x] `cargo build` passes
+- [x] Manual test: open PNG → image appears; open JPEG → image appears; open corrupt file → error dialog
 
 **Tests:** none
 **Gate:** build → `cargo build`
@@ -331,10 +331,10 @@ T3 ──→ T12 (independent of Phases 2-4, can run anytime after T3)
 - Skill: NONE
 
 **Done when:**
-- [ ] `show_error_dialog` function in `src/ui/dialogs.rs`
-- [ ] T8 and T9 updated to use the helper (no inline `adw::AlertDialog` construction)
-- [ ] `cargo build` passes
-- [ ] Manual test: trigger capture error and file load error; both show dialog with correct message
+- [x] `show_error_dialog` function in `src/ui/dialogs.rs`
+- [x] T8 and T9 updated to use the helper (no inline `adw::AlertDialog` construction)
+- [x] `cargo build` passes
+- [x] Manual test: trigger capture error and file load error; both show dialog with correct message
 
 **Tests:** none
 **Gate:** build → `cargo build`
@@ -356,9 +356,9 @@ T3 ──→ T12 (independent of Phases 2-4, can run anytime after T3)
 - Skill: NONE
 
 **Done when:**
-- [ ] `cargo build && cargo test --lib` passes with 0 failures
-- [ ] Unit test count: at minimum 8 (6 from T7 + 2 from T6 — no silent deletions)
-- [ ] No compiler warnings that indicate logic errors (allow `dead_code` for stubs only)
+- [x] `cargo build && cargo test --lib` passes with 0 failures
+- [x] Unit test count: at minimum 8 (6 from T7 + 2 from T6 — no silent deletions)
+- [x] No compiler warnings that indicate logic errors (allow `dead_code` for stubs only)
 
 **Tests:** unit
 **Gate:** full → `cargo build && cargo test --lib`
@@ -380,12 +380,12 @@ T3 ──→ T12 (independent of Phases 2-4, can run anytime after T3)
 - Skill: NONE
 
 **Done when:**
-- [ ] Manifest has correct `app-id`, `runtime` (GNOME SDK), `sdk`, `command`
-- [ ] Portal permissions: `--talk-name=org.freedesktop.portal.Screenshot`, `--talk-name=org.freedesktop.portal.Desktop`
-- [ ] Filesystem permission: `xdg-pictures` (read) for screenshot access
-- [ ] Rust build system module uses `cargo` build system
-- [ ] `flatpak-builder --build-only build-dir build/com.screenshot_hero.ScreenshotHero.yml` succeeds
-- [ ] Manual validation: `flatpak-builder --install --user` + `flatpak run` shows window and capture works
+- [x] Manifest has correct `app-id`, `runtime` (GNOME SDK), `sdk`, `command`
+- [x] Portal permissions: `--talk-name=org.freedesktop.portal.Screenshot`, `--talk-name=org.freedesktop.portal.Desktop`
+- [x] Filesystem permission: `xdg-pictures` (read) for screenshot access
+- [x] Rust build system module uses `cargo` build system
+- [x] `flatpak-builder --build-only build-dir build/com.screenshot_hero.ScreenshotHero.yml` succeeds
+- [x] Manual validation: `flatpak-builder --install --user` + `flatpak run` shows window and capture works
 
 **Tests:** none
 **Gate:** build → `flatpak-builder --build-only build-dir build/com.screenshot_hero.ScreenshotHero.yml --force-clean`
