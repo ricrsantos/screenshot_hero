@@ -7,8 +7,8 @@
 ## Current Focus
 
 **Feature:** PRD-004 - Project Management  
-**Phase:** Planning complete → Ready to Execute  
-**Next action:** Start T1 (Add serde derives to annotation model in `src/annotations/model.rs`)
+**Phase:** Implemented (T1–T8 complete)  
+**Next action:** Manual UAT — save/open project, verify auto-save updates `.shero` after annotation changes
 
 ### Previous Focus
 
@@ -66,9 +66,9 @@
 
 ## Todos
 
-- [ ] PRD-004 T7: Verify `gtk::FileDialog` filter API for `.shero` extension (pattern vs mime type) in gtk4-rs 0.9
-- [ ] PRD-004 T7: Confirm `Application::set_accels_for_action` is accessible at startup phase for `win.save-project` → Ctrl+S
-- [ ] PRD-004 T8: Confirm `on_annotation_changed` single-callback limitation — may need to extend to `Vec<Box<dyn Fn()>>` if two consumers are needed
+- [x] PRD-004 T7: Verify `gtk::FileDialog` filter API for `.shero` extension (pattern vs mime type) in gtk4-rs 0.9 — uses `add_pattern("*.shero")`
+- [x] PRD-004 T7: Confirm `Application::set_accels_for_action` is accessible at startup phase for `win.save-project` → Ctrl+S — wired in `application.rs`
+- [x] PRD-004 T8: Confirm `on_annotation_changed` single-callback limitation — extended existing closure (undo/redo + auto-save in one callback)
 - [ ] Verify exact crate versions for gtk4-rs ecosystem before T1 (use Context7 or crates.io)
 - [ ] Confirm Flatpak runtime version (GNOME SDK) used in POC-003 matches manifest in T12
 - [ ] Confirm `ashpd` async runtime compatibility (zbus + glib) during T6

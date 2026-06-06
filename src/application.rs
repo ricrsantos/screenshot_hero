@@ -49,6 +49,7 @@ mod imp {
             app.set_accels_for_action("win.zoom-100", &["<Control>0"]);
             app.set_accels_for_action("win.undo", &["<Control>z"]);
             app.set_accels_for_action("win.redo", &["<Control>y", "<Control><Shift>z"]);
+            app.set_accels_for_action("win.save-project", &["<Control>s"]);
         }
 
         fn activate(&self) {

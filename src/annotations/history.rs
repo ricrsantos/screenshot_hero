@@ -69,6 +69,11 @@ impl History {
     pub fn can_redo(&self) -> bool {
         !self.redo_stack.is_empty()
     }
+
+    pub fn clear(&mut self) {
+        self.undo_stack.clear();
+        self.redo_stack.clear();
+    }
 }
 
 impl Default for History {
@@ -227,6 +232,26 @@ mod tests {
 
         history.redo(&mut engine);
         assert_eq!(engine.all()[0].bounds, new_bounds);
+    }
+
+    #[test]
+    fn clear_empties_both_stacks() {
+        let mut engine = AnnotationEngine::new();
+        let mut history = History::new();
+        let ann1 = sample_annotation();
+        let ann2 = sample_annotation();
+
+        history.push(AnnotationCommand::Add(ann1.clone()));
+        apply_command(&mut engine, &AnnotationCommand::Add(ann1));
+        history.push(AnnotationCommand::Add(ann2.clone()));
+        apply_command(&mut engine, &AnnotationCommand::Add(ann2));
+        history.undo(&mut engine);
+        assert!(history.can_undo());
+        assert!(history.can_redo());
+
+        history.clear();
+        assert!(!history.can_undo());
+        assert!(!history.can_redo());
     }
 
     #[test]

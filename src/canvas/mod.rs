@@ -1,6 +1,8 @@
 mod imp;
 mod renderer;
 
+use std::path::PathBuf;
+
 use gtk::gdk;
 use gtk::glib;
 use gtk::prelude::*;
@@ -8,9 +10,9 @@ use gtk::subclass::prelude::*;
 use uuid::Uuid;
 
 use crate::annotations::{
-    ActiveTool, Annotation, AnnotationCommand, AnnotationKind, AnnotationStyle, ArrowData,
-    CalloutData, DrawingState, FreehandData, HandleIndex, NumberMarkerData, Point, Rect,
-    TextData,
+    ActiveTool, Annotation, AnnotationCommand, AnnotationEngine, AnnotationKind, AnnotationStyle,
+    ArrowData, CalloutData, DrawingState, FreehandData, HandleIndex, NumberMarkerData, Point,
+    Rect, TextData,
 };
 use crate::models::ImageData;
 
@@ -531,6 +533,47 @@ impl Canvas {
 
     pub fn zoom_level(&self) -> f64 {
         self.imp().zoom.get()
+    }
+
+    pub fn pan_offset(&self) -> (f64, f64) {
+        self.imp().pan_offset.get()
+    }
+
+    pub fn all_annotations(&self) -> Vec<Annotation> {
+        self.imp().annotations.borrow().all().to_vec()
+    }
+
+    pub fn source_image_path(&self) -> Option<PathBuf> {
+        self.imp()
+            .image
+            .borrow()
+            .as_ref()
+            .map(|img| img.source().path.clone())
+    }
+
+    pub fn source_image_dimensions(&self) -> Option<(u32, u32)> {
+        self.imp().image.borrow().as_ref().map(|img| {
+            (
+                img.width() as u32,
+                img.height() as u32,
+            )
+        })
+    }
+
+    pub fn restore_annotations(&self, annotations: Vec<Annotation>) {
+        let mut engine = AnnotationEngine::new();
+        for ann in annotations {
+            engine.add(ann);
+        }
+        *self.imp().annotations.borrow_mut() = engine;
+        self.queue_draw();
+    }
+
+    pub fn restore_zoom_pan(&self, zoom: f64, pan_x: f64, pan_y: f64) {
+        self.imp().zoom.set(zoom);
+        self.imp().pan_offset.set((pan_x, pan_y));
+        self.notify_zoom_changed(zoom);
+        self.queue_draw();
     }
 
     pub fn on_zoom_changed(&self, cb: impl Fn(f64) + 'static) {
