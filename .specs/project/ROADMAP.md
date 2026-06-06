@@ -1,9 +1,9 @@
 # Screenshot Hero - Roadmap
 
-## Milestone 1: Screenshot Capture and Loading ← current
+## Milestone 1: Screenshot Capture and Loading
 **Feature:** PRD-001  
 **Spec:** `.specs/features/capture-and-loading/`  
-**Status:** Planning
+**Status:** Implemented
 
 **Deliverables:**
 - Cargo project with GTK4 + Libadwaita + ashpd
@@ -16,9 +16,10 @@
 
 ---
 
-## Milestone 2: Canvas and Navigation
+## Milestone 2: Canvas and Navigation ← current
 **Feature:** PRD-002  
-**Status:** Not started
+**Spec:** `.specs/features/canvas-and-navigation/`  
+**Status:** Planning complete → Ready to Execute
 
 **Deliverables:**
 - Zoom (10% – 800%), scroll-wheel zoom
