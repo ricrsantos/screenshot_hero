@@ -16,10 +16,10 @@
 
 ---
 
-## Milestone 2: Canvas and Navigation ← current
+## Milestone 2: Canvas and Navigation
 **Feature:** PRD-002  
 **Spec:** `.specs/features/canvas-and-navigation/`  
-**Status:** Planning complete → Ready to Execute
+**Status:** Implemented
 
 **Deliverables:**
 - Zoom (10% – 800%), scroll-wheel zoom
@@ -29,15 +29,24 @@
 
 ---
 
-## Milestone 3: Annotations
+## Milestone 3: Annotations ← current
 **Feature:** PRD-003  
-**Status:** Not started
+**Spec:** `.specs/features/annotations/`  
+**Status:** Planning complete → Ready to Execute
 
 **Deliverables:**
-- Annotation engine (Command Pattern for undo/redo)
-- Tools: rectangle, arrow, ellipse, line, freehand, text, blur, pixelate, redaction, timestamp, numbered marker, callout
-- Selection, move, resize, delete
-- Undo/Redo
+- `src/annotations/` module: data model, engine (CRUD + selection + hit-test), history (Command Pattern), tool state
+- `src/canvas/renderer.rs`: Cairo renderers for all 12 annotation types + selection handles
+- Canvas interaction: draw/select/move/resize/delete gestures + keyboard shortcuts
+- Text annotation editor (modal dialog)
+- Tool palette widget (left sidebar with tool buttons + color/stroke controls)
+- Undo/Redo (Ctrl+Z / Ctrl+Y) via GActions
+
+**Task summary:** 18 tasks (T1–T18); see `.specs/features/annotations/tasks.md`
+
+**P1 (MVP):** Rectangle, Ellipse, Arrow, Line + Select/Move/Resize/Delete + Undo/Redo + Style (T1–T17)  
+**P2:** Freehand, Text, Blur, Pixelate, Redaction, Timestamp, Number Marker (included in T1–T18)  
+**P3:** Callout (included in T7, T9, T12)
 
 ---
 
