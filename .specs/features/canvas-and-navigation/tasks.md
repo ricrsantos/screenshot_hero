@@ -1,7 +1,7 @@
 # Canvas and Navigation — Tasks
 
 **Design:** `.specs/features/canvas-and-navigation/design.md`  
-**Status:** Approved
+**Status:** Complete
 
 ---
 

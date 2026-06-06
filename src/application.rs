@@ -39,6 +39,16 @@ mod imp {
 
     impl ObjectImpl for Application {}
     impl ApplicationImpl for Application {
+        fn startup(&self) {
+            self.parent_startup();
+
+            let app = self.obj();
+            app.set_accels_for_action("win.zoom-in", &["<Control>plus", "<Control>equal"]);
+            app.set_accels_for_action("win.zoom-out", &["<Control>minus"]);
+            app.set_accels_for_action("win.zoom-fit", &["<Control><Shift>f"]);
+            app.set_accels_for_action("win.zoom-100", &["<Control>0"]);
+        }
+
         fn activate(&self) {
             let app = self.obj();
             let window = MainWindow::new(app.as_ref());
