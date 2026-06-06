@@ -6,16 +6,19 @@
 
 ## Current Focus
 
-**Feature:** PRD-003 - Annotations  
+**Feature:** PRD-004 - Project Management  
 **Phase:** Planning complete → Ready to Execute  
-**Next action:** Start T1 (Create annotation data model in `src/annotations/model.rs`)
+**Next action:** Start T1 (Add serde derives to annotation model in `src/annotations/model.rs`)
 
 ### Previous Focus
 
-**Feature:** PRD-002 - Canvas and Navigation  
-**Phase:** Planning complete → Implemented (see `.specs/features/canvas-and-navigation/`)
+**Feature:** PRD-003 - Annotations  
+**Phase:** Planning complete → Ready to Execute (tasks in `.specs/features/annotations/tasks.md`)
 
 ### Earlier Focus
+
+**Feature:** PRD-002 - Canvas and Navigation  
+**Phase:** Implemented (see `.specs/features/canvas-and-navigation/`)
 
 **Feature:** PRD-001 - Screenshot Capture and Loading  
 **Phase:** Implemented (see `.specs/features/capture-and-loading/`)
@@ -26,6 +29,12 @@
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-06-06 | Add serde derives directly to `src/annotations/model.rs` (no DTO layer) | All model types are pure Rust with no GTK dependency; avoids redundant struct definitions; all crates (`serde`, `serde_json`, `uuid` serde feature) are already in Cargo.toml |
+| 2026-06-06 | Timestamps stored as `String` (RFC 3339) in `.shero` | Avoids enabling `chrono/serde` feature; strings are portable and human-readable in the JSON file; `chrono::Utc::now().to_rfc3339()` is available without feature changes |
+| 2026-06-06 | Auto-save trigger via `on_annotation_changed` callback at Window level | Callback already fires on every execute/undo/redo; zero new mechanism needed; keeps `src/annotations/` free of GTK/persistence concerns |
+| 2026-06-06 | Atomic write for `.shero` save (write to `.shero.tmp` then `fs::rename`) | Prevents file corruption if process is killed mid-write; `fs::rename` is atomic on Linux for same-filesystem paths |
+| 2026-06-06 | `ProjectManager` is pure Rust stored in `RefCell<ProjectManager>` in Window imp | No GTK dependency; fully unit-testable without display server; consistent with `src/annotations/` separation pattern |
+| 2026-06-06 | `const APP_VERSION: &str = env!("CARGO_PKG_VERSION")` for metadata | Compile-time version injection; always matches built binary version |
 | 2026-06-06 | Annotation coordinates stored in image-space only | Invariant under zoom/pan; required for ADR-003 "canvas == export" guarantee |
 | 2026-06-06 | Separate `src/annotations/` module — no GTK dependency | Enables unit testing of model/engine/history without a display server |
 | 2026-06-06 | Command pattern (AnnotationCommand enum) for undo/redo | Clean inverse-operation mapping; each command stores both old and new state |
@@ -57,17 +66,15 @@
 
 ## Todos
 
+- [ ] PRD-004 T7: Verify `gtk::FileDialog` filter API for `.shero` extension (pattern vs mime type) in gtk4-rs 0.9
+- [ ] PRD-004 T7: Confirm `Application::set_accels_for_action` is accessible at startup phase for `win.save-project` → Ctrl+S
+- [ ] PRD-004 T8: Confirm `on_annotation_changed` single-callback limitation — may need to extend to `Vec<Box<dyn Fn()>>` if two consumers are needed
 - [ ] Verify exact crate versions for gtk4-rs ecosystem before T1 (use Context7 or crates.io)
 - [ ] Confirm Flatpak runtime version (GNOME SDK) used in POC-003 matches manifest in T12
 - [ ] Confirm `ashpd` async runtime compatibility (zbus + glib) during T6
-- [ ] PRD-002 T2: Verify `GestureDrag::connect_drag_begin` signature in gtk4-rs bindings version in use
-- [ ] PRD-002 T2: Verify `set_cursor_from_name` availability on `Widget` (alternative: `gdk::Cursor::from_name` + `widget.set_cursor`)
-- [ ] PRD-002 T2: Verify `cr.source()` returns filterable pattern in cairo-rs bindings (bilinear filter path)
-- [ ] PRD-002 T4: Confirm `ApplicationImpl::startup()` is the correct override in the libadwaita subclassing pattern in use
 - [ ] PRD-003 T7: Verify `cairo-rs` API for pixbuf sub-region extraction + scale operations (for Blur/Pixelate renderers)
 - [ ] PRD-003 T12: Verify `adw::MessageDialog` with `gtk::Entry` API availability in current libadwaita-rs version
 - [ ] PRD-003 T14: Verify `gtk::ColorButton` vs `gtk::ColorDialog` availability in gtk4-rs version in use
-- [ ] PRD-003: Add `uuid` crate to `Cargo.toml` before starting T1 (features = ["v4"])
 
 ---
 
@@ -77,7 +84,7 @@
 |------|-------------|------------|
 | `gdk4::Texture` for image loading | Simpler to start with Pixbuf; Texture has better GPU path | Milestone 5 (export) |
 | Drag-and-drop image loading | Not in PRD-001 scope | PRD-001 backlog |
-| Recent files list | Requires GSettings + file history | PRD-004 (project management) |
+| Recent files list | Requires GSettings + file history | PRD-006 (settings) — excluded from PRD-004 scope |
 | Image format validation (magic bytes) | File extension check sufficient for v1 | PRD-001 backlog |
 | Multi-selection of annotations | ADR-003 defers this explicitly | Post-PRD-003 |
 | Copy/paste annotations | Not in PRD-003 scope | Post-PRD-003 |
