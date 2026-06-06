@@ -11,6 +11,10 @@
 | Data models | `src/models/` | unit | Pure structs, no GTK; fully testable |
 | Capture service | `src/capture/service.rs` | unit | Business logic testable without portal (mock/stub) |
 | File loader | `src/capture/loader.rs` | unit | File parsing logic testable with fixture files |
+| Export renderer | `src/export/renderer.rs` | unit | Cairo surface + Pixbuf creation don't require a display |
+| Export path logic | `src/export/auto_export.rs` | unit | Pure `std::path` logic; no GTK dependency |
+| Export file writer | `src/export/exporter.rs` | unit | `Pixbuf::savev` testable with temp files; no display required |
+| Clipboard writer | `src/export/clipboard.rs` | none | `gdk::Display` requires a running compositor |
 | UI components | `src/ui/`, `src/canvas/` | none | GTK4 widgets require a display server; manual only |
 | Application entry | `src/main.rs`, `src/application.rs` | none | GApplication init requires display; manual only |
 | Flatpak build | `build/` | none | Must be validated manually via `flatpak run` |

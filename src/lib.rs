@@ -2,6 +2,7 @@ mod application;
 pub mod annotations;
 mod canvas;
 mod capture;
+pub mod export;
 pub mod models;
 pub mod persistence;
 mod ui;

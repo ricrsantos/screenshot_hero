@@ -1,5 +1,5 @@
 mod imp;
-mod renderer;
+pub(crate) mod renderer;
 
 use std::path::PathBuf;
 
@@ -549,6 +549,14 @@ impl Canvas {
             .borrow()
             .as_ref()
             .map(|img| img.source().path.clone())
+    }
+
+    pub fn source_pixbuf(&self) -> Option<gdk_pixbuf::Pixbuf> {
+        self.imp()
+            .image
+            .borrow()
+            .as_ref()
+            .map(|img| img.pixbuf().clone())
     }
 
     pub fn source_image_dimensions(&self) -> Option<(u32, u32)> {

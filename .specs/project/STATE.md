@@ -6,11 +6,15 @@
 
 ## Current Focus
 
-**Feature:** PRD-004 - Project Management  
-**Phase:** Implemented (T1–T8 complete)  
-**Next action:** Manual UAT — save/open project, verify auto-save updates `.shero` after annotation changes
+**Feature:** PRD-005 - Export and Clipboard  
+**Phase:** Planning complete → Ready to Execute (tasks in `.specs/features/export-and-clipboard/tasks.md`)  
+**Next action:** Execute T1–T4 in parallel (pure Rust export module), then T5–T9 sequentially
 
 ### Previous Focus
+
+**Feature:** PRD-004 - Project Management  
+**Phase:** Implemented (T1–T8 complete)  
+**Next action (deferred):** Manual UAT — save/open project, verify auto-save updates `.shero` after annotation changes
 
 **Feature:** PRD-003 - Annotations  
 **Phase:** Planning complete → Ready to Execute (tasks in `.specs/features/annotations/tasks.md`)
@@ -29,6 +33,11 @@
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-06-06 | Off-screen render uses `cairo::Format::ARgb32` + manual BGRA→RGBA + un-premultiply conversion | Required for annotation alpha blending; avoids additional crate dependency; `Pixbuf::from_bytes` accepts raw RGBA |
+| 2026-06-06 | Auto-export always produces PNG (not JPEG) | ADR-001 specifies `original_name_shero.png`; PNG is lossless, appropriate for screenshots |
+| 2026-06-06 | Export config stored as `Cell<bool>` / `RefCell<String>` fields in `MainWindow` | PRD-006 (Settings) will later replace these with GSettings-backed persistence; minimal coupling for now |
+| 2026-06-06 | Debounce via `glib::timeout_add_local_once` + `SourceId::remove()` stored in `RefCell<Option<glib::SourceId>>` | GLib main-thread safe; consistent with project's use of GLib primitives; 300ms per ADR-001 |
+| 2026-06-06 | No new crate dependencies for export/clipboard | All required APIs available via existing `gtk`, `glib`, `gdk-pixbuf`; keeps Flatpak manifest clean |
 | 2026-06-06 | Add serde derives directly to `src/annotations/model.rs` (no DTO layer) | All model types are pure Rust with no GTK dependency; avoids redundant struct definitions; all crates (`serde`, `serde_json`, `uuid` serde feature) are already in Cargo.toml |
 | 2026-06-06 | Timestamps stored as `String` (RFC 3339) in `.shero` | Avoids enabling `chrono/serde` feature; strings are portable and human-readable in the JSON file; `chrono::Utc::now().to_rfc3339()` is available without feature changes |
 | 2026-06-06 | Auto-save trigger via `on_annotation_changed` callback at Window level | Callback already fires on every execute/undo/redo; zero new mechanism needed; keeps `src/annotations/` free of GTK/persistence concerns |
@@ -75,6 +84,11 @@
 - [ ] PRD-003 T7: Verify `cairo-rs` API for pixbuf sub-region extraction + scale operations (for Blur/Pixelate renderers)
 - [ ] PRD-003 T12: Verify `adw::MessageDialog` with `gtk::Entry` API availability in current libadwaita-rs version
 - [ ] PRD-003 T14: Verify `gtk::ColorButton` vs `gtk::ColorDialog` availability in gtk4-rs version in use
+- [ ] PRD-005 T4: Verify `gdk::Clipboard::set_texture` method signature in gtk4-rs 0.9 (may need `ContentProvider` instead)
+- [ ] PRD-005 T4: Verify `gdk::Texture::for_pixbuf` availability in gtk4-rs 0.9
+- [ ] PRD-005 T8: Verify `glib::SourceId::remove()` consuming method signature in glib 0.20
+- [ ] PRD-005 T1: Verify `gdk_pixbuf::Pixbuf::from_bytes` constructor signature in gdk-pixbuf 0.20
+- [ ] PRD-005 T3: Confirm JPEG quality option key for `Pixbuf::savev` is `"quality"` (not `"jpeg-quality"`)
 
 ---
 

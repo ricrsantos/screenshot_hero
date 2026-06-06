@@ -29,7 +29,7 @@
 
 ---
 
-## Milestone 3: Annotations ← current
+## Milestone 3: Annotations
 **Feature:** PRD-003  
 **Spec:** `.specs/features/annotations/`  
 **Status:** Planning complete → Ready to Execute
@@ -61,14 +61,16 @@
 
 ---
 
-## Milestone 5: Export and Clipboard
+## Milestone 5: Export and Clipboard ← current
 **Feature:** PRD-005  
-**Status:** Not started
+**Spec:** `.specs/features/export-and-clipboard/`  
+**Status:** Planning complete → Ready to Execute (9 tasks: T1–T4 parallel, T5–T9 sequential)
 
 **Deliverables:**
-- Export PNG/JPEG
-- Auto clipboard update (debounced 300ms)
-- Auto export option (same-directory suffix)
+- `src/export/` module: off-screen renderer, file exporter (PNG/JPEG), clipboard writer, auto-export path logic
+- Manual export GActions: `win.export-png`, `win.export-jpeg`, `win.copy-to-clipboard`
+- Auto-clipboard update (debounced 300ms, enabled by default)
+- Auto-export (disabled by default, configurable suffix `_shero`, saves beside original)
 
 ---
 

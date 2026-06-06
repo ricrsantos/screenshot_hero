@@ -135,8 +135,9 @@ fn draw_ellipse(cr: &cairo::Context, bounds: &Rect, style: &AnnotationStyle) {
     apply_stroke(cr, style);
     let cx = bounds.x + bounds.width / 2.0;
     let cy = bounds.y + bounds.height / 2.0;
-    let rx = bounds.width / 2.0;
-    let ry = bounds.height / 2.0;
+    // Cairo rejects scale(0, …); flat drags (width or height ≈ 0) happen during preview.
+    let rx = (bounds.width / 2.0).max(0.5);
+    let ry = (bounds.height / 2.0).max(0.5);
     cr.save().expect("cairo save");
     cr.translate(cx, cy);
     cr.scale(rx, ry);

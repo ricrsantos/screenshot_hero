@@ -1,5 +1,6 @@
-use std::cell::{OnceCell, RefCell};
+use std::cell::{Cell, OnceCell, RefCell};
 use std::path::{Path, PathBuf};
+use std::time::Duration;
 
 use gtk::gio;
 use gtk::glib;
@@ -13,6 +14,7 @@ use libadwaita::subclass::window::AdwWindowImpl;
 
 use crate::canvas::Canvas;
 use crate::capture::{CaptureError, CaptureService, FileLoader, LoadError};
+use crate::export::{self, auto_export, exporter, renderer};
 use crate::persistence::{
     is_portal_document_path, PersistenceError, ProjectManager, ProjectMetadata, SheroProject,
     SourceImageRecord, ViewState,
@@ -24,6 +26,10 @@ pub struct MainWindow {
     tool_palette: OnceCell<ToolPalette>,
     zoom_label: OnceCell<gtk::Label>,
     project_manager: RefCell<ProjectManager>,
+    clipboard_debounce: RefCell<Option<glib::SourceId>>,
+    auto_clipboard_enabled: Cell<bool>,
+    auto_export_enabled: Cell<bool>,
+    auto_export_suffix: RefCell<String>,
 }
 
 impl Default for MainWindow {
@@ -33,6 +39,10 @@ impl Default for MainWindow {
             tool_palette: OnceCell::new(),
             zoom_label: OnceCell::new(),
             project_manager: RefCell::new(ProjectManager::new()),
+            clipboard_debounce: RefCell::new(None),
+            auto_clipboard_enabled: Cell::new(true),
+            auto_export_enabled: Cell::new(false),
+            auto_export_suffix: RefCell::new("_shero".to_string()),
         }
     }
 }
@@ -70,19 +80,38 @@ impl ObjectImpl for MainWindow {
         let save_project = gio::SimpleAction::new("save-project", None);
         save_project.set_enabled(false);
 
+        let export_png = gio::SimpleAction::new("export-png", None);
+        export_png.set_enabled(false);
+        let export_jpeg = gio::SimpleAction::new("export-jpeg", None);
+        export_jpeg.set_enabled(false);
+        let copy_to_clipboard_action = gio::SimpleAction::new("copy-to-clipboard", None);
+        copy_to_clipboard_action.set_enabled(false);
+
         let new_screenshot = gio::SimpleAction::new("new-screenshot", None);
         let window_for_capture = window.clone();
         let canvas_for_capture = canvas.clone();
         let save_project_for_capture = save_project.clone();
+        let export_png_for_capture = export_png.clone();
+        let export_jpeg_for_capture = export_jpeg.clone();
+        let copy_for_capture = copy_to_clipboard_action.clone();
         new_screenshot.connect_activate(move |_, _| {
             let window = window_for_capture.clone();
             let canvas = canvas_for_capture.clone();
             let save_project = save_project_for_capture.clone();
+            let export_png = export_png_for_capture.clone();
+            let export_jpeg = export_jpeg_for_capture.clone();
+            let copy_to_clipboard_action = copy_for_capture.clone();
             glib::spawn_future_local(async move {
                 match CaptureService::capture().await {
                     Ok(Some(image)) => {
                         canvas.set_image(image);
-                        update_save_project_enabled(&canvas, &save_project);
+                        update_image_dependent_actions(
+                            &canvas,
+                            &save_project,
+                            &export_png,
+                            &export_jpeg,
+                            &copy_to_clipboard_action,
+                        );
                     }
                     Ok(None) | Err(CaptureError::PortalCancelled) => {}
                     Err(CaptureError::PortalUnavailable(msg)) => {
@@ -102,10 +131,16 @@ impl ObjectImpl for MainWindow {
         let window_for_open = window.clone();
         let canvas_for_open = canvas.clone();
         let save_project_for_open = save_project.clone();
+        let export_png_for_open = export_png.clone();
+        let export_jpeg_for_open = export_jpeg.clone();
+        let copy_for_open = copy_to_clipboard_action.clone();
         open_file.connect_activate(move |_, _| {
             let window = window_for_open.clone();
             let canvas = canvas_for_open.clone();
             let save_project = save_project_for_open.clone();
+            let export_png = export_png_for_open.clone();
+            let export_jpeg = export_jpeg_for_open.clone();
+            let copy_to_clipboard_action = copy_for_open.clone();
             glib::spawn_future_local(async move {
                 let filter = gtk::FileFilter::new();
                 filter.set_name(Some("PNG and JPEG Images"));
@@ -143,7 +178,13 @@ impl ObjectImpl for MainWindow {
                 match FileLoader::load_from_path(&path) {
                     Ok(image) => {
                         canvas.set_image(image);
-                        update_save_project_enabled(&canvas, &save_project);
+                        update_image_dependent_actions(
+                            &canvas,
+                            &save_project,
+                            &export_png,
+                            &export_jpeg,
+                            &copy_to_clipboard_action,
+                        );
                     }
                     Err(error) => {
                         let message = format_load_error(&path, &error);
@@ -185,7 +226,7 @@ impl ObjectImpl for MainWindow {
                 {
                     Ok(()) => {
                         update_window_title(&window, &path);
-                        update_save_project_enabled(&canvas, &save_project);
+                        save_project.set_enabled(canvas.source_image_path().is_some());
                     }
                     Err(err) => {
                         let message = format_persistence_error(&err);
@@ -222,7 +263,7 @@ impl ObjectImpl for MainWindow {
                 {
                     Ok(()) => {
                         update_window_title(&window, &path);
-                        update_save_project_enabled(&canvas, &save_project);
+                        save_project.set_enabled(canvas.source_image_path().is_some());
                     }
                     Err(err) => {
                         let message = format_persistence_error(&err);
@@ -238,10 +279,16 @@ impl ObjectImpl for MainWindow {
         let window_for_open_project = window.clone();
         let canvas_for_open_project = canvas.clone();
         let save_project_for_open_project = save_project.clone();
+        let export_png_for_open_project = export_png.clone();
+        let export_jpeg_for_open_project = export_jpeg.clone();
+        let copy_for_open_project = copy_to_clipboard_action.clone();
         open_project.connect_activate(move |_, _| {
             let window = window_for_open_project.clone();
             let canvas = canvas_for_open_project.clone();
             let save_project = save_project_for_open_project.clone();
+            let export_png = export_png_for_open_project.clone();
+            let export_jpeg = export_jpeg_for_open_project.clone();
+            let copy_to_clipboard_action = copy_for_open_project.clone();
             glib::spawn_future_local(async move {
                 let Some(path) = show_open_project_dialog(&window).await else {
                     return;
@@ -287,7 +334,13 @@ impl ObjectImpl for MainWindow {
                 );
                 canvas.imp().history.borrow_mut().clear();
                 update_window_title(&window, &path);
-                update_save_project_enabled(&canvas, &save_project);
+                update_image_dependent_actions(
+                    &canvas,
+                    &save_project,
+                    &export_png,
+                    &export_jpeg,
+                    &copy_to_clipboard_action,
+                );
             });
         });
         actions.add_action(&open_project);
@@ -336,6 +389,40 @@ impl ObjectImpl for MainWindow {
         });
         actions.add_action(&redo);
 
+        let window_for_export_png = window.clone();
+        let canvas_for_export_png = canvas.clone();
+        export_png.connect_activate(move |_, _| {
+            let window = window_for_export_png.clone();
+            let canvas = canvas_for_export_png.clone();
+            glib::spawn_future_local(async move {
+                let Some(path) = show_export_png_dialog(&window).await else {
+                    return;
+                };
+                export_rendered_image(&window, &canvas, &path, ExportFormat::Png).await;
+            });
+        });
+        actions.add_action(&export_png);
+
+        let window_for_export_jpeg = window.clone();
+        let canvas_for_export_jpeg = canvas.clone();
+        export_jpeg.connect_activate(move |_, _| {
+            let window = window_for_export_jpeg.clone();
+            let canvas = canvas_for_export_jpeg.clone();
+            glib::spawn_future_local(async move {
+                let Some(path) = show_export_jpeg_dialog(&window).await else {
+                    return;
+                };
+                export_rendered_image(&window, &canvas, &path, ExportFormat::Jpeg).await;
+            });
+        });
+        actions.add_action(&export_jpeg);
+
+        let canvas_for_copy = canvas.clone();
+        copy_to_clipboard_action.connect_activate(move |_, _| {
+            copy_canvas_to_clipboard(&canvas_for_copy);
+        });
+        actions.add_action(&copy_to_clipboard_action);
+
         let undo_for_cb = undo.clone();
         let redo_for_cb = redo.clone();
         let canvas_for_annotation_cb = canvas.clone();
@@ -350,6 +437,36 @@ impl ObjectImpl for MainWindow {
                     .project_manager
                     .borrow()
                     .maybe_auto_save(snapshot);
+            }
+
+            let imp = window_for_annotation_cb.imp();
+
+            if imp.auto_clipboard_enabled.get() {
+                cancel_clipboard_debounce(&imp.clipboard_debounce);
+
+                let canvas = canvas_for_annotation_cb.clone();
+                let window = window_for_annotation_cb.clone();
+                let id = glib::timeout_add_local_once(Duration::from_millis(300), move || {
+                    copy_canvas_to_clipboard(&canvas);
+                    *window.imp().clipboard_debounce.borrow_mut() = None;
+                });
+                *imp.clipboard_debounce.borrow_mut() = Some(id);
+            }
+
+            if imp.auto_export_enabled.get() {
+                if let Some(source_path) = canvas_for_annotation_cb.source_image_path() {
+                    if let Some(source) = canvas_for_annotation_cb.source_pixbuf() {
+                        let annotations = canvas_for_annotation_cb.all_annotations();
+                        if let Some(pixbuf) = renderer::render_to_pixbuf(&source, &annotations) {
+                            let suffix = imp.auto_export_suffix.borrow().clone();
+                            let export_path =
+                                auto_export::build_auto_export_path(&source_path, &suffix);
+                            if let Err(err) = exporter::export_png(&pixbuf, &export_path) {
+                                log::warn!("Auto-export failed: {err}");
+                            }
+                        }
+                    }
+                }
             }
         });
 
@@ -380,6 +497,24 @@ impl ObjectImpl for MainWindow {
             .action_name("win.open-project")
             .build();
         header.pack_start(&open_project_button);
+
+        let export_png_button = gtk::Button::builder()
+            .label("Export PNG")
+            .action_name("win.export-png")
+            .build();
+        header.pack_start(&export_png_button);
+
+        let export_jpeg_button = gtk::Button::builder()
+            .label("Export JPEG")
+            .action_name("win.export-jpeg")
+            .build();
+        header.pack_start(&export_jpeg_button);
+
+        let copy_button = gtk::Button::builder()
+            .label("Copy")
+            .action_name("win.copy-to-clipboard")
+            .build();
+        header.pack_start(&copy_button);
 
         let zoom_in_button = gtk::Button::builder()
             .label("+")
@@ -470,8 +605,129 @@ fn build_project_snapshot(canvas: &Canvas) -> Option<SheroProject> {
     })
 }
 
-fn update_save_project_enabled(canvas: &Canvas, action: &gio::SimpleAction) {
-    action.set_enabled(canvas.source_image_path().is_some());
+fn cancel_clipboard_debounce(debounce: &RefCell<Option<glib::SourceId>>) {
+    if let Some(id) = debounce.borrow_mut().take() {
+        // g_source_remove returns FALSE if the source already fired; SourceId::remove panics.
+        unsafe {
+            glib::ffi::g_source_remove(id.as_raw());
+        }
+    }
+}
+
+fn update_image_dependent_actions(
+    canvas: &Canvas,
+    save_project: &gio::SimpleAction,
+    export_png: &gio::SimpleAction,
+    export_jpeg: &gio::SimpleAction,
+    copy_to_clipboard: &gio::SimpleAction,
+) {
+    let enabled = canvas.source_image_path().is_some();
+    save_project.set_enabled(enabled);
+    export_png.set_enabled(enabled);
+    export_jpeg.set_enabled(enabled);
+    copy_to_clipboard.set_enabled(enabled);
+}
+
+enum ExportFormat {
+    Png,
+    Jpeg,
+}
+
+async fn export_rendered_image(
+    window: &super::MainWindow,
+    canvas: &Canvas,
+    path: &Path,
+    format: ExportFormat,
+) {
+    let Some(source) = canvas.source_pixbuf() else {
+        log::error!("Export failed: no source image loaded");
+        return;
+    };
+    let annotations = canvas.all_annotations();
+    let Some(pixbuf) = renderer::render_to_pixbuf(&source, &annotations) else {
+        log::error!("Export failed: could not render image");
+        return;
+    };
+
+    let result = match format {
+        ExportFormat::Png => exporter::export_png(&pixbuf, path),
+        ExportFormat::Jpeg => exporter::export_jpeg(&pixbuf, path),
+    };
+
+    if let Err(err) = result {
+        log::error!("Export failed: {err}");
+        show_error_dialog(window, "Export Failed", &err.to_string());
+    }
+}
+
+fn copy_canvas_to_clipboard(canvas: &Canvas) {
+    let Some(source) = canvas.source_pixbuf() else {
+        log::error!("Clipboard copy failed: no source image loaded");
+        return;
+    };
+    let annotations = canvas.all_annotations();
+    let Some(pixbuf) = renderer::render_to_pixbuf(&source, &annotations) else {
+        log::error!("Clipboard copy failed: could not render image");
+        return;
+    };
+    let Some(display) = gtk::gdk::Display::default() else {
+        log::error!("Clipboard copy failed: no display available");
+        return;
+    };
+    export::copy_to_clipboard(&display, &pixbuf);
+}
+
+async fn show_export_png_dialog(window: &super::MainWindow) -> Option<PathBuf> {
+    let filter = gtk::FileFilter::new();
+    filter.set_name(Some("PNG Images"));
+    filter.add_mime_type("image/png");
+    filter.add_pattern("*.png");
+
+    let filters = gio::ListStore::new::<gtk::FileFilter>();
+    filters.append(&filter);
+
+    let dialog = gtk::FileDialog::new();
+    dialog.set_title("Export PNG");
+    dialog.set_modal(true);
+    dialog.set_initial_name(Some("export.png"));
+    dialog.set_filters(Some(&filters));
+    dialog.set_default_filter(Some(&filter));
+
+    match dialog.save_future(Some(window)).await {
+        Ok(file) => file.path(),
+        Err(error) if error.matches(gio::IOErrorEnum::Cancelled) => None,
+        Err(error) => {
+            log::error!("Export PNG dialog failed: {error}");
+            None
+        }
+    }
+}
+
+async fn show_export_jpeg_dialog(window: &super::MainWindow) -> Option<PathBuf> {
+    let filter = gtk::FileFilter::new();
+    filter.set_name(Some("JPEG Images"));
+    filter.add_mime_type("image/jpeg");
+    filter.add_pattern("*.jpg");
+    filter.add_pattern("*.jpeg");
+
+    let filters = gio::ListStore::new::<gtk::FileFilter>();
+    filters.append(&filter);
+
+    let dialog = gtk::FileDialog::new();
+    dialog.set_title("Export JPEG");
+    dialog.set_modal(true);
+    dialog.set_initial_name(Some("export.jpg"));
+    dialog.set_filters(Some(&filters));
+    dialog.set_default_filter(Some(&filter));
+
+    match dialog.save_future(Some(window)).await {
+        Ok(file) => file.path(),
+        Err(error) if error.matches(gio::IOErrorEnum::Cancelled) => None,
+        Err(error) => {
+            log::error!("Export JPEG dialog failed: {error}");
+            None
+        }
+    }
 }
 
 fn update_window_title(window: &super::MainWindow, path: &Path) {
