@@ -5,7 +5,9 @@ use gtk::gio;
 use gtk::glib;
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
-use libadwaita::prelude::{AdwApplicationWindowExt, AdwDialogExt};
+use libadwaita::prelude::AdwApplicationWindowExt;
+
+use crate::ui::dialogs::show_error_dialog;
 use libadwaita::subclass::application_window::AdwApplicationWindowImpl;
 use libadwaita::subclass::window::AdwWindowImpl;
 
@@ -49,11 +51,11 @@ impl ObjectImpl for MainWindow {
                     Ok(None) | Err(CaptureError::PortalCancelled) => {}
                     Err(CaptureError::PortalUnavailable(msg)) => {
                         log::error!("Screenshot portal unavailable: {msg}");
-                        show_capture_error_dialog(&window, &msg);
+                        show_error_dialog(&window, "Screenshot Failed", &msg);
                     }
                     Err(CaptureError::ImageLoadFailed(msg)) => {
                         log::error!("Screenshot image load failed: {msg}");
-                        show_capture_error_dialog(&window, &msg);
+                        show_error_dialog(&window, "Screenshot Failed", &msg);
                     }
                 }
             });
@@ -96,7 +98,7 @@ impl ObjectImpl for MainWindow {
                 let Some(path) = file.path() else {
                     let message = "Selected file has no local path";
                     log::error!("{message}");
-                    show_load_error_dialog(&window, message);
+                    show_error_dialog(&window, "Open Failed", message);
                     return;
                 };
 
@@ -105,7 +107,7 @@ impl ObjectImpl for MainWindow {
                     Err(error) => {
                         let message = format_load_error(&path, &error);
                         log::error!("Failed to load image: {message}");
-                        show_load_error_dialog(&window, &message);
+                        show_error_dialog(&window, "Open Failed", &message);
                     }
                 }
             });
@@ -134,16 +136,6 @@ impl ObjectImpl for MainWindow {
 
         window.set_content(Some(&toolbar_view));
     }
-}
-
-fn show_capture_error_dialog(window: &super::MainWindow, message: &str) {
-    let dialog = libadwaita::AlertDialog::new(Some("Screenshot Failed"), Some(message));
-    dialog.present(Some(window));
-}
-
-fn show_load_error_dialog(window: &super::MainWindow, message: &str) {
-    let dialog = libadwaita::AlertDialog::new(Some("Open Failed"), Some(message));
-    dialog.present(Some(window));
 }
 
 fn format_load_error(path: &Path, error: &LoadError) -> String {
