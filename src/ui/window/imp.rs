@@ -6,6 +6,8 @@ use libadwaita::prelude::AdwApplicationWindowExt;
 use libadwaita::subclass::application_window::AdwApplicationWindowImpl;
 use libadwaita::subclass::window::AdwWindowImpl;
 
+use crate::canvas::Canvas;
+
 #[derive(Default)]
 pub struct MainWindow;
 
@@ -48,11 +50,11 @@ impl ObjectImpl for MainWindow {
             .build();
         header.pack_start(&open_button);
 
-        let placeholder = gtk::Box::new(gtk::Orientation::Vertical, 0);
+        let canvas = Canvas::new();
 
         let toolbar_view = libadwaita::ToolbarView::new();
         toolbar_view.add_top_bar(&header);
-        toolbar_view.set_content(Some(&placeholder));
+        toolbar_view.set_content(Some(&canvas));
 
         window.set_content(Some(&toolbar_view));
     }
