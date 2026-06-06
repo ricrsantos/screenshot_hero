@@ -17,6 +17,7 @@ use crate::capture::{CaptureError, CaptureService, FileLoader, LoadError};
 #[derive(Default)]
 pub struct MainWindow {
     pub(crate) canvas: OnceCell<Canvas>,
+    zoom_label: OnceCell<gtk::Label>,
 }
 
 #[glib::object_subclass]
@@ -36,6 +37,16 @@ impl ObjectImpl for MainWindow {
         self.canvas
             .set(canvas.clone())
             .expect("canvas initialized once");
+
+        let zoom_label = gtk::Label::new(Some("100%"));
+        self.zoom_label
+            .set(zoom_label.clone())
+            .expect("zoom_label initialized once");
+
+        let zoom_label_for_cb = zoom_label.clone();
+        canvas.on_zoom_changed(move |zoom| {
+            zoom_label_for_cb.set_text(&format!("{}%", (zoom * 100.0).round() as i32));
+        });
 
         let actions = gio::SimpleActionGroup::new();
 
@@ -114,6 +125,34 @@ impl ObjectImpl for MainWindow {
         });
         actions.add_action(&open_file);
 
+        let zoom_in = gio::SimpleAction::new("zoom-in", None);
+        let canvas_for_zoom_in = canvas.clone();
+        zoom_in.connect_activate(move |_, _| {
+            canvas_for_zoom_in.zoom_in();
+        });
+        actions.add_action(&zoom_in);
+
+        let zoom_out = gio::SimpleAction::new("zoom-out", None);
+        let canvas_for_zoom_out = canvas.clone();
+        zoom_out.connect_activate(move |_, _| {
+            canvas_for_zoom_out.zoom_out();
+        });
+        actions.add_action(&zoom_out);
+
+        let zoom_fit = gio::SimpleAction::new("zoom-fit", None);
+        let canvas_for_zoom_fit = canvas.clone();
+        zoom_fit.connect_activate(move |_, _| {
+            canvas_for_zoom_fit.fit_to_window();
+        });
+        actions.add_action(&zoom_fit);
+
+        let zoom_100 = gio::SimpleAction::new("zoom-100", None);
+        let canvas_for_zoom_100 = canvas.clone();
+        zoom_100.connect_activate(move |_, _| {
+            canvas_for_zoom_100.zoom_100();
+        });
+        actions.add_action(&zoom_100);
+
         window.insert_action_group("win", Some(&actions));
 
         let header = libadwaita::HeaderBar::new();
@@ -129,6 +168,30 @@ impl ObjectImpl for MainWindow {
             .action_name("win.open-file")
             .build();
         header.pack_start(&open_button);
+
+        let zoom_in_button = gtk::Button::builder()
+            .label("+")
+            .action_name("win.zoom-in")
+            .build();
+        let zoom_out_button = gtk::Button::builder()
+            .label("-")
+            .action_name("win.zoom-out")
+            .build();
+        let zoom_fit_button = gtk::Button::builder()
+            .label("fit")
+            .action_name("win.zoom-fit")
+            .build();
+        let zoom_100_button = gtk::Button::builder()
+            .label("1:1")
+            .action_name("win.zoom-100")
+            .build();
+
+        // pack_end: first = nearest title, last = outermost right → [label][1:1][fit][-][+]
+        header.pack_end(&zoom_label);
+        header.pack_end(&zoom_100_button);
+        header.pack_end(&zoom_fit_button);
+        header.pack_end(&zoom_out_button);
+        header.pack_end(&zoom_in_button);
 
         let toolbar_view = libadwaita::ToolbarView::new();
         toolbar_view.add_top_bar(&header);
