@@ -6,11 +6,15 @@
 
 ## Current Focus
 
-**Feature:** PRD-005 - Export and Clipboard  
-**Phase:** Planning complete → Ready to Execute (tasks in `.specs/features/export-and-clipboard/tasks.md`)  
-**Next action:** Execute T1–T4 in parallel (pure Rust export module), then T5–T9 sequentially
+**Feature:** PRD-006 - Settings and Preferences  
+**Phase:** Planning complete → Ready to Execute (tasks in `.specs/features/settings-and-preferences/tasks.md`)  
+**Next action:** Execute T1 (GSettings schema) → T2 (AppSettings module); then T3–T6 (UI) sequential; T7+T8 parallel; T9 (wiring); T10 (build) independent after T1
 
 ### Previous Focus
+
+**Feature:** PRD-005 - Export and Clipboard  
+**Phase:** Planning complete → Ready to Execute (tasks in `.specs/features/export-and-clipboard/tasks.md`)  
+**Next action (deferred):** Execute T1–T4 in parallel (pure Rust export module), then T5–T9 sequentially
 
 **Feature:** PRD-004 - Project Management  
 **Phase:** Implemented (T1–T8 complete)  
@@ -35,7 +39,13 @@
 |------|----------|-----------|
 | 2026-06-06 | Off-screen render uses `cairo::Format::ARgb32` + manual BGRA→RGBA + un-premultiply conversion | Required for annotation alpha blending; avoids additional crate dependency; `Pixbuf::from_bytes` accepts raw RGBA |
 | 2026-06-06 | Auto-export always produces PNG (not JPEG) | ADR-001 specifies `original_name_shero.png`; PNG is lossless, appropriate for screenshots |
-| 2026-06-06 | Export config stored as `Cell<bool>` / `RefCell<String>` fields in `MainWindow` | PRD-006 (Settings) will later replace these with GSettings-backed persistence; minimal coupling for now |
+| 2026-06-06 | GSettings schema ID: `com.screenshot_hero.ScreenshotHero`, path `/com/screenshot_hero/ScreenshotHero/` | Matches app-id in Flatpak manifest and `Application::new()` property |
+| 2026-06-06 | `env_logger` not yet initialized anywhere — currently all `log::*` calls are silent | Will be fixed in PRD-006 T7: `env_logger::Builder::new().filter_level(Trace).init()` in `Application::startup()` |
+| 2026-06-06 | GSettings `color-scheme` mapped to `adw::StyleManager::set_color_scheme()` using `ColorScheme::Default / ForceLight / ForceDark` | Libadwaita-native; avoids custom theme switching |
+| 2026-06-06 | `log::set_max_level()` used for runtime log level changes | Works with env_logger because `log` checks max level before dispatching; no logger reinit needed |
+| 2026-06-06 | `AppSettings::try_new()` returns `Option<Self>` for graceful degradation when GSettings schema is absent | Prevents crash on dev machines without compiled schema; fallback to hardcoded defaults |
+| 2026-06-06 | Dev run requires: `glib-compile-schemas data/ && GSETTINGS_SCHEMA_DIR=data/ cargo run` | GSettings schema must be compiled before any `gio::Settings::new()` call |
+| 2026-06-06 | Export config stored as `Cell<bool>` / `RefCell<String>` fields in `MainWindow` | PRD-006 T8 will replace these with GSettings reads; fields removed from struct |
 | 2026-06-06 | Debounce via `glib::timeout_add_local_once` + `SourceId::remove()` stored in `RefCell<Option<glib::SourceId>>` | GLib main-thread safe; consistent with project's use of GLib primitives; 300ms per ADR-001 |
 | 2026-06-06 | No new crate dependencies for export/clipboard | All required APIs available via existing `gtk`, `glib`, `gdk-pixbuf`; keeps Flatpak manifest clean |
 | 2026-06-06 | Add serde derives directly to `src/annotations/model.rs` (no DTO layer) | All model types are pure Rust with no GTK dependency; avoids redundant struct definitions; all crates (`serde`, `serde_json`, `uuid` serde feature) are already in Cargo.toml |
@@ -74,6 +84,15 @@
 ---
 
 ## Todos
+
+### PRD-006 — Settings and Preferences
+
+- [ ] PRD-006 T2: Verify `gio::Settings::bind()` availability and parameter signature for string keys (EntryRow binding) in gio-rs 0.20
+- [ ] PRD-006 T2: Verify `adw::ComboRow` manual `connect_selected_notify` vs `gio::Settings::bind()` — enum-backed ComboRows may need custom position mapping
+- [ ] PRD-006 T7: Confirm `env_logger::Builder::filter_level(LevelFilter::Trace).init()` call order vs GLib initialization (must be after glib is ready but before any log call)
+- [ ] PRD-006 T8: Confirm `gio::Settings::boolean()` / `gio::Settings::string()` are available on `gio::Settings` (not just via `SettingsExt`) in gio-rs 0.20
+
+
 
 - [x] PRD-004 T7: Verify `gtk::FileDialog` filter API for `.shero` extension (pattern vs mime type) in gtk4-rs 0.9 — uses `add_pattern("*.shero")`
 - [x] PRD-004 T7: Confirm `Application::set_accels_for_action` is accessible at startup phase for `win.save-project` → Ctrl+S — wired in `application.rs`
