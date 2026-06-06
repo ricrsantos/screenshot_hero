@@ -14,7 +14,8 @@ use libadwaita::subclass::window::AdwWindowImpl;
 use crate::canvas::Canvas;
 use crate::capture::{CaptureError, CaptureService, FileLoader, LoadError};
 use crate::persistence::{
-    PersistenceError, ProjectManager, ProjectMetadata, SheroProject, SourceImageRecord, ViewState,
+    is_portal_document_path, PersistenceError, ProjectManager, ProjectMetadata, SheroProject,
+    SourceImageRecord, ViewState,
 };
 use crate::ui::ToolPalette;
 
@@ -474,12 +475,25 @@ fn update_save_project_enabled(canvas: &Canvas, action: &gio::SimpleAction) {
 }
 
 fn update_window_title(window: &super::MainWindow, path: &Path) {
-    if let Some(name) = path.file_name() {
-        window.set_title(Some(&format!(
-            "{} - Screenshot Hero",
-            name.to_string_lossy()
-        )));
+    window.set_title(Some(&format!(
+        "{} - Screenshot Hero",
+        project_display_name(path)
+    )));
+}
+
+/// Portal staging paths look like `.xdp-cap2.shero.tmp-ifkkL1`; extract the user-chosen name.
+fn project_display_name(path: &Path) -> String {
+    let Some(name) = path.file_name().and_then(|n| n.to_str()) else {
+        return path.display().to_string();
+    };
+
+    if let Some(rest) = name.strip_prefix(".xdp-") {
+        if let Some(chosen) = rest.split(".tmp-").next() {
+            return chosen.to_string();
+        }
     }
+
+    name.to_string()
 }
 
 fn format_persistence_error(err: &PersistenceError) -> String {
@@ -501,6 +515,7 @@ async fn show_save_project_dialog(window: &super::MainWindow) -> Option<PathBuf>
     let dialog = gtk::FileDialog::new();
     dialog.set_title("Save Project");
     dialog.set_modal(true);
+    dialog.set_initial_name(Some("project.shero"));
     dialog.set_filters(Some(&filters));
     dialog.set_default_filter(Some(&filter));
 
@@ -513,10 +528,19 @@ async fn show_save_project_dialog(window: &super::MainWindow) -> Option<PathBuf>
         }
     };
 
-    let mut path = file.path()?;
-    if path.extension().is_none_or(|ext| ext != "shero") {
+    let Some(mut path) = file.path() else {
+        return None;
+    };
+
+    // Flatpak grants write access only to the exact portal staging path (e.g.
+    // `.xdp-cap2.shero.tmp-ifkkL1`). Mutating the extension would point at an
+    // unauthorized neighbor path and leave an empty staging file behind.
+    if !is_portal_document_path(&path)
+        && path.extension().is_none_or(|ext| ext != "shero")
+    {
         path.set_extension("shero");
     }
+
     Some(path)
 }
 

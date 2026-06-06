@@ -7,3 +7,4 @@ mod serializer;
 pub use error::PersistenceError;
 pub use manager::ProjectManager;
 pub use model::{ProjectMetadata, SheroProject, SourceImageRecord, ViewState};
+pub use serializer::is_portal_document_path;

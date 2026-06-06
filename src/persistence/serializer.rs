@@ -4,14 +4,29 @@ use std::path::Path;
 use super::error::PersistenceError;
 use super::model::SheroProject;
 
+/// Flatpak / xdg-desktop-portal grants write access only to the exact file
+/// returned by the save dialog. Creating a sibling `.tmp` and renaming fails
+/// (no "neighbor" permission), leaving orphaned `.xdp-*.tmp-*` staging files.
+pub fn is_portal_document_path(path: &Path) -> bool {
+    let s = path.to_string_lossy();
+    if s.contains(".xdp-") {
+        return true;
+    }
+    s.starts_with("/run/user/") && s.contains("/doc/")
+}
+
 pub fn save_project(path: &Path, project: &SheroProject) -> Result<(), PersistenceError> {
     let json = serde_json::to_string_pretty(project).map_err(PersistenceError::Json)?;
 
-    let mut temp_path = path.as_os_str().to_os_string();
-    temp_path.push(".tmp");
+    if is_portal_document_path(path) {
+        fs::write(path, json).map_err(PersistenceError::Io)?;
+    } else {
+        let mut temp_path = path.as_os_str().to_os_string();
+        temp_path.push(".tmp");
 
-    fs::write(&temp_path, json).map_err(PersistenceError::Io)?;
-    fs::rename(&temp_path, path).map_err(PersistenceError::Io)?;
+        fs::write(&temp_path, json).map_err(PersistenceError::Io)?;
+        fs::rename(&temp_path, path).map_err(PersistenceError::Io)?;
+    }
 
     Ok(())
 }
@@ -54,6 +69,20 @@ mod tests {
                 app_version: "0.1.0".to_string(),
             },
         }
+    }
+
+    #[test]
+    fn portal_document_paths_are_detected() {
+        assert!(is_portal_document_path(Path::new(
+            "/run/user/1000/doc/.xdp-cap2.shero.tmp-ifkkL1"
+        )));
+        assert!(is_portal_document_path(Path::new(
+            "/run/user/1000/doc/abc123/myproject.shero"
+        )));
+        assert!(!is_portal_document_path(Path::new("/tmp/myproject.shero")));
+        assert!(!is_portal_document_path(Path::new(
+            "/home/user/Pictures/myproject.shero"
+        )));
     }
 
     #[test]
