@@ -1,4 +1,5 @@
 use std::cell::OnceCell;
+use std::path::Path;
 
 use gtk::gio;
 use gtk::glib;
@@ -9,7 +10,7 @@ use libadwaita::subclass::application_window::AdwApplicationWindowImpl;
 use libadwaita::subclass::window::AdwWindowImpl;
 
 use crate::canvas::Canvas;
-use crate::capture::{CaptureError, CaptureService};
+use crate::capture::{CaptureError, CaptureService, FileLoader, LoadError};
 
 #[derive(Default)]
 pub struct MainWindow {
@@ -60,7 +61,55 @@ impl ObjectImpl for MainWindow {
         actions.add_action(&new_screenshot);
 
         let open_file = gio::SimpleAction::new("open-file", None);
-        open_file.connect_activate(|_, _| {});
+        let window_for_open = window.clone();
+        let canvas_for_open = canvas.clone();
+        open_file.connect_activate(move |_, _| {
+            let window = window_for_open.clone();
+            let canvas = canvas_for_open.clone();
+            glib::spawn_future_local(async move {
+                let filter = gtk::FileFilter::new();
+                filter.set_name(Some("PNG and JPEG Images"));
+                filter.add_mime_type("image/png");
+                filter.add_mime_type("image/jpeg");
+                filter.add_pattern("*.png");
+                filter.add_pattern("*.jpg");
+                filter.add_pattern("*.jpeg");
+
+                let filters = gio::ListStore::new::<gtk::FileFilter>();
+                filters.append(&filter);
+
+                let dialog = gtk::FileDialog::new();
+                dialog.set_title("Open Image");
+                dialog.set_modal(true);
+                dialog.set_filters(Some(&filters));
+                dialog.set_default_filter(Some(&filter));
+
+                let file = match dialog.open_future(Some(&window)).await {
+                    Ok(file) => file,
+                    Err(error) if error.matches(gio::IOErrorEnum::Cancelled) => return,
+                    Err(error) => {
+                        log::error!("File dialog failed: {error}");
+                        return;
+                    }
+                };
+
+                let Some(path) = file.path() else {
+                    let message = "Selected file has no local path";
+                    log::error!("{message}");
+                    show_load_error_dialog(&window, message);
+                    return;
+                };
+
+                match FileLoader::load_from_path(&path) {
+                    Ok(image) => canvas.set_image(image),
+                    Err(error) => {
+                        let message = format_load_error(&path, &error);
+                        log::error!("Failed to load image: {message}");
+                        show_load_error_dialog(&window, &message);
+                    }
+                }
+            });
+        });
         actions.add_action(&open_file);
 
         window.insert_action_group("win", Some(&actions));
@@ -90,6 +139,22 @@ impl ObjectImpl for MainWindow {
 fn show_capture_error_dialog(window: &super::MainWindow, message: &str) {
     let dialog = libadwaita::AlertDialog::new(Some("Screenshot Failed"), Some(message));
     dialog.present(Some(window));
+}
+
+fn show_load_error_dialog(window: &super::MainWindow, message: &str) {
+    let dialog = libadwaita::AlertDialog::new(Some("Open Failed"), Some(message));
+    dialog.present(Some(window));
+}
+
+fn format_load_error(path: &Path, error: &LoadError) -> String {
+    let reason = match error {
+        LoadError::FileNotFound(_) => "file not found".to_string(),
+        LoadError::UnsupportedFormat(_) => "unsupported format".to_string(),
+        LoadError::DecodeFailed(message) => message.clone(),
+        LoadError::InvalidUri(message) => message.clone(),
+    };
+
+    format!("{}: {reason}", path.display())
 }
 
 impl WidgetImpl for MainWindow {}
