@@ -66,10 +66,24 @@ cargo test --lib
 
 ## Run with Cargo (development)
 
-From the project root, build and run the application directly:
+`cargo run` compiles the GSettings schema automatically during the build. No extra setup is required for preferences and persisted settings to work.
 
 ```bash
 cargo run
+```
+
+If you change `data/*.gschema.xml`, rebuild so the schema is recompiled:
+
+```bash
+cargo build
+cargo run
+```
+
+For manual schema compilation (optional):
+
+```bash
+glib-compile-schemas data/
+GSETTINGS_SCHEMA_DIR=data/ cargo run
 ```
 
 With logging enabled:

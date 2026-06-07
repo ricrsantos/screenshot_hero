@@ -25,6 +25,8 @@ modules:
       - cargo --offline fetch --manifest-path Cargo.toml --verbose
       - cargo --offline build --release --bin screenshot-hero
       - install -Dm755 target/release/screenshot-hero ${FLATPAK_DEST}/bin/screenshot-hero
+      - install -Dm0644 data/com.screenshot_hero.ScreenshotHero.gschema.xml ${FLATPAK_DEST}/share/glib-2.0/schemas/com.screenshot_hero.ScreenshotHero.gschema.xml
+      - glib-compile-schemas ${FLATPAK_DEST}/share/glib-2.0/schemas/
     sources:
       - cargo-sources.json
       - type: dir

@@ -1,4 +1,5 @@
 pub mod dialogs;
+pub mod preferences;
 pub mod tool_palette;
 pub mod window;
 

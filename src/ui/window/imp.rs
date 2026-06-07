@@ -1,4 +1,4 @@
-use std::cell::{Cell, OnceCell, RefCell};
+use std::cell::{OnceCell, RefCell};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
@@ -19,6 +19,8 @@ use crate::persistence::{
     is_portal_document_path, PersistenceError, ProjectManager, ProjectMetadata, SheroProject,
     SourceImageRecord, ViewState,
 };
+use crate::settings::AppSettings;
+use crate::ui::preferences::PreferencesWindow;
 use crate::ui::ToolPalette;
 
 pub struct MainWindow {
@@ -27,9 +29,7 @@ pub struct MainWindow {
     zoom_label: OnceCell<gtk::Label>,
     project_manager: RefCell<ProjectManager>,
     clipboard_debounce: RefCell<Option<glib::SourceId>>,
-    auto_clipboard_enabled: Cell<bool>,
-    auto_export_enabled: Cell<bool>,
-    auto_export_suffix: RefCell<String>,
+    settings: OnceCell<gio::Settings>,
 }
 
 impl Default for MainWindow {
@@ -40,9 +40,7 @@ impl Default for MainWindow {
             zoom_label: OnceCell::new(),
             project_manager: RefCell::new(ProjectManager::new()),
             clipboard_debounce: RefCell::new(None),
-            auto_clipboard_enabled: Cell::new(true),
-            auto_export_enabled: Cell::new(false),
-            auto_export_suffix: RefCell::new("_shero".to_string()),
+            settings: OnceCell::new(),
         }
     }
 }
@@ -57,6 +55,17 @@ impl ObjectSubclass for MainWindow {
 impl ObjectImpl for MainWindow {
     fn constructed(&self) {
         self.parent_constructed();
+
+        match AppSettings::try_new() {
+            Some(app_settings) => {
+                let _ = self
+                    .settings
+                    .set(app_settings.settings().clone());
+            }
+            None => log::warn!(
+                "GSettings schema unavailable; using hardcoded defaults for automation settings"
+            ),
+        }
 
         let window = self.obj();
 
@@ -423,6 +432,20 @@ impl ObjectImpl for MainWindow {
         });
         actions.add_action(&copy_to_clipboard_action);
 
+        let show_preferences = gio::SimpleAction::new("show-preferences", None);
+        let window_for_prefs = window.clone();
+        show_preferences.connect_activate(move |_, _| {
+            let imp = window_for_prefs.imp();
+            if let Some(settings) = imp.settings.get() {
+                let prefs = PreferencesWindow::new(settings);
+                prefs.set_transient_for(Some(&window_for_prefs));
+                prefs.present();
+            } else {
+                log::warn!("Cannot open preferences: GSettings schema unavailable");
+            }
+        });
+        actions.add_action(&show_preferences);
+
         let undo_for_cb = undo.clone();
         let redo_for_cb = redo.clone();
         let canvas_for_annotation_cb = canvas.clone();
@@ -431,17 +454,15 @@ impl ObjectImpl for MainWindow {
             undo_for_cb.set_enabled(canvas_for_annotation_cb.can_undo());
             redo_for_cb.set_enabled(canvas_for_annotation_cb.can_redo());
 
-            if let Some(snapshot) = build_project_snapshot(&canvas_for_annotation_cb) {
-                window_for_annotation_cb
-                    .imp()
-                    .project_manager
-                    .borrow()
-                    .maybe_auto_save(snapshot);
-            }
-
             let imp = window_for_annotation_cb.imp();
 
-            if imp.auto_clipboard_enabled.get() {
+            if settings_boolean(&imp.settings, "auto-save-enabled", true) {
+                if let Some(snapshot) = build_project_snapshot(&canvas_for_annotation_cb) {
+                    imp.project_manager.borrow().maybe_auto_save(snapshot);
+                }
+            }
+
+            if settings_boolean(&imp.settings, "auto-clipboard-enabled", true) {
                 cancel_clipboard_debounce(&imp.clipboard_debounce);
 
                 let canvas = canvas_for_annotation_cb.clone();
@@ -453,12 +474,13 @@ impl ObjectImpl for MainWindow {
                 *imp.clipboard_debounce.borrow_mut() = Some(id);
             }
 
-            if imp.auto_export_enabled.get() {
+            if settings_boolean(&imp.settings, "auto-export-enabled", false) {
                 if let Some(source_path) = canvas_for_annotation_cb.source_image_path() {
                     if let Some(source) = canvas_for_annotation_cb.source_pixbuf() {
                         let annotations = canvas_for_annotation_cb.all_annotations();
                         if let Some(pixbuf) = renderer::render_to_pixbuf(&source, &annotations) {
-                            let suffix = imp.auto_export_suffix.borrow().clone();
+                            let suffix =
+                                settings_string(&imp.settings, "auto-export-suffix", "_shero");
                             let export_path =
                                 auto_export::build_auto_export_path(&source_path, &suffix);
                             if let Err(err) = exporter::export_png(&pixbuf, &export_path) {
@@ -533,8 +555,14 @@ impl ObjectImpl for MainWindow {
             .action_name("win.zoom-100")
             .build();
 
-        // pack_end: first = nearest title, last = outermost right → [label][1:1][fit][-][+]
+        let preferences_button = gtk::Button::builder()
+            .icon_name("preferences-system-symbolic")
+            .action_name("win.show-preferences")
+            .build();
+
+        // pack_end: first = nearest title, last = outermost right → [label][1:1][fit][-][+][prefs]
         header.pack_end(&zoom_label);
+        header.pack_end(&preferences_button);
         header.pack_end(&zoom_100_button);
         header.pack_end(&zoom_fit_button);
         header.pack_end(&zoom_out_button);
@@ -603,6 +631,20 @@ fn build_project_snapshot(canvas: &Canvas) -> Option<SheroProject> {
             app_version: String::new(),
         },
     })
+}
+
+fn settings_boolean(settings: &OnceCell<gio::Settings>, key: &str, default: bool) -> bool {
+    settings
+        .get()
+        .map(|s| s.boolean(key))
+        .unwrap_or(default)
+}
+
+fn settings_string(settings: &OnceCell<gio::Settings>, key: &str, default: &str) -> String {
+    settings
+        .get()
+        .map(|s| s.string(key).to_string())
+        .unwrap_or_else(|| default.to_string())
 }
 
 fn cancel_clipboard_debounce(debounce: &RefCell<Option<glib::SourceId>>) {

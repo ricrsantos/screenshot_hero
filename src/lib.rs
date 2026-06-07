@@ -1,5 +1,6 @@
 mod application;
 pub mod annotations;
+pub mod settings;
 mod canvas;
 mod capture;
 pub mod export;
