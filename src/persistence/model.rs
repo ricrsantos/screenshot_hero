@@ -74,8 +74,7 @@ mod tests {
     fn shero_project_round_trips_through_json() {
         let original = sample_project();
         let json = serde_json::to_string(&original).expect("serialize SheroProject");
-        let restored: SheroProject =
-            serde_json::from_str(&json).expect("deserialize SheroProject");
+        let restored: SheroProject = serde_json::from_str(&json).expect("deserialize SheroProject");
         assert_eq!(original, restored);
     }
 }

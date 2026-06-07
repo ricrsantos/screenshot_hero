@@ -18,15 +18,7 @@ pub fn render_to_pixbuf(source: &Pixbuf, annotations: &[Annotation]) -> Option<P
     cr.set_source_pixbuf(source, 0.0, 0.0);
     let _ = cr.paint();
 
-    draw_all(
-        &cr,
-        annotations,
-        None,
-        Some(source),
-        1.0,
-        0.0,
-        0.0,
-    );
+    draw_all(&cr, annotations, None, Some(source), 1.0, 0.0, 0.0);
 
     surface_to_pixbuf(&surface)
 }
@@ -114,9 +106,7 @@ mod tests {
 
     #[test]
     fn test_render_flat_ellipse_does_not_panic() {
-        use crate::annotations::{
-            Annotation, AnnotationKind, AnnotationStyle, Color, Rect,
-        };
+        use crate::annotations::{Annotation, AnnotationKind, AnnotationStyle, Color, Rect};
         use uuid::Uuid;
 
         let source = test_pixbuf(100, 80);

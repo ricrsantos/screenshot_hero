@@ -65,10 +65,8 @@ impl ToolPalette {
 
         let tool_changed_cb: Rc<RefCell<Option<Box<dyn Fn(ActiveTool)>>>> =
             Rc::new(RefCell::new(None));
-        let color_changed_cb: Rc<RefCell<Option<Box<dyn Fn(Color)>>>> =
-            Rc::new(RefCell::new(None));
-        let stroke_changed_cb: Rc<RefCell<Option<Box<dyn Fn(f32)>>>> =
-            Rc::new(RefCell::new(None));
+        let color_changed_cb: Rc<RefCell<Option<Box<dyn Fn(Color)>>>> = Rc::new(RefCell::new(None));
+        let stroke_changed_cb: Rc<RefCell<Option<Box<dyn Fn(f32)>>>> = Rc::new(RefCell::new(None));
 
         for (tool, btn) in &tool_buttons {
             let tool = *tool;

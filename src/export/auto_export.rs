@@ -22,29 +22,20 @@ mod tests {
     fn test_build_auto_export_path_png() {
         let source = PathBuf::from("/home/u/Screenshots/shot.png");
         let result = build_auto_export_path(&source, "_shero");
-        assert_eq!(
-            result,
-            PathBuf::from("/home/u/Screenshots/shot_shero.png")
-        );
+        assert_eq!(result, PathBuf::from("/home/u/Screenshots/shot_shero.png"));
     }
 
     #[test]
     fn test_build_auto_export_path_jpeg_source() {
         let source = PathBuf::from("/home/u/Screenshots/shot.jpg");
         let result = build_auto_export_path(&source, "_shero");
-        assert_eq!(
-            result,
-            PathBuf::from("/home/u/Screenshots/shot_shero.png")
-        );
+        assert_eq!(result, PathBuf::from("/home/u/Screenshots/shot_shero.png"));
     }
 
     #[test]
     fn test_build_auto_export_path_no_extension() {
         let source = PathBuf::from("/home/u/Screenshots/shot");
         let result = build_auto_export_path(&source, "_shero");
-        assert_eq!(
-            result,
-            PathBuf::from("/home/u/Screenshots/shot_shero.png")
-        );
+        assert_eq!(result, PathBuf::from("/home/u/Screenshots/shot_shero.png"));
     }
 }

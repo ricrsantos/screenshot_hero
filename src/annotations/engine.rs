@@ -174,9 +174,7 @@ fn scale_point_in_rect(p: Point, from: Rect, to: Rect) -> Point {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::annotations::model::{
-        AnnotationKind, AnnotationStyle, CalloutData, TextData,
-    };
+    use crate::annotations::model::{AnnotationKind, AnnotationStyle, CalloutData, TextData};
 
     fn rect_at(x: f64, y: f64, w: f64, h: f64) -> Rect {
         Rect {

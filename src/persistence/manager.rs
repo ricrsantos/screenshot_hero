@@ -144,7 +144,10 @@ mod tests {
         let first = deserializer::load_project(&path).expect("read after first save");
         assert!(!first.metadata.created_at.is_empty());
         assert!(!first.metadata.modified_at.is_empty());
-        assert_eq!(manager.created_at.as_deref(), Some(first.metadata.created_at.as_str()));
+        assert_eq!(
+            manager.created_at.as_deref(),
+            Some(first.metadata.created_at.as_str())
+        );
 
         thread::sleep(Duration::from_secs(1));
 

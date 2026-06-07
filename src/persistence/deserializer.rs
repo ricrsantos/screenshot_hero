@@ -6,8 +6,7 @@ use crate::persistence::model::SheroProject;
 
 pub fn load_project(path: &Path) -> Result<SheroProject, PersistenceError> {
     let contents = fs::read_to_string(path).map_err(PersistenceError::Io)?;
-    let project: SheroProject =
-        serde_json::from_str(&contents).map_err(PersistenceError::Json)?;
+    let project: SheroProject = serde_json::from_str(&contents).map_err(PersistenceError::Json)?;
     if project.version != 1 {
         return Err(PersistenceError::UnsupportedVersion(project.version));
     }
@@ -79,10 +78,7 @@ mod tests {
 
         let err = load_project(&path).expect_err("unsupported version should fail");
 
-        assert!(matches!(
-            err,
-            PersistenceError::UnsupportedVersion(2)
-        ));
+        assert!(matches!(err, PersistenceError::UnsupportedVersion(2)));
     }
 
     #[test]

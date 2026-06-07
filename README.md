@@ -72,6 +72,12 @@ cargo test --lib
 cargo run
 ```
 
+Start directly in capture mode (opens GNOME/XDG capture UI first, then loads result in Screenshot Hero):
+
+```bash
+cargo run -- --capture
+```
+
 If you change `data/*.gschema.xml`, rebuild so the schema is recompiled:
 
 ```bash
@@ -90,6 +96,12 @@ With logging enabled:
 
 ```bash
 RUST_LOG=info cargo run
+```
+
+With capture mode and logging:
+
+```bash
+RUST_LOG=info cargo run -- --capture
 ```
 
 Use **New Screenshot** to capture via the portal, or **Open File** to load a PNG/JPEG image.
@@ -122,7 +134,21 @@ flatpak-builder --user --install build-dir build/com.screenshot_hero.ScreenshotH
 flatpak run com.screenshot_hero.ScreenshotHero
 ```
 
+Run the installed Flatpak directly in capture mode:
+
+```bash
+flatpak run com.screenshot_hero.ScreenshotHero --capture
+```
+
 > Always validate the installed app with `flatpak run`, not only `flatpak-builder --build-only`. The installed runtime matches what end users get.
+
+## Run compiled binary
+
+After `cargo build`:
+
+```bash
+./target/debug/screenshot-hero --capture
+```
 
 ## Project layout
 

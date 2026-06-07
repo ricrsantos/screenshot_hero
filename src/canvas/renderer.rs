@@ -220,9 +220,15 @@ fn draw_effect_placeholder(cr: &cairo::Context, bounds: &Rect, style: &Annotatio
     let _ = cr.fill();
 }
 
-fn draw_blur(cr: &cairo::Context, bounds: &Rect, source: Option<&Pixbuf>, _style: &AnnotationStyle) {
+fn draw_blur(
+    cr: &cairo::Context,
+    bounds: &Rect,
+    source: Option<&Pixbuf>,
+    _style: &AnnotationStyle,
+) {
     if let Some(pixbuf) = source {
-        if let Some(effect) = extract_scaled_region(pixbuf, bounds, 8, gdk_pixbuf::InterpType::Bilinear)
+        if let Some(effect) =
+            extract_scaled_region(pixbuf, bounds, 8, gdk_pixbuf::InterpType::Bilinear)
         {
             cr.save().expect("cairo save");
             cr.translate(bounds.x, bounds.y);

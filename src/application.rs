@@ -1,6 +1,37 @@
-use gtk::glib;
 use gtk::gio;
+use gtk::glib;
 use gtk::prelude::ApplicationExtManual;
+use gtk::subclass::prelude::ObjectSubclassIsExt;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LaunchOptions {
+    pub start_with_capture: bool,
+    pub passthrough_args: Vec<String>,
+}
+
+impl LaunchOptions {
+    pub fn parse<I, S>(args: I) -> Self
+    where
+        I: IntoIterator<Item = S>,
+        S: Into<String>,
+    {
+        let mut start_with_capture = false;
+        let mut passthrough_args = Vec::new();
+
+        for arg in args.into_iter().map(Into::into) {
+            if arg == "--capture" {
+                start_with_capture = true;
+            } else {
+                passthrough_args.push(arg);
+            }
+        }
+
+        Self {
+            start_with_capture,
+            passthrough_args,
+        }
+    }
+}
 
 glib::wrapper! {
     pub struct Application(ObjectSubclass<imp::Application>)
@@ -8,18 +39,29 @@ glib::wrapper! {
 }
 
 impl Application {
-    pub fn new() -> Self {
-        glib::Object::builder()
+    pub fn new(start_with_capture: bool) -> Self {
+        let app: Self = glib::Object::builder()
             .property("application-id", "com.screenshot_hero.ScreenshotHero")
-            .build()
+            .build();
+
+        app.imp().start_with_capture.set(start_with_capture);
+        app
     }
 
-    pub fn run(&self) -> glib::ExitCode {
-        ApplicationExtManual::run(self)
+    pub fn run_with_args(&self, args: &[String]) -> glib::ExitCode {
+        ApplicationExtManual::run_with_args(self, args)
+    }
+}
+
+impl Default for Application {
+    fn default() -> Self {
+        Self::new(false)
     }
 }
 
 mod imp {
+    use std::cell::Cell;
+
     use gtk::glib;
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
@@ -29,7 +71,9 @@ mod imp {
     use crate::ui::MainWindow;
 
     #[derive(Default)]
-    pub struct Application;
+    pub struct Application {
+        pub start_with_capture: Cell<bool>,
+    }
 
     #[glib::object_subclass]
     impl ObjectSubclass for Application {
@@ -80,8 +124,44 @@ mod imp {
             let app = self.obj();
             let window = MainWindow::new(app.as_ref());
             window.present();
+
+            if self.start_with_capture.replace(false) {
+                if let Err(err) = window.activate_action("win.new-screenshot", None) {
+                    log::warn!("Unable to trigger startup capture action: {err}");
+                }
+            }
         }
     }
     impl GtkApplicationImpl for Application {}
     impl AdwApplicationImpl for Application {}
+}
+
+#[cfg(test)]
+mod tests {
+    use super::LaunchOptions;
+
+    #[test]
+    fn parse_capture_flag_and_keep_other_args() {
+        let options =
+            LaunchOptions::parse(["screenshot-hero", "--capture", "--gapplication-service"]);
+
+        assert!(options.start_with_capture);
+        assert_eq!(
+            options.passthrough_args,
+            vec![
+                "screenshot-hero".to_string(),
+                "--gapplication-service".to_string()
+            ]
+        );
+    }
+
+    #[test]
+    fn parse_without_capture_flag() {
+        let options = LaunchOptions::parse(["screenshot-hero"]);
+        assert!(!options.start_with_capture);
+        assert_eq!(
+            options.passthrough_args,
+            vec!["screenshot-hero".to_string()]
+        );
+    }
 }

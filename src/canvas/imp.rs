@@ -3,9 +3,7 @@ use std::cell::{Cell, RefCell};
 use gtk::glib;
 use gtk::subclass::prelude::*;
 
-use crate::annotations::{
-    ActiveTool, AnnotationEngine, AnnotationStyle, DrawingState, History,
-};
+use crate::annotations::{ActiveTool, AnnotationEngine, AnnotationStyle, DrawingState, History};
 use crate::models::ImageData;
 
 pub struct Canvas {

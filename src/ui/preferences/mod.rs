@@ -62,9 +62,7 @@ impl PreferencesWindow {
             .title("Automation")
             .build();
 
-        let auto_save = libadwaita::SwitchRow::builder()
-            .title("Auto Save")
-            .build();
+        let auto_save = libadwaita::SwitchRow::builder().title("Auto Save").build();
         settings
             .bind("auto-save-enabled", &auto_save, "active")
             .build();

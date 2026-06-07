@@ -11,8 +11,8 @@ use uuid::Uuid;
 
 use crate::annotations::{
     ActiveTool, Annotation, AnnotationCommand, AnnotationEngine, AnnotationKind, AnnotationStyle,
-    ArrowData, CalloutData, DrawingState, FreehandData, HandleIndex, NumberMarkerData, Point,
-    Rect, TextData,
+    ArrowData, CalloutData, DrawingState, FreehandData, HandleIndex, NumberMarkerData, Point, Rect,
+    TextData,
 };
 use crate::models::ImageData;
 
@@ -185,9 +185,7 @@ impl Canvas {
             let (start_x, start_y) = {
                 let state = c.imp().drawing_state.borrow();
                 match &*state {
-                    DrawingState::Drawing { start, .. } => {
-                        c.image_to_screen(*start)
-                    }
+                    DrawingState::Drawing { start, .. } => c.image_to_screen(*start),
                     DrawingState::Moving { drag_start, .. } => c.image_to_screen(*drag_start),
                     DrawingState::ResizingHandle { drag_start, .. } => {
                         c.image_to_screen(*drag_start)
@@ -360,11 +358,14 @@ impl Canvas {
                 if old_style != style {
                     engine.update_style(id, style.clone());
                     drop(engine);
-                    self.imp().history.borrow_mut().push(AnnotationCommand::UpdateStyle {
-                        id,
-                        old_style,
-                        new_style: style.clone(),
-                    });
+                    self.imp()
+                        .history
+                        .borrow_mut()
+                        .push(AnnotationCommand::UpdateStyle {
+                            id,
+                            old_style,
+                            new_style: style.clone(),
+                        });
                     *self.imp().current_style.borrow_mut() = style;
                     self.notify_annotation_changed();
                     self.queue_draw();
@@ -411,9 +412,7 @@ impl Canvas {
     }
 
     pub fn on_annotation_changed(&self, cb: impl Fn() + 'static) {
-        self.imp()
-            .annotation_changed_cb
-            .replace(Some(Box::new(cb)));
+        self.imp().annotation_changed_cb.replace(Some(Box::new(cb)));
     }
 
     pub fn open_text_editor(&self, position: Point, existing_id: Option<Uuid>) {
@@ -560,12 +559,11 @@ impl Canvas {
     }
 
     pub fn source_image_dimensions(&self) -> Option<(u32, u32)> {
-        self.imp().image.borrow().as_ref().map(|img| {
-            (
-                img.width() as u32,
-                img.height() as u32,
-            )
-        })
+        self.imp()
+            .image
+            .borrow()
+            .as_ref()
+            .map(|img| (img.width() as u32, img.height() as u32))
     }
 
     pub fn restore_annotations(&self, annotations: Vec<Annotation>) {
@@ -607,16 +605,8 @@ impl Canvas {
         let r = Self::HANDLE_HIT_RADIUS;
         let corners = [
             (HandleIndex::TopLeft, bounds.x, bounds.y),
-            (
-                HandleIndex::TopRight,
-                bounds.x + bounds.width,
-                bounds.y,
-            ),
-            (
-                HandleIndex::BottomLeft,
-                bounds.x,
-                bounds.y + bounds.height,
-            ),
+            (HandleIndex::TopRight, bounds.x + bounds.width, bounds.y),
+            (HandleIndex::BottomLeft, bounds.x, bounds.y + bounds.height),
             (
                 HandleIndex::BottomRight,
                 bounds.x + bounds.width,
@@ -643,7 +633,9 @@ impl Canvas {
                 if distance(start, current) < Self::MIN_DRAG_DISTANCE {
                     if matches!(
                         self.imp().active_tool.get(),
-                        ActiveTool::Text | ActiveTool::Callout | ActiveTool::Timestamp
+                        ActiveTool::Text
+                            | ActiveTool::Callout
+                            | ActiveTool::Timestamp
                             | ActiveTool::NumberMarker
                     ) {
                         self.handle_click_tool(start);
@@ -662,13 +654,14 @@ impl Canvas {
                     let new_bounds = ann.bounds;
                     drop(engine);
                     if new_bounds != original_bounds {
-                        self.imp().history.borrow_mut().push(
-                            AnnotationCommand::UpdateBounds {
+                        self.imp()
+                            .history
+                            .borrow_mut()
+                            .push(AnnotationCommand::UpdateBounds {
                                 id,
                                 old_bounds: original_bounds,
                                 new_bounds,
-                            },
-                        );
+                            });
                         self.notify_annotation_changed();
                     }
                 }
@@ -683,13 +676,14 @@ impl Canvas {
                     let new_bounds = ann.bounds;
                     drop(engine);
                     if new_bounds != original_bounds {
-                        self.imp().history.borrow_mut().push(
-                            AnnotationCommand::UpdateBounds {
+                        self.imp()
+                            .history
+                            .borrow_mut()
+                            .push(AnnotationCommand::UpdateBounds {
                                 id,
                                 old_bounds: original_bounds,
                                 new_bounds,
-                            },
-                        );
+                            });
                         self.notify_annotation_changed();
                     }
                 }
@@ -754,7 +748,10 @@ impl Canvas {
     ) -> Option<Annotation> {
         let id = Uuid::new_v4();
         match tool {
-            ActiveTool::Rectangle | ActiveTool::Blur | ActiveTool::Pixelate | ActiveTool::Redaction => {
+            ActiveTool::Rectangle
+            | ActiveTool::Blur
+            | ActiveTool::Pixelate
+            | ActiveTool::Redaction => {
                 let bounds = rect_from_points(start, current);
                 let kind = match tool {
                     ActiveTool::Blur => AnnotationKind::Blur,
@@ -776,7 +773,10 @@ impl Canvas {
                 style,
             }),
             ActiveTool::Arrow => {
-                let data = ArrowData { start, end: current };
+                let data = ArrowData {
+                    start,
+                    end: current,
+                };
                 Some(Annotation {
                     id,
                     kind: AnnotationKind::Arrow(data),
@@ -785,7 +785,10 @@ impl Canvas {
                 })
             }
             ActiveTool::Line => {
-                let data = ArrowData { start, end: current };
+                let data = ArrowData {
+                    start,
+                    end: current,
+                };
                 Some(Annotation {
                     id,
                     kind: AnnotationKind::Line(data),
@@ -847,11 +850,14 @@ impl Canvas {
                 if old != text {
                     let new_text = text.clone();
                     self.imp().annotations.borrow_mut().update_text(id, text);
-                    self.imp().history.borrow_mut().push(AnnotationCommand::UpdateText {
-                        id,
-                        old_text: old,
-                        new_text,
-                    });
+                    self.imp()
+                        .history
+                        .borrow_mut()
+                        .push(AnnotationCommand::UpdateText {
+                            id,
+                            old_text: old,
+                            new_text,
+                        });
                     self.notify_annotation_changed();
                     self.queue_draw();
                 }

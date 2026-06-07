@@ -58,9 +58,7 @@ impl ObjectImpl for MainWindow {
 
         match AppSettings::try_new() {
             Some(app_settings) => {
-                let _ = self
-                    .settings
-                    .set(app_settings.settings().clone());
+                let _ = self.settings.set(app_settings.settings().clone());
             }
             None => log::warn!(
                 "GSettings schema unavailable; using hardcoded defaults for automation settings"
@@ -314,10 +312,7 @@ impl ObjectImpl for MainWindow {
                 };
 
                 if !Path::new(&project.source_image.path).exists() {
-                    let message = format!(
-                        "Source image not found: {}",
-                        project.source_image.path
-                    );
+                    let message = format!("Source image not found: {}", project.source_image.path);
                     log::error!("{message}");
                     show_error_dialog(&window, "Open Failed", &message);
                     return;
@@ -634,10 +629,7 @@ fn build_project_snapshot(canvas: &Canvas) -> Option<SheroProject> {
 }
 
 fn settings_boolean(settings: &OnceCell<gio::Settings>, key: &str, default: bool) -> bool {
-    settings
-        .get()
-        .map(|s| s.boolean(key))
-        .unwrap_or(default)
+    settings.get().map(|s| s.boolean(key)).unwrap_or(default)
 }
 
 fn settings_string(settings: &OnceCell<gio::Settings>, key: &str, default: &str) -> String {
@@ -833,9 +825,7 @@ async fn show_save_project_dialog(window: &super::MainWindow) -> Option<PathBuf>
     // Flatpak grants write access only to the exact portal staging path (e.g.
     // `.xdp-cap2.shero.tmp-ifkkL1`). Mutating the extension would point at an
     // unauthorized neighbor path and leave an empty staging file behind.
-    if !is_portal_document_path(&path)
-        && path.extension().is_none_or(|ext| ext != "shero")
-    {
+    if !is_portal_document_path(&path) && path.extension().is_none_or(|ext| ext != "shero") {
         path.set_extension("shero");
     }
 

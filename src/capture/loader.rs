@@ -49,12 +49,7 @@ impl FileLoader {
 fn is_supported_extension(path: &Path) -> bool {
     path.extension()
         .and_then(|ext| ext.to_str())
-        .map(|ext| {
-            matches!(
-                ext.to_ascii_lowercase().as_str(),
-                "png" | "jpg" | "jpeg"
-            )
-        })
+        .map(|ext| matches!(ext.to_ascii_lowercase().as_str(), "png" | "jpg" | "jpeg"))
         .unwrap_or(false)
 }
 

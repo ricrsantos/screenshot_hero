@@ -84,10 +84,7 @@ pub struct CalloutData {
 
 impl Rect {
     pub fn contains(&self, p: Point) -> bool {
-        p.x >= self.x
-            && p.x <= self.x + self.width
-            && p.y >= self.y
-            && p.y <= self.y + self.height
+        p.x >= self.x && p.x <= self.x + self.width && p.y >= self.y && p.y <= self.y + self.height
     }
 }
 
@@ -183,10 +180,7 @@ mod tests {
     #[test]
     fn freehand_variant_fields_accessible() {
         let data = FreehandData {
-            points: vec![
-                Point { x: 0.0, y: 0.0 },
-                Point { x: 10.0, y: 5.0 },
-            ],
+            points: vec![Point { x: 0.0, y: 0.0 }, Point { x: 10.0, y: 5.0 }],
         };
         let ann = sample_annotation(AnnotationKind::Freehand(data));
         if let AnnotationKind::Freehand(d) = ann.kind {
