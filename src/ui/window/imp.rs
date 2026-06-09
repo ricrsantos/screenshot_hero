@@ -497,36 +497,6 @@ impl ObjectImpl for MainWindow {
             .build();
         header.pack_start(&new_button);
 
-        let open_button = gtk::Button::builder()
-            .label("Open File")
-            .action_name("win.open-file")
-            .build();
-        header.pack_start(&open_button);
-
-        let save_button = gtk::Button::builder()
-            .label("Save")
-            .action_name("win.save-project")
-            .build();
-        header.pack_start(&save_button);
-
-        let open_project_button = gtk::Button::builder()
-            .label("Open Project")
-            .action_name("win.open-project")
-            .build();
-        header.pack_start(&open_project_button);
-
-        let export_png_button = gtk::Button::builder()
-            .label("Export PNG")
-            .action_name("win.export-png")
-            .build();
-        header.pack_start(&export_png_button);
-
-        let export_jpeg_button = gtk::Button::builder()
-            .label("Export JPEG")
-            .action_name("win.export-jpeg")
-            .build();
-        header.pack_start(&export_jpeg_button);
-
         let copy_button = gtk::Button::builder()
             .label("Copy")
             .action_name("win.copy-to-clipboard")
@@ -550,18 +520,35 @@ impl ObjectImpl for MainWindow {
             .action_name("win.zoom-100")
             .build();
 
-        let preferences_button = gtk::Button::builder()
-            .icon_name("preferences-system-symbolic")
-            .action_name("win.show-preferences")
+        let file_section = gio::Menu::new();
+        file_section.append(Some("Open File"), Some("win.open-file"));
+        file_section.append(Some("Open Project"), Some("win.open-project"));
+        file_section.append(Some("Save"), Some("win.save-project"));
+
+        let export_section = gio::Menu::new();
+        export_section.append(Some("Export PNG"), Some("win.export-png"));
+        export_section.append(Some("Export JPEG"), Some("win.export-jpeg"));
+
+        let app_section = gio::Menu::new();
+        app_section.append(Some("Preferences"), Some("win.show-preferences"));
+
+        let file_menu = gio::Menu::new();
+        file_menu.append_section(None, &file_section);
+        file_menu.append_section(Some("Export"), &export_section);
+        file_menu.append_section(None, &app_section);
+
+        let menu_button = gtk::MenuButton::builder()
+            .icon_name("open-menu-symbolic")
+            .menu_model(&file_menu)
             .build();
 
-        // pack_end: first = nearest title, last = outermost right → [label][1:1][fit][-][+][prefs]
+        // pack_end: first = nearest title, last = outermost right
         header.pack_end(&zoom_label);
-        header.pack_end(&preferences_button);
         header.pack_end(&zoom_100_button);
         header.pack_end(&zoom_fit_button);
         header.pack_end(&zoom_out_button);
         header.pack_end(&zoom_in_button);
+        header.pack_end(&menu_button);
 
         let tool_palette = ToolPalette::new();
 
