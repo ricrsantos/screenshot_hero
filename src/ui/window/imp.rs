@@ -66,6 +66,7 @@ impl ObjectImpl for MainWindow {
         }
 
         let window = self.obj();
+        window.set_default_size(1000, 750);
 
         let canvas = Canvas::new();
         self.canvas
@@ -112,6 +113,7 @@ impl ObjectImpl for MainWindow {
                 match CaptureService::capture().await {
                     Ok(Some(image)) => {
                         canvas.set_image(image);
+                        canvas.fit_to_window();
                         update_image_dependent_actions(
                             &canvas,
                             &save_project,
@@ -185,6 +187,7 @@ impl ObjectImpl for MainWindow {
                 match FileLoader::load_from_path(&path) {
                     Ok(image) => {
                         canvas.set_image(image);
+                        canvas.fit_to_window();
                         update_image_dependent_actions(
                             &canvas,
                             &save_project,
@@ -497,16 +500,17 @@ impl ObjectImpl for MainWindow {
             .build();
         header.pack_start(&new_button);
 
-        let copy_button = gtk::Button::builder()
-            .label("Copy")
-            .action_name("win.copy-to-clipboard")
+        let open_button = gtk::Button::builder()
+            .label("Open")
+            .action_name("win.open-file")
             .build();
-        header.pack_start(&copy_button);
+        header.pack_start(&open_button);
 
         let file_section = gio::Menu::new();
         file_section.append(Some("Open File"), Some("win.open-file"));
         file_section.append(Some("Open Project"), Some("win.open-project"));
         file_section.append(Some("Save"), Some("win.save-project"));
+        file_section.append(Some("Copy to Clipboard"), Some("win.copy-to-clipboard"));
 
         let export_section = gio::Menu::new();
         export_section.append(Some("Export PNG"), Some("win.export-png"));
@@ -559,8 +563,7 @@ impl ObjectImpl for MainWindow {
 
         // Zoom controls — floating pill overlay at the bottom-right of the canvas
         let zoom_bar = gtk::Box::new(gtk::Orientation::Horizontal, 0);
-        zoom_bar.add_css_class("osd");
-        zoom_bar.add_css_class("linked");
+        zoom_bar.add_css_class("zoom-overlay");
         zoom_bar.set_halign(gtk::Align::End);
         zoom_bar.set_valign(gtk::Align::End);
         zoom_bar.set_margin_end(12);
@@ -571,8 +574,6 @@ impl ObjectImpl for MainWindow {
         zoom_out_btn.set_tooltip_text(Some("Zoom Out"));
         zoom_bar.append(&zoom_out_btn);
 
-        zoom_label.set_margin_start(10);
-        zoom_label.set_margin_end(10);
         zoom_bar.append(&zoom_label);
 
         let zoom_in_btn = gtk::Button::from_icon_name("zoom-in-symbolic");
@@ -580,7 +581,7 @@ impl ObjectImpl for MainWindow {
         zoom_in_btn.set_tooltip_text(Some("Zoom In"));
         zoom_bar.append(&zoom_in_btn);
 
-        let zoom_100_btn = gtk::Button::from_icon_name("zoom-original-symbolic");
+        let zoom_100_btn = gtk::Button::from_icon_name("edit-find-symbolic");
         zoom_100_btn.set_action_name(Some("win.zoom-100"));
         zoom_100_btn.set_tooltip_text(Some("Zoom to Actual Size (1:1)"));
         zoom_bar.append(&zoom_100_btn);
@@ -596,8 +597,11 @@ impl ObjectImpl for MainWindow {
         canvas_overlay.add_overlay(&zoom_bar);
         content_box.append(&canvas_overlay);
 
+        load_zoom_overlay_css();
+
         let toolbar_view = libadwaita::ToolbarView::new();
         toolbar_view.add_top_bar(&header);
+        toolbar_view.set_top_bar_style(libadwaita::ToolbarStyle::Raised);
         toolbar_view.set_content(Some(&content_box));
 
         window.set_content(Some(&toolbar_view));
@@ -864,6 +868,51 @@ fn format_load_error(path: &Path, error: &LoadError) -> String {
     };
 
     format!("{}: {reason}", path.display())
+}
+
+fn load_zoom_overlay_css() {
+    let css = gtk::CssProvider::new();
+    css.load_from_data(
+        "
+        .zoom-overlay {
+            background: rgba(0, 0, 0, 0.65);
+            border-radius: 9999px;
+            padding: 3px;
+        }
+        .zoom-overlay > button {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            border-radius: 9999px;
+            color: rgba(255, 255, 255, 0.95);
+            min-height: 30px;
+            min-width: 30px;
+            padding: 0 6px;
+        }
+        .zoom-overlay > button:hover {
+            background: rgba(255, 255, 255, 0.14);
+        }
+        .zoom-overlay > button:active {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        .zoom-overlay > button:disabled {
+            color: rgba(255, 255, 255, 0.35);
+        }
+        .zoom-overlay > label {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 0.85em;
+            min-width: 42px;
+            margin: 0 4px;
+        }
+        ",
+    );
+    if let Some(display) = gtk::gdk::Display::default() {
+        gtk::style_context_add_provider_for_display(
+            &display,
+            &css,
+            gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
+        );
+    }
 }
 
 impl WidgetImpl for MainWindow {}
