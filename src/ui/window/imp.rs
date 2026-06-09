@@ -503,23 +503,6 @@ impl ObjectImpl for MainWindow {
             .build();
         header.pack_start(&copy_button);
 
-        let zoom_in_button = gtk::Button::builder()
-            .label("+")
-            .action_name("win.zoom-in")
-            .build();
-        let zoom_out_button = gtk::Button::builder()
-            .label("-")
-            .action_name("win.zoom-out")
-            .build();
-        let zoom_fit_button = gtk::Button::builder()
-            .label("fit")
-            .action_name("win.zoom-fit")
-            .build();
-        let zoom_100_button = gtk::Button::builder()
-            .label("1:1")
-            .action_name("win.zoom-100")
-            .build();
-
         let file_section = gio::Menu::new();
         file_section.append(Some("Open File"), Some("win.open-file"));
         file_section.append(Some("Open Project"), Some("win.open-project"));
@@ -542,12 +525,6 @@ impl ObjectImpl for MainWindow {
             .menu_model(&file_menu)
             .build();
 
-        // pack_end: first = nearest title, last = outermost right
-        header.pack_end(&zoom_label);
-        header.pack_end(&zoom_100_button);
-        header.pack_end(&zoom_fit_button);
-        header.pack_end(&zoom_out_button);
-        header.pack_end(&zoom_in_button);
         header.pack_end(&menu_button);
 
         let tool_palette = ToolPalette::new();
@@ -579,7 +556,45 @@ impl ObjectImpl for MainWindow {
         let content_box = gtk::Box::new(gtk::Orientation::Horizontal, 0);
         content_box.append(&palette_widget);
         canvas.set_hexpand(true);
-        content_box.append(&canvas);
+
+        // Zoom controls — floating pill overlay at the bottom-right of the canvas
+        let zoom_bar = gtk::Box::new(gtk::Orientation::Horizontal, 0);
+        zoom_bar.add_css_class("osd");
+        zoom_bar.add_css_class("linked");
+        zoom_bar.set_halign(gtk::Align::End);
+        zoom_bar.set_valign(gtk::Align::End);
+        zoom_bar.set_margin_end(12);
+        zoom_bar.set_margin_bottom(12);
+
+        let zoom_out_btn = gtk::Button::from_icon_name("zoom-out-symbolic");
+        zoom_out_btn.set_action_name(Some("win.zoom-out"));
+        zoom_out_btn.set_tooltip_text(Some("Zoom Out"));
+        zoom_bar.append(&zoom_out_btn);
+
+        zoom_label.set_margin_start(10);
+        zoom_label.set_margin_end(10);
+        zoom_bar.append(&zoom_label);
+
+        let zoom_in_btn = gtk::Button::from_icon_name("zoom-in-symbolic");
+        zoom_in_btn.set_action_name(Some("win.zoom-in"));
+        zoom_in_btn.set_tooltip_text(Some("Zoom In"));
+        zoom_bar.append(&zoom_in_btn);
+
+        let zoom_100_btn = gtk::Button::from_icon_name("zoom-original-symbolic");
+        zoom_100_btn.set_action_name(Some("win.zoom-100"));
+        zoom_100_btn.set_tooltip_text(Some("Zoom to Actual Size (1:1)"));
+        zoom_bar.append(&zoom_100_btn);
+
+        let zoom_fit_btn = gtk::Button::from_icon_name("zoom-fit-best-symbolic");
+        zoom_fit_btn.set_action_name(Some("win.zoom-fit"));
+        zoom_fit_btn.set_tooltip_text(Some("Zoom to Fit"));
+        zoom_bar.append(&zoom_fit_btn);
+
+        let canvas_overlay = gtk::Overlay::new();
+        canvas_overlay.set_hexpand(true);
+        canvas_overlay.set_child(Some(&canvas));
+        canvas_overlay.add_overlay(&zoom_bar);
+        content_box.append(&canvas_overlay);
 
         let toolbar_view = libadwaita::ToolbarView::new();
         toolbar_view.add_top_bar(&header);
