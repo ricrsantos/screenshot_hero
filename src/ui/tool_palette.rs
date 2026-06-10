@@ -16,40 +16,50 @@ pub struct ToolPalette {
     stroke_changed_cb: Rc<RefCell<Option<Box<dyn Fn(f32)>>>>,
 }
 
+// Tool groups — separators are inserted between groups.
+const TOOLS: &[(ActiveTool, &str, &str)] = &[
+    // ── Selection ──────────────────────────────────────────
+    (ActiveTool::Select,       "edit-select-symbolic",          "Select"),
+    // ── Shapes ─────────────────────────────────────────────
+    (ActiveTool::Rectangle,    "media-playback-stop-symbolic",  "Rectangle"),
+    (ActiveTool::Ellipse,      "media-record-symbolic",         "Ellipse"),
+    (ActiveTool::Arrow,        "go-next-symbolic",              "Arrow"),
+    (ActiveTool::Line,         "format-text-underline-symbolic","Line"),
+    // ── Drawing ────────────────────────────────────────────
+    (ActiveTool::Freehand,     "document-edit-symbolic",        "Freehand"),
+    (ActiveTool::Text,         "insert-text-symbolic",          "Text"),
+    // ── Effects ────────────────────────────────────────────
+    (ActiveTool::Blur,         "zoom-out-symbolic",             "Blur"),
+    (ActiveTool::Pixelate,     "view-grid-symbolic",            "Pixelate"),
+    (ActiveTool::Redaction,    "edit-clear-symbolic",           "Redaction"),
+    // ── Labels ─────────────────────────────────────────────
+    (ActiveTool::Timestamp,    "alarm-symbolic",                "Timestamp"),
+    (ActiveTool::NumberMarker, "format-list-ordered-symbolic",  "Number Marker"),
+    (ActiveTool::Callout,      "dialog-information-symbolic",   "Callout"),
+];
+
+// Indices (0-based) after which a separator is inserted.
+const SEP_AFTER: &[usize] = &[0, 4, 6, 9];
+
 impl ToolPalette {
     pub fn new() -> Self {
-        let container = gtk::Box::new(gtk::Orientation::Vertical, 4);
+        let container = gtk::Box::new(gtk::Orientation::Vertical, 0);
         container.set_margin_start(4);
         container.set_margin_end(4);
-        container.set_margin_top(4);
-        container.set_margin_bottom(4);
+        container.set_margin_top(6);
+        container.set_margin_bottom(6);
+        container.add_css_class("tool-palette");
 
-        // (tool, icon-name, tooltip)
-        let tools: [(ActiveTool, &str, &str); 13] = [
-            (ActiveTool::Select,       "edit-select-symbolic",          "Select"),
-            (ActiveTool::Rectangle,    "draw-rectangle-symbolic",       "Rectangle"),
-            (ActiveTool::Ellipse,      "draw-circle-symbolic",          "Ellipse"),
-            (ActiveTool::Arrow,        "go-next-symbolic",              "Arrow"),
-            (ActiveTool::Line,         "draw-line-symbolic",            "Line"),
-            (ActiveTool::Freehand,     "document-edit-symbolic",        "Freehand"),
-            (ActiveTool::Text,         "insert-text-symbolic",          "Text"),
-            (ActiveTool::Blur,         "zoom-out-symbolic",             "Blur"),
-            (ActiveTool::Pixelate,     "view-grid-symbolic",            "Pixelate"),
-            (ActiveTool::Redaction,    "edit-clear-symbolic",           "Redaction"),
-            (ActiveTool::Timestamp,    "alarm-symbolic",                "Timestamp"),
-            (ActiveTool::NumberMarker, "format-list-numbered-symbolic", "Number Marker"),
-            (ActiveTool::Callout,      "dialog-information-symbolic",   "Callout"),
-        ];
-
-        let mut tool_buttons = Vec::with_capacity(tools.len());
+        let mut tool_buttons = Vec::with_capacity(TOOLS.len());
         let mut prev_btn: Option<gtk::ToggleButton> = None;
 
-        for (tool, icon, tooltip) in tools {
+        for (idx, &(tool, icon, tooltip)) in TOOLS.iter().enumerate() {
             let btn = gtk::ToggleButton::builder()
                 .icon_name(icon)
                 .tooltip_text(tooltip)
                 .build();
             btn.add_css_class("flat");
+            btn.add_css_class("tool-btn");
             if tool == ActiveTool::Select {
                 btn.set_active(true);
             }
@@ -57,18 +67,32 @@ impl ToolPalette {
                 btn.set_group(Some(prev));
             }
             prev_btn = Some(btn.clone());
+            container.append(&btn);
             tool_buttons.push((tool, btn));
+
+            if SEP_AFTER.contains(&idx) {
+                let sep = gtk::Separator::new(gtk::Orientation::Horizontal);
+                sep.add_css_class("tool-sep");
+                container.append(&sep);
+            }
         }
 
-        let separator = gtk::Separator::new(gtk::Orientation::Horizontal);
+        let style_sep = gtk::Separator::new(gtk::Orientation::Horizontal);
+        container.append(&style_sep);
 
         let color_button = gtk::ColorButton::new();
         color_button.set_rgba(&gdk::RGBA::new(1.0, 0.0, 0.0, 1.0));
         color_button.set_tooltip_text(Some("Stroke Color"));
+        color_button.add_css_class("tool-color");
+        container.append(&color_button);
 
         let stroke_adjustment = gtk::Adjustment::new(2.0, 1.0, 20.0, 1.0, 1.0, 0.0);
         let stroke_spin = gtk::SpinButton::new(Some(&stroke_adjustment), 1.0, 0);
         stroke_spin.set_tooltip_text(Some("Stroke Width"));
+        stroke_spin.set_width_chars(2);
+        stroke_spin.set_max_width_chars(2);
+        stroke_spin.add_css_class("tool-spin");
+        container.append(&stroke_spin);
 
         let tool_changed_cb: Rc<RefCell<Option<Box<dyn Fn(ActiveTool)>>>> =
             Rc::new(RefCell::new(None));
@@ -87,12 +111,7 @@ impl ToolPalette {
                     }
                 }
             });
-            container.append(btn);
         }
-
-        container.append(&separator);
-        container.append(&color_button);
-        container.append(&stroke_spin);
 
         let color_cb_cell = Rc::clone(&color_changed_cb);
         color_button.connect_color_set(move |button| {

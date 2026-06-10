@@ -597,7 +597,7 @@ impl ObjectImpl for MainWindow {
         canvas_overlay.add_overlay(&zoom_bar);
         content_box.append(&canvas_overlay);
 
-        load_zoom_overlay_css();
+        load_app_css();
 
         let toolbar_view = libadwaita::ToolbarView::new();
         toolbar_view.add_top_bar(&header);
@@ -870,10 +870,11 @@ fn format_load_error(path: &Path, error: &LoadError) -> String {
     format!("{}: {reason}", path.display())
 }
 
-fn load_zoom_overlay_css() {
+fn load_app_css() {
     let css = gtk::CssProvider::new();
     css.load_from_data(
         "
+        /* ── Zoom overlay pill ── */
         .zoom-overlay {
             background: rgba(0, 0, 0, 0.65);
             border-radius: 9999px;
@@ -903,6 +904,33 @@ fn load_zoom_overlay_css() {
             font-size: 0.85em;
             min-width: 42px;
             margin: 0 4px;
+        }
+
+        /* ── Left tool palette ── */
+        .tool-palette {
+            box-shadow: 2px 0 6px rgba(0, 0, 0, 0.18);
+        }
+        .tool-btn {
+            min-width: 36px;
+            min-height: 36px;
+            padding: 0;
+        }
+        .tool-sep {
+            margin: 2px 6px;
+            opacity: 0.4;
+        }
+        /* Force color + spin to stay narrow */
+        .tool-color,
+        .tool-color > button {
+            min-width: 0;
+            margin: 2px 2px;
+        }
+        .tool-spin {
+            min-width: 0;
+            margin: 2px 2px;
+        }
+        .tool-spin > text {
+            min-width: 0;
         }
         ",
     );
