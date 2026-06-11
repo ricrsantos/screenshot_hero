@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/com/screenshot_hero/ScreenshotHero">
+    <file>resources/icons/arrow.svg</file>
+    <file>resources/icons/blur.svg</file>
+    <file>resources/icons/callout.svg</file>
+    <file>resources/icons/crop.svg</file>
+    <file>resources/icons/ellipse.svg</file>
+    <file>resources/icons/freehand.svg</file>
+    <file>resources/icons/line.svg</file>
+    <file>resources/icons/number-marker.svg</file>
+    <file>resources/icons/pan.svg</file>
+    <file>resources/icons/pixelate.svg</file>
+    <file>resources/icons/rectangle.svg</file>
+    <file>resources/icons/redaction.svg</file>
+    <file>resources/icons/select.svg</file>
+    <file>resources/icons/square-half.svg</file>
+    <file>resources/icons/text.svg</file>
+    <file>resources/icons/timestamp.svg</file>
+
+    <file>icons/hicolor/32x32/apps/com.screenshot_hero.ScreenshotHero.png</file>
+    <file>icons/hicolor/48x48/apps/com.screenshot_hero.ScreenshotHero.png</file>
+    <file>icons/hicolor/64x64/apps/com.screenshot_hero.ScreenshotHero.png</file>
+    <file>icons/hicolor/128x128/apps/com.screenshot_hero.ScreenshotHero.png</file>
+    <file>icons/hicolor/256x256/apps/com.screenshot_hero.ScreenshotHero.png</file>
+    <file>icons/hicolor/512x512/apps/com.screenshot_hero.ScreenshotHero.png</file>
+  </gresource>
+</gresources>

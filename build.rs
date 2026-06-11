@@ -1,19 +1,23 @@
 use std::env;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 fn main() {
-    let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
-    let schema_xml = manifest_dir.join("data/com.screenshot_hero.ScreenshotHero.gschema.xml");
+    let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR"));
+    compile_gsettings(&manifest_dir);
+    compile_gresources(&manifest_dir);
+}
 
+fn compile_gsettings(manifest_dir: &Path) {
+    let schema_xml = manifest_dir.join("data/com.screenshot_hero.ScreenshotHero.gschema.xml");
     if !schema_xml.exists() {
         return;
     }
 
     println!("cargo:rerun-if-changed={}", schema_xml.display());
 
-    let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
+    let out_dir = PathBuf::from(env::var("OUT_DIR").expect("OUT_DIR"));
     let schema_dir = out_dir.join("schemas");
     fs::create_dir_all(&schema_dir).expect("create schema output directory");
 
@@ -41,5 +45,61 @@ fn main() {
             "cargo:rustc-env=APP_GSETTINGS_SCHEMA_DIR={}",
             dev_dir.display()
         );
+    }
+}
+
+fn compile_gresources(manifest_dir: &Path) {
+    let resource_xml = manifest_dir.join("data/com.screenshot_hero.ScreenshotHero.gresource.xml");
+    if !resource_xml.exists() {
+        return;
+    }
+
+    println!("cargo:rerun-if-changed={}", resource_xml.display());
+    emit_rerun_if_changed_for_dir(&manifest_dir.join("data/resources/icons"));
+    emit_rerun_if_changed_for_dir(&manifest_dir.join("data/icons/hicolor"));
+
+    let out_dir = PathBuf::from(env::var("OUT_DIR").expect("OUT_DIR"));
+    let output_resource = out_dir.join("com.screenshot_hero.ScreenshotHero.gresource");
+
+    let compiled = Command::new("glib-compile-resources")
+        .arg(&resource_xml)
+        .arg("--sourcedir")
+        .arg(manifest_dir.join("data"))
+        .arg("--target")
+        .arg(&output_resource)
+        .status()
+        .map(|status| status.success())
+        .unwrap_or(false);
+
+    if compiled {
+        println!(
+            "cargo:rustc-env=APP_GRESOURCE_PATH={}",
+            output_resource.display()
+        );
+    } else {
+        panic!(
+            "glib-compile-resources is required to embed SVG/PNG assets via GResource"
+        );
+    }
+}
+
+fn emit_rerun_if_changed_for_dir(dir: &Path) {
+    if !dir.exists() {
+        return;
+    }
+
+    println!("cargo:rerun-if-changed={}", dir.display());
+
+    let Ok(entries) = fs::read_dir(dir) else {
+        return;
+    };
+
+    for entry in entries.filter_map(Result::ok) {
+        let path = entry.path();
+        if path.is_dir() {
+            emit_rerun_if_changed_for_dir(&path);
+        } else {
+            println!("cargo:rerun-if-changed={}", path.display());
+        }
     }
 }

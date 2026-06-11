@@ -4,6 +4,7 @@ use gtk::glib;
 use gtk::subclass::prelude::*;
 
 use crate::canvas::Canvas;
+use crate::resources;
 use crate::Application;
 
 glib::wrapper! {
@@ -16,6 +17,7 @@ impl MainWindow {
         glib::Object::builder()
             .property("application", app)
             .property("title", "Screenshot Hero")
+            .property("icon-name", resources::APP_ICON_NAME)
             .build()
     }
 

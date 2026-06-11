@@ -42,6 +42,7 @@ impl Application {
     pub fn new(start_with_capture: bool) -> Self {
         let app: Self = glib::Object::builder()
             .property("application-id", "com.screenshot_hero.ScreenshotHero")
+            .property("resource-base-path", crate::resources::RESOURCE_BASE_PATH)
             .build();
 
         app.imp().start_with_capture.set(start_with_capture);
@@ -67,6 +68,7 @@ mod imp {
     use gtk::subclass::prelude::*;
     use libadwaita::subclass::prelude::AdwApplicationImpl;
 
+    use crate::resources;
     use crate::settings::AppSettings;
     use crate::ui::MainWindow;
 
@@ -89,7 +91,13 @@ mod imp {
                 .filter_level(log::LevelFilter::Trace)
                 .try_init();
 
+            if let Err(err) = resources::register() {
+                log::warn!("{err}");
+            }
+
             self.parent_startup();
+            resources::configure_icon_theme();
+            gtk::Window::set_default_icon_name(resources::APP_ICON_NAME);
 
             if let Some(settings) = AppSettings::try_new() {
                 log::set_max_level(settings.log_level());

@@ -5,6 +5,7 @@ mod capture;
 pub mod export;
 pub mod models;
 pub mod persistence;
+pub(crate) mod resources;
 pub mod settings;
 mod ui;
 

@@ -498,6 +498,7 @@ impl ObjectImpl for MainWindow {
             .label("New Screenshot")
             .action_name("win.new-screenshot")
             .build();
+        new_button.add_css_class("new-screenshot-btn");
         header.pack_start(&new_button);
 
         let open_button = gtk::Button::builder()
@@ -906,6 +907,17 @@ fn load_app_css() {
             margin: 0 4px;
         }
 
+        .new-screenshot-btn {
+            background: #1c71d8;
+            color: #ffffff;
+        }
+        .new-screenshot-btn:hover {
+            background: #3584e4;
+        }
+        .new-screenshot-btn:active {
+            background: #15539e;
+        }
+
         /* ── Left tool palette ── */
         .tool-palette {
             box-shadow: 2px 0 6px rgba(0, 0, 0, 0.18);
@@ -923,13 +935,22 @@ fn load_app_css() {
         .tool-color,
         .tool-color > button {
             min-width: 0;
+            max-width: 18px;
+            min-height: 18px;
             margin: 2px 2px;
         }
-        .tool-spin {
+        .tool-stroke {
             min-width: 0;
+            max-width: 36px;
             margin: 2px 2px;
         }
-        .tool-spin > text {
+        .tool-step-btn {
+            min-width: 0;
+            min-height: 18px;
+            padding: 0;
+        }
+        .tool-stroke-value {
+            font-size: 1.125em;
             min-width: 0;
         }
         ",
