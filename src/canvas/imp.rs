@@ -3,7 +3,7 @@ use std::cell::{Cell, RefCell};
 use gtk::glib;
 use gtk::subclass::prelude::*;
 
-use crate::annotations::{ActiveTool, AnnotationEngine, AnnotationStyle, DrawingState, History};
+use crate::annotations::{ActiveTool, AnnotationEngine, AnnotationStyle, DrawingState, History, Rect};
 use crate::models::ImageData;
 
 pub struct Canvas {
@@ -20,6 +20,7 @@ pub struct Canvas {
     pub current_style: RefCell<AnnotationStyle>,
     pub annotation_changed_cb: RefCell<Option<Box<dyn Fn()>>>,
     pub freehand_points: RefCell<Vec<crate::annotations::Point>>,
+    pub crop_bounds: RefCell<Option<Rect>>,
 }
 
 impl Default for Canvas {
@@ -38,6 +39,7 @@ impl Default for Canvas {
             current_style: RefCell::new(AnnotationStyle::default()),
             annotation_changed_cb: RefCell::new(None),
             freehand_points: RefCell::new(Vec::new()),
+            crop_bounds: RefCell::new(None),
         }
     }
 }

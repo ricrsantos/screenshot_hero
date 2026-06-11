@@ -6,6 +6,8 @@ use super::model::{Point, Rect};
 pub enum ActiveTool {
     #[default]
     Select,
+    Crop,
+    Pan,
     Rectangle,
     Ellipse,
     Arrow,
@@ -49,6 +51,19 @@ pub enum DrawingState {
     EditingText {
         existing_id: Option<Uuid>,
         position: Point,
+    },
+    CropSelecting {
+        start: Point,
+        current: Point,
+    },
+    CropMoving {
+        drag_start: Point,
+        original_bounds: Rect,
+    },
+    CropResizing {
+        handle: HandleIndex,
+        original_bounds: Rect,
+        drag_start: Point,
     },
 }
 

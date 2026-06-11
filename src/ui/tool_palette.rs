@@ -19,6 +19,13 @@ pub struct ToolPalette {
 
 // Tool groups — separators are inserted between groups.
 const TOOLS: &[(ActiveTool, &str, &str)] = &[
+    // ── Navigation ─────────────────────────────────────────
+    (
+        ActiveTool::Crop,
+        "crop.svg",
+        "Crop (double click to apply, Esc to cancel)",
+    ),
+    (ActiveTool::Pan, "pan.svg", "Pan"),
     // ── Selection ──────────────────────────────────────────
     (ActiveTool::Select,       "select.svg",          "Select"),
     // ── Shapes ─────────────────────────────────────────────
@@ -40,7 +47,7 @@ const TOOLS: &[(ActiveTool, &str, &str)] = &[
 ];
 
 // Indices (0-based) after which a separator is inserted.
-const SEP_AFTER: &[usize] = &[4, 6, 9];
+const SEP_AFTER: &[usize] = &[1, 6, 8, 11];
 
 impl ToolPalette {
     pub fn new() -> Self {

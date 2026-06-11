@@ -935,13 +935,13 @@ fn load_app_css() {
         .tool-color,
         .tool-color > button {
             min-width: 0;
-            max-width: 18px;
+            min-width: 18px;
             min-height: 18px;
             margin: 2px 2px;
         }
         .tool-stroke {
             min-width: 0;
-            max-width: 36px;
+            min-width: 36px;
             margin: 2px 2px;
         }
         .tool-step-btn {

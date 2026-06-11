@@ -14,7 +14,7 @@ use crate::annotations::{
     ArrowData, CalloutData, DrawingState, FreehandData, HandleIndex, NumberMarkerData, Point, Rect,
     TextData,
 };
-use crate::models::ImageData;
+use crate::models::{ImageData, SourceImage};
 
 glib::wrapper! {
     pub struct Canvas(ObjectSubclass<imp::Canvas>)
@@ -67,6 +67,7 @@ impl Canvas {
                 if let Some(preview) = canvas.build_preview_annotation() {
                     renderer::draw_preview(cr, &preview, Some(pixbuf), zoom, pan_x, pan_y);
                 }
+                canvas.draw_crop_overlay(cr, width as f64, height as f64);
             } else {
                 cr.set_source_rgb(0.12, 0.12, 0.12);
                 cr.rectangle(0.0, 0.0, width as f64, height as f64);
@@ -139,6 +140,56 @@ impl Canvas {
             let p = c.screen_to_image(start_x, start_y);
             let tool = c.imp().active_tool.get();
 
+            if tool == ActiveTool::Pan {
+                if c.can_pan_in_viewport() {
+                    c.imp().pan_base.set(c.imp().pan_offset.get());
+                    c.set_cursor_from_name(Some("grabbing"));
+                }
+                return;
+            }
+
+            if tool == ActiveTool::Crop {
+                let existing_bounds = *c.imp().crop_bounds.borrow();
+                if let Some(bounds) = existing_bounds {
+                    if let Some(handle) = c.handle_at(&bounds, p) {
+                        c.imp().drawing_state.replace(DrawingState::CropResizing {
+                            handle,
+                            original_bounds: bounds,
+                            drag_start: p,
+                        });
+                    } else if bounds.contains(p) {
+                        c.imp().drawing_state.replace(DrawingState::CropMoving {
+                            drag_start: p,
+                            original_bounds: bounds,
+                        });
+                    } else {
+                        c.imp().drawing_state.replace(DrawingState::CropSelecting {
+                            start: p,
+                            current: p,
+                        });
+                        c.imp().crop_bounds.replace(Some(Rect {
+                            x: p.x,
+                            y: p.y,
+                            width: 0.0,
+                            height: 0.0,
+                        }));
+                    }
+                } else {
+                    c.imp().drawing_state.replace(DrawingState::CropSelecting {
+                        start: p,
+                        current: p,
+                    });
+                    c.imp().crop_bounds.replace(Some(Rect {
+                        x: p.x,
+                        y: p.y,
+                        width: 0.0,
+                        height: 0.0,
+                    }));
+                }
+                c.queue_draw();
+                return;
+            }
+
             if tool == ActiveTool::Select {
                 let mut engine = c.imp().annotations.borrow_mut();
                 if let Some(id) = engine.hit_test(p) {
@@ -182,6 +233,16 @@ impl Canvas {
             let Some(c) = canvas_weak.upgrade() else {
                 return;
             };
+            if c.imp().active_tool.get() == ActiveTool::Pan {
+                if c.can_pan_in_viewport() {
+                    let (base_x, base_y) = c.imp().pan_base.get();
+                    c.imp()
+                        .pan_offset
+                        .set((base_x + offset_x, base_y + offset_y));
+                    c.queue_draw();
+                }
+                return;
+            }
             let (start_x, start_y) = {
                 let state = c.imp().drawing_state.borrow();
                 match &*state {
@@ -190,6 +251,9 @@ impl Canvas {
                     DrawingState::ResizingHandle { drag_start, .. } => {
                         c.image_to_screen(*drag_start)
                     }
+                    DrawingState::CropSelecting { start, .. } => c.image_to_screen(*start),
+                    DrawingState::CropMoving { drag_start, .. } => c.image_to_screen(*drag_start),
+                    DrawingState::CropResizing { drag_start, .. } => c.image_to_screen(*drag_start),
                     _ => return,
                 }
             };
@@ -253,6 +317,45 @@ impl Canvas {
                         .resize_to_bounds(id, original, new_bounds);
                     c.queue_draw();
                 }
+                DrawingState::CropSelecting { start, current: cur } => {
+                    *cur = current;
+                    let bounds = c.clamp_rect_to_image(rect_from_points(*start, current));
+                    drop(state);
+                    c.imp().crop_bounds.replace(Some(bounds));
+                    c.queue_draw();
+                }
+                DrawingState::CropMoving {
+                    drag_start,
+                    original_bounds,
+                } => {
+                    let dx = current.x - drag_start.x;
+                    let dy = current.y - drag_start.y;
+                    let moved = Rect {
+                        x: original_bounds.x + dx,
+                        y: original_bounds.y + dy,
+                        width: original_bounds.width,
+                        height: original_bounds.height,
+                    };
+                    drop(state);
+                    c.imp()
+                        .crop_bounds
+                        .replace(Some(c.clamp_crop_move_to_image(moved)));
+                    c.queue_draw();
+                }
+                DrawingState::CropResizing {
+                    handle,
+                    original_bounds,
+                    drag_start,
+                } => {
+                    let dx = current.x - drag_start.x;
+                    let dy = current.y - drag_start.y;
+                    let resized = resize_bounds(*original_bounds, *handle, dx, dy);
+                    drop(state);
+                    c.imp()
+                        .crop_bounds
+                        .replace(Some(c.clamp_rect_to_image(resized)));
+                    c.queue_draw();
+                }
                 _ => {}
             }
         });
@@ -262,6 +365,10 @@ impl Canvas {
             let Some(c) = canvas_weak.upgrade() else {
                 return;
             };
+            if c.imp().active_tool.get() == ActiveTool::Pan {
+                c.set_cursor_from_name(Some("grab"));
+                return;
+            }
             c.finish_draw_drag(offset_x, offset_y);
         });
         canvas.add_controller(draw_drag);
@@ -277,6 +384,10 @@ impl Canvas {
             let Some(c) = canvas_weak.upgrade() else {
                 return;
             };
+            if c.imp().active_tool.get() == ActiveTool::Crop {
+                c.apply_crop();
+                return;
+            }
             let p = c.screen_to_image(x, y);
             let engine = c.imp().annotations.borrow();
             if let Some(id) = engine.hit_test(p) {
@@ -317,6 +428,12 @@ impl Canvas {
                     glib::Propagation::Stop
                 }
                 gdk::Key::Escape => {
+                    if c.imp().active_tool.get() == ActiveTool::Crop {
+                        c.imp().crop_bounds.replace(None);
+                        c.imp().drawing_state.replace(DrawingState::Idle);
+                        c.queue_draw();
+                        return glib::Propagation::Stop;
+                    }
                     c.imp().annotations.borrow_mut().deselect();
                     c.imp().drawing_state.replace(DrawingState::Idle);
                     c.queue_draw();
@@ -341,8 +458,15 @@ impl Canvas {
     }
 
     pub fn set_active_tool(&self, tool: ActiveTool) {
+        if tool != ActiveTool::Crop {
+            self.imp().crop_bounds.replace(None);
+        }
         self.imp().active_tool.set(tool);
-        self.set_cursor_from_name(None);
+        match tool {
+            ActiveTool::Pan => self.set_cursor_from_name(Some("grab")),
+            ActiveTool::Crop => self.set_cursor_from_name(Some("crosshair")),
+            _ => self.set_cursor_from_name(None),
+        }
         self.queue_draw();
     }
 
@@ -688,6 +812,11 @@ impl Canvas {
                     }
                 }
             }
+            DrawingState::CropSelecting { .. }
+            | DrawingState::CropMoving { .. }
+            | DrawingState::CropResizing { .. } => {
+                self.queue_draw();
+            }
             _ => {
                 let _ = (offset_x, offset_y);
             }
@@ -989,6 +1118,134 @@ impl Canvas {
         if let Some(cb) = self.imp().annotation_changed_cb.borrow().as_ref() {
             cb();
         }
+    }
+
+    fn can_pan_in_viewport(&self) -> bool {
+        let (iw, ih) = self.image_size();
+        if iw <= 0.0 || ih <= 0.0 {
+            return false;
+        }
+        let zoom = self.imp().zoom.get();
+        iw * zoom > self.width() as f64 || ih * zoom > self.height() as f64
+    }
+
+    fn clamp_rect_to_image(&self, rect: Rect) -> Rect {
+        let (iw, ih) = self.image_size();
+        if iw <= 0.0 || ih <= 0.0 {
+            return rect;
+        }
+
+        let x1 = rect.x.clamp(0.0, iw);
+        let y1 = rect.y.clamp(0.0, ih);
+        let x2 = (rect.x + rect.width).clamp(0.0, iw);
+        let y2 = (rect.y + rect.height).clamp(0.0, ih);
+        Rect {
+            x: x1.min(x2),
+            y: y1.min(y2),
+            width: (x2 - x1).abs(),
+            height: (y2 - y1).abs(),
+        }
+    }
+
+    fn clamp_crop_move_to_image(&self, rect: Rect) -> Rect {
+        let (iw, ih) = self.image_size();
+        if iw <= 0.0 || ih <= 0.0 {
+            return rect;
+        }
+        let max_x = (iw - rect.width).max(0.0);
+        let max_y = (ih - rect.height).max(0.0);
+        Rect {
+            x: rect.x.clamp(0.0, max_x),
+            y: rect.y.clamp(0.0, max_y),
+            width: rect.width.min(iw),
+            height: rect.height.min(ih),
+        }
+    }
+
+    fn draw_crop_overlay(&self, cr: &gtk::cairo::Context, widget_w: f64, widget_h: f64) {
+        if self.imp().active_tool.get() != ActiveTool::Crop {
+            return;
+        }
+        let Some(bounds) = *self.imp().crop_bounds.borrow() else {
+            return;
+        };
+
+        let (x, y) = self.image_to_screen(Point {
+            x: bounds.x,
+            y: bounds.y,
+        });
+        let zoom = self.imp().zoom.get();
+        let w = bounds.width * zoom;
+        let h = bounds.height * zoom;
+        if w <= 0.0 || h <= 0.0 {
+            return;
+        }
+
+        cr.save().expect("cairo save");
+        cr.set_source_rgba(0.0, 0.0, 0.0, 0.35);
+        cr.rectangle(0.0, 0.0, widget_w, widget_h);
+        cr.rectangle(x, y, w, h);
+        cr.set_fill_rule(gtk::cairo::FillRule::EvenOdd);
+        let _ = cr.fill();
+        cr.restore().expect("cairo restore");
+
+        cr.save().expect("cairo save");
+        cr.set_source_rgba(1.0, 1.0, 1.0, 0.95);
+        cr.set_line_width(1.0);
+        cr.set_dash(&[6.0, 4.0], 0.0);
+        cr.rectangle(x, y, w, h);
+        let _ = cr.stroke();
+        cr.restore().expect("cairo restore");
+
+        cr.save().expect("cairo save");
+        let (pan_x, pan_y) = self.imp().pan_offset.get();
+        cr.translate(pan_x, pan_y);
+        cr.scale(zoom, zoom);
+        renderer::draw_selection_handles(cr, &bounds, zoom);
+        cr.restore().expect("cairo restore");
+    }
+
+    fn apply_crop(&self) {
+        let Some(bounds) = *self.imp().crop_bounds.borrow() else {
+            return;
+        };
+        let crop = self.clamp_rect_to_image(bounds);
+        if crop.width < 1.0 || crop.height < 1.0 {
+            return;
+        }
+
+        let x = crop.x.floor() as i32;
+        let y = crop.y.floor() as i32;
+        let w = crop.width.floor() as i32;
+        let h = crop.height.floor() as i32;
+        if w <= 0 || h <= 0 {
+            return;
+        }
+
+        let (cropped, source) = {
+            let image_ref = self.imp().image.borrow();
+            let Some(image) = image_ref.as_ref() else {
+                return;
+            };
+            (
+                image.pixbuf().new_subpixbuf(x, y, w, h),
+                SourceImage {
+                    path: image.source().path.clone(),
+                    width: w,
+                    height: h,
+                },
+            )
+        };
+        self.imp()
+            .image
+            .replace(Some(ImageData::from_pixbuf(cropped, source)));
+        *self.imp().annotations.borrow_mut() = AnnotationEngine::new();
+        self.imp().history.borrow_mut().clear();
+        self.imp().crop_bounds.replace(None);
+        self.imp().drawing_state.replace(DrawingState::Idle);
+        self.fit_to_window();
+        self.notify_annotation_changed();
+        self.queue_draw();
     }
 }
 
