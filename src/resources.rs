@@ -6,7 +6,7 @@ use gtk::glib;
 
 pub const RESOURCE_BASE_PATH: &str = "/com/screenshot_hero/ScreenshotHero";
 pub const TOOL_ICON_DIR: &str = "/com/screenshot_hero/ScreenshotHero/resources/icons";
-pub const APP_ICON_THEME_PATH: &str = "/com/screenshot_hero/ScreenshotHero/icons/hicolor";
+pub const APP_ICON_THEME_PATH: &str = "/com/screenshot_hero/ScreenshotHero/icons";
 pub const APP_ICON_NAME: &str = "com.screenshot_hero.ScreenshotHero";
 
 pub fn register() -> Result<(), String> {

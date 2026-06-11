@@ -25,7 +25,15 @@ modules:
       - cargo --offline fetch --manifest-path Cargo.toml --verbose
       - cargo --offline build --release --bin screenshot-hero
       - install -Dm755 target/release/screenshot-hero ${FLATPAK_DEST}/bin/screenshot-hero
+      - install -Dm0644 data/com.screenshot_hero.ScreenshotHero.desktop ${FLATPAK_DEST}/share/applications/com.screenshot_hero.ScreenshotHero.desktop
       - install -Dm0644 data/com.screenshot_hero.ScreenshotHero.gschema.xml ${FLATPAK_DEST}/share/glib-2.0/schemas/com.screenshot_hero.ScreenshotHero.gschema.xml
+      - install -Dm0644 data/icons/hicolor/32x32/apps/com.screenshot_hero.ScreenshotHero.png ${FLATPAK_DEST}/share/icons/hicolor/32x32/apps/com.screenshot_hero.ScreenshotHero.png
+      - install -Dm0644 data/icons/hicolor/48x48/apps/com.screenshot_hero.ScreenshotHero.png ${FLATPAK_DEST}/share/icons/hicolor/48x48/apps/com.screenshot_hero.ScreenshotHero.png
+      - install -Dm0644 data/icons/hicolor/64x64/apps/com.screenshot_hero.ScreenshotHero.png ${FLATPAK_DEST}/share/icons/hicolor/64x64/apps/com.screenshot_hero.ScreenshotHero.png
+      - install -Dm0644 data/icons/hicolor/128x128/apps/com.screenshot_hero.ScreenshotHero.png ${FLATPAK_DEST}/share/icons/hicolor/128x128/apps/com.screenshot_hero.ScreenshotHero.png
+      - install -Dm0644 data/icons/hicolor/256x256/apps/com.screenshot_hero.ScreenshotHero.png ${FLATPAK_DEST}/share/icons/hicolor/256x256/apps/com.screenshot_hero.ScreenshotHero.png
+      - install -Dm0644 data/icons/hicolor/512x512/apps/com.screenshot_hero.ScreenshotHero.png ${FLATPAK_DEST}/share/icons/hicolor/512x512/apps/com.screenshot_hero.ScreenshotHero.png
+      - gtk4-update-icon-cache -q -t -f ${FLATPAK_DEST}/share/icons/hicolor || true
       - glib-compile-schemas ${FLATPAK_DEST}/share/glib-2.0/schemas/
     sources:
       - cargo-sources.json
