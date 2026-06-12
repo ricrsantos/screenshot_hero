@@ -27,6 +27,10 @@ pub struct MainWindow {
     pub(crate) canvas: OnceCell<Canvas>,
     tool_palette: OnceCell<ToolPalette>,
     zoom_label: OnceCell<gtk::Label>,
+    pub(crate) save_project_action: OnceCell<gio::SimpleAction>,
+    pub(crate) export_png_action: OnceCell<gio::SimpleAction>,
+    pub(crate) export_jpeg_action: OnceCell<gio::SimpleAction>,
+    pub(crate) copy_to_clipboard_action: OnceCell<gio::SimpleAction>,
     project_manager: RefCell<ProjectManager>,
     clipboard_debounce: RefCell<Option<glib::SourceId>>,
     settings: OnceCell<gio::Settings>,
@@ -38,6 +42,10 @@ impl Default for MainWindow {
             canvas: OnceCell::new(),
             tool_palette: OnceCell::new(),
             zoom_label: OnceCell::new(),
+            save_project_action: OnceCell::new(),
+            export_png_action: OnceCell::new(),
+            export_jpeg_action: OnceCell::new(),
+            copy_to_clipboard_action: OnceCell::new(),
             project_manager: RefCell::new(ProjectManager::new()),
             clipboard_debounce: RefCell::new(None),
             settings: OnceCell::new(),
@@ -94,6 +102,18 @@ impl ObjectImpl for MainWindow {
         export_jpeg.set_enabled(false);
         let copy_to_clipboard_action = gio::SimpleAction::new("copy-to-clipboard", None);
         copy_to_clipboard_action.set_enabled(false);
+        self.save_project_action
+            .set(save_project.clone())
+            .expect("save_project_action initialized once");
+        self.export_png_action
+            .set(export_png.clone())
+            .expect("export_png_action initialized once");
+        self.export_jpeg_action
+            .set(export_jpeg.clone())
+            .expect("export_jpeg_action initialized once");
+        self.copy_to_clipboard_action
+            .set(copy_to_clipboard_action.clone())
+            .expect("copy_to_clipboard_action initialized once");
 
         let new_screenshot = gio::SimpleAction::new("new-screenshot", None);
         let window_for_capture = window.clone();

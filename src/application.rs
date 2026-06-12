@@ -69,8 +69,10 @@ mod imp {
     use gtk::subclass::prelude::*;
     use libadwaita::subclass::prelude::AdwApplicationImpl;
 
+    use crate::capture::{CaptureError, CaptureService};
     use crate::resources;
     use crate::settings::AppSettings;
+    use crate::ui::dialogs::show_error_dialog;
     use crate::ui::MainWindow;
 
     #[derive(Default)]
@@ -93,13 +95,17 @@ mod imp {
                 .into_iter()
                 .any(|arg| arg.to_string_lossy() == "--capture");
 
-            self.present_main_window(start_with_capture);
+            if start_with_capture {
+                self.capture_first_then_present_window();
+            } else {
+                self.present_main_window(false);
+            }
             glib::ExitCode::SUCCESS
         }
 
         fn startup(&self) {
             let _ = env_logger::Builder::new()
-                .filter_level(log::LevelFilter::Trace)
+                .filter_level(log::LevelFilter::Info)
                 .try_init();
 
             if let Err(err) = resources::register() {
@@ -158,6 +164,31 @@ mod imp {
                     log::warn!("Unable to trigger startup capture action: {err}");
                 }
             }
+        }
+
+        fn capture_first_then_present_window(&self) {
+            let app = self.obj().clone();
+            let hold_guard = app.hold();
+            glib::spawn_future_local(async move {
+                let _hold_guard = hold_guard;
+                match CaptureService::capture().await {
+                    Ok(Some(image)) => {
+                        let window = MainWindow::new(app.as_ref());
+                        window.set_loaded_image(image);
+                        window.present();
+                    }
+                    Ok(None) | Err(CaptureError::PortalCancelled) => {
+                        let window = MainWindow::new(app.as_ref());
+                        window.present();
+                    }
+                    Err(CaptureError::PortalUnavailable(msg))
+                    | Err(CaptureError::ImageLoadFailed(msg)) => {
+                        let window = MainWindow::new(app.as_ref());
+                        window.present();
+                        show_error_dialog(&window, "Screenshot Failed", &msg);
+                    }
+                }
+            });
         }
     }
     impl GtkApplicationImpl for Application {}
