@@ -29,7 +29,7 @@ impl PreferencesWindow {
                 2 => "dark",
                 _ => "follow-system",
             };
-            settings_for_color.set_string("color-scheme", value);
+            let _ = settings_for_color.set_string("color-scheme", value);
         });
 
         appearance.add(&color_row);
@@ -117,7 +117,7 @@ impl PreferencesWindow {
                 4 => "trace",
                 _ => "info",
             };
-            settings_for_log.set_string("log-level", value);
+            let _ = settings_for_log.set_string("log-level", value);
         });
 
         developer.add(&log_row);

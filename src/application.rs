@@ -21,9 +21,8 @@ impl LaunchOptions {
         for arg in args.into_iter().map(Into::into) {
             if arg == "--capture" {
                 start_with_capture = true;
-            } else {
-                passthrough_args.push(arg);
             }
+            passthrough_args.push(arg);
         }
 
         Self {
@@ -43,6 +42,7 @@ impl Application {
         let app: Self = glib::Object::builder()
             .property("application-id", "com.screenshot_hero.ScreenshotHero")
             .property("resource-base-path", crate::resources::RESOURCE_BASE_PATH)
+            .property("flags", gio::ApplicationFlags::HANDLES_COMMAND_LINE)
             .build();
 
         app.imp().start_with_capture.set(start_with_capture);
@@ -63,6 +63,7 @@ impl Default for Application {
 mod imp {
     use std::cell::Cell;
 
+    use gtk::gio;
     use gtk::glib;
     use gtk::prelude::*;
     use gtk::subclass::prelude::*;
@@ -86,6 +87,16 @@ mod imp {
 
     impl ObjectImpl for Application {}
     impl ApplicationImpl for Application {
+        fn command_line(&self, command_line: &gio::ApplicationCommandLine) -> glib::ExitCode {
+            let start_with_capture = command_line
+                .arguments()
+                .into_iter()
+                .any(|arg| arg.to_string_lossy() == "--capture");
+
+            self.present_main_window(start_with_capture);
+            glib::ExitCode::SUCCESS
+        }
+
         fn startup(&self) {
             let _ = env_logger::Builder::new()
                 .filter_level(log::LevelFilter::Trace)
@@ -132,11 +143,17 @@ mod imp {
         }
 
         fn activate(&self) {
+            self.present_main_window(self.start_with_capture.replace(false));
+        }
+    }
+
+    impl Application {
+        fn present_main_window(&self, start_with_capture: bool) {
             let app = self.obj();
             let window = MainWindow::new(app.as_ref());
             window.present();
 
-            if self.start_with_capture.replace(false) {
+            if start_with_capture {
                 if let Err(err) = window.activate_action("win.new-screenshot", None) {
                     log::warn!("Unable to trigger startup capture action: {err}");
                 }
@@ -161,6 +178,7 @@ mod tests {
             options.passthrough_args,
             vec![
                 "screenshot-hero".to_string(),
+                "--capture".to_string(),
                 "--gapplication-service".to_string()
             ]
         );

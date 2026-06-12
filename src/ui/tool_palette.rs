@@ -11,7 +11,6 @@ use crate::resources;
 
 pub struct ToolPalette {
     container: gtk::Box,
-    tool_buttons: Vec<(ActiveTool, gtk::ToggleButton)>,
     tool_changed_cb: Rc<RefCell<Option<Box<dyn Fn(ActiveTool)>>>>,
     color_changed_cb: Rc<RefCell<Option<Box<dyn Fn(Color)>>>>,
     stroke_changed_cb: Rc<RefCell<Option<Box<dyn Fn(f32)>>>>,
@@ -87,7 +86,7 @@ impl ToolPalette {
         let style_sep = gtk::Separator::new(gtk::Orientation::Horizontal);
         container.append(&style_sep);
 
-        let color_button = gtk::ColorButton::new();
+        let color_button = gtk::ColorDialogButton::new(Some(gtk::ColorDialog::new()));
         color_button.set_rgba(&gdk::RGBA::new(1.0, 0.0, 0.0, 1.0));
         color_button.set_tooltip_text(Some("Stroke Color"));
         color_button.add_css_class("tool-color");
@@ -150,7 +149,7 @@ impl ToolPalette {
         }
 
         let color_cb_cell = Rc::clone(&color_changed_cb);
-        color_button.connect_color_set(move |button| {
+        color_button.connect_rgba_notify(move |button| {
             let rgba = button.rgba();
             let color = Color {
                 r: rgba.red() as f64,
@@ -194,7 +193,6 @@ impl ToolPalette {
 
         Self {
             container,
-            tool_buttons,
             tool_changed_cb,
             color_changed_cb,
             stroke_changed_cb,
@@ -207,12 +205,6 @@ impl ToolPalette {
 
     pub fn on_tool_changed(&self, cb: impl Fn(ActiveTool) + 'static) {
         *self.tool_changed_cb.borrow_mut() = Some(Box::new(cb));
-    }
-
-    pub fn set_active_tool(&self, tool: ActiveTool) {
-        for (active_tool, btn) in &self.tool_buttons {
-            btn.set_active(*active_tool == tool);
-        }
     }
 
     pub fn on_color_changed(&self, cb: impl Fn(Color) + 'static) {

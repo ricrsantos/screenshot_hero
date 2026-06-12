@@ -586,11 +586,11 @@ impl Canvas {
                 })
         });
 
-        let tool = if existing_id.is_some() {
+        let tool = if let Some(id) = existing_id {
             self.imp()
                 .annotations
                 .borrow()
-                .annotation_at(existing_id.unwrap())
+                .annotation_at(id)
                 .map(|ann| match ann.kind {
                     AnnotationKind::Callout(_) => ActiveTool::Callout,
                     _ => ActiveTool::Text,
@@ -600,49 +600,78 @@ impl Canvas {
             self.imp().active_tool.get()
         };
 
-        let dialog = gtk::Dialog::builder()
+        let dialog = gtk::Window::builder()
             .title(if existing_id.is_some() {
                 "Edit Text"
             } else {
                 "Add Text"
             })
             .modal(true)
+            .default_width(360)
             .build();
 
-        if let Some(root) = self.root() {
-            dialog.set_transient_for(Some(
-                root.downcast_ref::<gtk::Window>().expect("root is Window"),
-            ));
+        if let Some(root) = self.root().and_then(|r| r.downcast::<gtk::Window>().ok()) {
+            dialog.set_transient_for(Some(&root));
         }
 
-        let content = dialog.content_area();
+        let content = gtk::Box::new(gtk::Orientation::Vertical, 12);
+        content.set_margin_start(12);
+        content.set_margin_end(12);
+        content.set_margin_top(12);
+        content.set_margin_bottom(12);
         let entry = gtk::Entry::builder()
             .hexpand(true)
-            .activates_default(true)
             .build();
         if let Some(text) = existing_text {
             entry.set_text(&text);
         }
         content.append(&entry);
 
-        dialog.add_button("Cancel", gtk::ResponseType::Cancel);
-        dialog.add_button("OK", gtk::ResponseType::Accept);
-        dialog.set_default_response(gtk::ResponseType::Accept);
+        let actions = gtk::Box::new(gtk::Orientation::Horizontal, 6);
+        actions.set_halign(gtk::Align::End);
+        let cancel_btn = gtk::Button::with_label("Cancel");
+        let ok_btn = gtk::Button::with_label("OK");
+        ok_btn.add_css_class("suggested-action");
+        actions.append(&cancel_btn);
+        actions.append(&ok_btn);
+        content.append(&actions);
+        dialog.set_child(Some(&content));
 
         let canvas_weak = self.downgrade();
-        let style = self.imp().current_style.borrow().clone();
-        let entry_for_response = entry.clone();
-        dialog.connect_response(move |dialog, response| {
-            if response == gtk::ResponseType::Accept {
+        let style = *self.imp().current_style.borrow();
+
+        {
+            let dialog = dialog.clone();
+            cancel_btn.connect_clicked(move |_| {
+                dialog.close();
+            });
+        }
+
+        {
+            let dialog = dialog.clone();
+            let entry_for_response = entry.clone();
+            let canvas_weak = canvas_weak.clone();
+            ok_btn.connect_clicked(move |_| {
                 let text = entry_for_response.text().to_string();
                 if !text.is_empty() {
                     if let Some(c) = canvas_weak.upgrade() {
-                        c.confirm_text_editor(text, position, existing_id, tool, style.clone());
+                        c.confirm_text_editor(text, position, existing_id, tool, style);
                     }
                 }
-            }
-            dialog.close();
-        });
+                dialog.close();
+            });
+        }
+
+        {
+            let dialog = dialog.clone();
+            let entry_for_response = entry.clone();
+            entry.connect_activate(move |_| {
+                ok_btn.emit_clicked();
+                if entry_for_response.text().is_empty() {
+                    dialog.close();
+                }
+            });
+        }
 
         dialog.present();
         entry.grab_focus_without_selecting();

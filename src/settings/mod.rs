@@ -85,7 +85,7 @@ impl AppSettings {
     }
 
     pub fn set_color_scheme(&self, value: ColorSchemePreference) {
-        self.inner.set_string("color-scheme", value.as_str());
+        let _ = self.inner.set_string("color-scheme", value.as_str());
     }
 
     pub fn timestamp_enabled(&self) -> bool {
@@ -93,7 +93,7 @@ impl AppSettings {
     }
 
     pub fn set_timestamp_enabled(&self, value: bool) {
-        self.inner.set_boolean("timestamp-enabled", value);
+        let _ = self.inner.set_boolean("timestamp-enabled", value);
     }
 
     pub fn timestamp_format(&self) -> String {
@@ -101,7 +101,7 @@ impl AppSettings {
     }
 
     pub fn set_timestamp_format(&self, value: &str) {
-        self.inner.set_string("timestamp-format", value);
+        let _ = self.inner.set_string("timestamp-format", value);
     }
 
     pub fn auto_save_enabled(&self) -> bool {
@@ -109,7 +109,7 @@ impl AppSettings {
     }
 
     pub fn set_auto_save_enabled(&self, value: bool) {
-        self.inner.set_boolean("auto-save-enabled", value);
+        let _ = self.inner.set_boolean("auto-save-enabled", value);
     }
 
     pub fn auto_export_enabled(&self) -> bool {
@@ -117,7 +117,7 @@ impl AppSettings {
     }
 
     pub fn set_auto_export_enabled(&self, value: bool) {
-        self.inner.set_boolean("auto-export-enabled", value);
+        let _ = self.inner.set_boolean("auto-export-enabled", value);
     }
 
     pub fn auto_export_suffix(&self) -> String {
@@ -125,7 +125,7 @@ impl AppSettings {
     }
 
     pub fn set_auto_export_suffix(&self, value: &str) {
-        self.inner.set_string("auto-export-suffix", value);
+        let _ = self.inner.set_string("auto-export-suffix", value);
     }
 
     pub fn auto_clipboard_enabled(&self) -> bool {
@@ -133,7 +133,7 @@ impl AppSettings {
     }
 
     pub fn set_auto_clipboard_enabled(&self, value: bool) {
-        self.inner.set_boolean("auto-clipboard-enabled", value);
+        let _ = self.inner.set_boolean("auto-clipboard-enabled", value);
     }
 
     pub fn log_level(&self) -> LevelFilter {
@@ -156,7 +156,7 @@ impl AppSettings {
             LevelFilter::Trace => "trace",
             LevelFilter::Off => "info",
         };
-        self.inner.set_string("log-level", level);
+        let _ = self.inner.set_string("log-level", level);
     }
 
     pub fn connect_changed<F: Fn(&str) + 'static>(&self, f: F) {

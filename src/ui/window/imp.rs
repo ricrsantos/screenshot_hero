@@ -519,9 +519,15 @@ impl ObjectImpl for MainWindow {
         new_button.add_css_class("new-screenshot-btn");
         header.pack_start(&new_button);
 
-        let open_button = gtk::Button::builder()
+        let new_button = gtk::Button::builder()
             .label("New")
             .action_name("win.new-image")
+            .build();
+        header.pack_start(&new_button);
+
+        let open_button = gtk::Button::builder()
+            .label("Open")
+            .action_name("win.open-file")
             .build();
         header.pack_start(&open_button);
 
