@@ -136,6 +136,24 @@ impl ObjectImpl for MainWindow {
         });
         actions.add_action(&new_screenshot);
 
+        let new_image = gio::SimpleAction::new("new-image", None);
+        let canvas_for_new_image = canvas.clone();
+        let save_project_for_new_image = save_project.clone();
+        let export_png_for_new_image = export_png.clone();
+        let export_jpeg_for_new_image = export_jpeg.clone();
+        let copy_for_new_image = copy_to_clipboard_action.clone();
+        new_image.connect_activate(move |_, _| {
+            canvas_for_new_image.new_blank_image();
+            update_image_dependent_actions(
+                &canvas_for_new_image,
+                &save_project_for_new_image,
+                &export_png_for_new_image,
+                &export_jpeg_for_new_image,
+                &copy_for_new_image,
+            );
+        });
+        actions.add_action(&new_image);
+
         let open_file = gio::SimpleAction::new("open-file", None);
         let window_for_open = window.clone();
         let canvas_for_open = canvas.clone();
@@ -502,28 +520,29 @@ impl ObjectImpl for MainWindow {
         header.pack_start(&new_button);
 
         let open_button = gtk::Button::builder()
-            .label("Open")
-            .action_name("win.open-file")
+            .label("New")
+            .action_name("win.new-image")
             .build();
         header.pack_start(&open_button);
 
-        let file_section = gio::Menu::new();
-        file_section.append(Some("Open File"), Some("win.open-file"));
-        file_section.append(Some("Open Project"), Some("win.open-project"));
-        file_section.append(Some("Save"), Some("win.save-project"));
-        file_section.append(Some("Copy to Clipboard"), Some("win.copy-to-clipboard"));
+        let image_section = gio::Menu::new();
+        image_section.append(Some("New Image"), Some("win.new-image"));
+        image_section.append(Some("Open"), Some("win.open-file"));
+        image_section.append(Some("Save as PNG"), Some("win.export-png"));
+        image_section.append(Some("Save as JPEG"), Some("win.export-jpeg"));
+        image_section.append(Some("Copy to Clipboard"), Some("win.copy-to-clipboard"));
 
-        let export_section = gio::Menu::new();
-        export_section.append(Some("Export PNG"), Some("win.export-png"));
-        export_section.append(Some("Export JPEG"), Some("win.export-jpeg"));
+        let project_section = gio::Menu::new();
+        project_section.append(Some("Open Project"), Some("win.open-project"));
+        project_section.append(Some("Save Project"), Some("win.save-project"));
 
-        let app_section = gio::Menu::new();
-        app_section.append(Some("Preferences"), Some("win.show-preferences"));
+        let preferences_section = gio::Menu::new();
+        preferences_section.append(Some("Preferences"), Some("win.show-preferences"));
 
         let file_menu = gio::Menu::new();
-        file_menu.append_section(None, &file_section);
-        file_menu.append_section(Some("Export"), &export_section);
-        file_menu.append_section(None, &app_section);
+        file_menu.append_section(Some("Image"), &image_section);
+        file_menu.append_section(Some("Project"), &project_section);
+        file_menu.append_section(None, &preferences_section);
 
         let menu_button = gtk::MenuButton::builder()
             .icon_name("open-menu-symbolic")

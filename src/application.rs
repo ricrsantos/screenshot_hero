@@ -124,7 +124,10 @@ mod imp {
             app.set_accels_for_action("win.zoom-100", &["<Control>0"]);
             app.set_accels_for_action("win.undo", &["<Control>z"]);
             app.set_accels_for_action("win.redo", &["<Control>y", "<Control><Shift>z"]);
+            app.set_accels_for_action("win.new-image", &["<Control>n"]);
+            app.set_accels_for_action("win.open-file", &["<Control>o"]);
             app.set_accels_for_action("win.save-project", &["<Control>s"]);
+            app.set_accels_for_action("win.copy-to-clipboard", &["<Control>c"]);
             app.set_accels_for_action("win.show-preferences", &["<Control>comma"]);
         }
 

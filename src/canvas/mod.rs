@@ -452,6 +452,28 @@ impl Canvas {
         self.queue_draw();
     }
 
+    pub fn new_blank_image(&self) {
+        let width = self.width().max(1);
+        let height = self.height().max(1);
+        let Some(pixbuf) = gdk_pixbuf::Pixbuf::new(gdk_pixbuf::Colorspace::Rgb, false, 8, width, height)
+        else {
+            log::error!("Unable to allocate blank image {width}x{height}");
+            return;
+        };
+        pixbuf.fill(0xFFFFFFFF);
+        self.set_image(ImageData::from_pixbuf(
+            pixbuf,
+            SourceImage {
+                path: PathBuf::from("new-image.png"),
+                width,
+                height,
+            },
+        ));
+        self.imp().annotations.borrow_mut().deselect();
+        self.imp().history.borrow_mut().clear();
+        self.fit_to_window();
+    }
+
     pub fn clear(&self) {
         self.imp().image.replace(None);
         self.queue_draw();
