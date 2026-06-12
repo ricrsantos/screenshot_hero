@@ -39,10 +39,10 @@ impl AnnotationEngine {
         }
     }
 
-    pub fn move_to_bounds(&mut self, id: Uuid, from_bounds: Rect, to_bounds: Rect) {
-        let dx = to_bounds.x - from_bounds.x;
-        let dy = to_bounds.y - from_bounds.y;
+    pub fn move_to_bounds(&mut self, id: Uuid, _from_bounds: Rect, to_bounds: Rect) {
         if let Some(ann) = self.annotations.iter_mut().find(|a| a.id == id) {
+            let dx = to_bounds.x - ann.bounds.x;
+            let dy = to_bounds.y - ann.bounds.y;
             ann.bounds = to_bounds;
             match &mut ann.kind {
                 AnnotationKind::Arrow(data) | AnnotationKind::Line(data) => {

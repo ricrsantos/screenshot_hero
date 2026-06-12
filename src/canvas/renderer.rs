@@ -328,7 +328,8 @@ fn draw_number_marker(
     layout.set_font_description(Some(&font));
 
     let (tw, th) = layout.pixel_size();
-    cr.set_source_rgba(1.0, 1.0, 1.0, 1.0);
+    let c = style.stroke_color;
+    cr.set_source_rgba(c.r, c.g, c.b, c.a);
     cr.move_to(cx - tw as f64 / 2.0, cy - th as f64 / 2.0);
     show_layout(cr, &layout);
 }
@@ -399,7 +400,8 @@ pub fn draw_selection_handles(cr: &cairo::Context, bounds: &Rect, zoom: f64) {
         (bounds.x + bounds.width, bounds.y + bounds.height),
     ];
 
-    cr.set_source_rgba(1.0, 1.0, 1.0, 1.0);
+    // Adwaita blue for better contrast in both themes.
+    cr.set_source_rgba(0.21, 0.52, 0.89, 1.0);
     cr.set_line_width(1.0 / zoom);
 
     for (cx, cy) in corners {

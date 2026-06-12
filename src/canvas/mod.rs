@@ -14,6 +14,7 @@ use crate::annotations::{
     ArrowData, CalloutData, DrawingState, FreehandData, HandleIndex, NumberMarkerData, Point, Rect,
     TextData,
 };
+use crate::export::renderer as export_renderer;
 use crate::models::{ImageData, SourceImage};
 
 glib::wrapper! {
@@ -134,6 +135,7 @@ impl Canvas {
             let Some(c) = canvas_weak.upgrade() else {
                 return;
             };
+            c.grab_focus();
             if gesture.current_button() != 1 {
                 return;
             }
@@ -378,12 +380,13 @@ impl Canvas {
         click.set_propagation_phase(gtk::PropagationPhase::Capture);
         let canvas_weak = canvas.downgrade();
         click.connect_pressed(move |gesture, n_press, x, y| {
-            if gesture.current_button() != 1 || n_press != 2 {
-                return;
-            }
             let Some(c) = canvas_weak.upgrade() else {
                 return;
             };
+            c.grab_focus();
+            if gesture.current_button() != 1 || n_press != 2 {
+                return;
+            }
             if c.imp().active_tool.get() == ActiveTool::Crop {
                 c.apply_crop();
                 return;
@@ -412,7 +415,7 @@ impl Canvas {
                 return glib::Propagation::Proceed;
             };
             match key {
-                gdk::Key::Delete => {
+                gdk::Key::Delete | gdk::Key::KP_Delete => {
                     let mut engine = c.imp().annotations.borrow_mut();
                     if let Some(id) = engine.selected_id() {
                         if let Some(ann) = engine.remove(id) {
@@ -449,6 +452,11 @@ impl Canvas {
 
     pub fn set_image(&self, image: ImageData) {
         self.imp().image.replace(Some(image));
+        *self.imp().annotations.borrow_mut() = AnnotationEngine::new();
+        self.imp().history.borrow_mut().clear();
+        self.imp().drawing_state.replace(DrawingState::Idle);
+        self.imp().freehand_points.borrow_mut().clear();
+        self.imp().crop_bounds.replace(None);
         self.queue_draw();
     }
 
@@ -460,7 +468,13 @@ impl Canvas {
             log::error!("Unable to allocate blank image {width}x{height}");
             return;
         };
-        pixbuf.fill(0xFFFFFFFF);
+        let fill = if libadwaita::StyleManager::default().is_dark() {
+            // Slightly lighter than the dark window background.
+            0x3A3A3AFF
+        } else {
+            0xFFFFFFFF
+        };
+        pixbuf.fill(fill);
         self.set_image(ImageData::from_pixbuf(
             pixbuf,
             SourceImage {
@@ -469,8 +483,6 @@ impl Canvas {
                 height,
             },
         ));
-        self.imp().annotations.borrow_mut().deselect();
-        self.imp().history.borrow_mut().clear();
         self.fit_to_window();
     }
 
@@ -772,7 +784,6 @@ impl Canvas {
 
     fn finish_draw_drag(&self, offset_x: f64, offset_y: f64) {
         let state = self.imp().drawing_state.replace(DrawingState::Idle);
-        self.imp().freehand_points.borrow_mut().clear();
 
         match state {
             DrawingState::Drawing { start, current } => {
@@ -843,6 +854,7 @@ impl Canvas {
                 let _ = (offset_x, offset_y);
             }
         }
+        self.imp().freehand_points.borrow_mut().clear();
     }
 
     fn handle_click_tool(&self, position: Point) {
@@ -1249,8 +1261,15 @@ impl Canvas {
             let Some(image) = image_ref.as_ref() else {
                 return;
             };
+            let annotations = self.imp().annotations.borrow();
+            let composed = if annotations.all().is_empty() {
+                image.pixbuf().clone()
+            } else {
+                export_renderer::render_to_pixbuf(image.pixbuf(), annotations.all())
+                    .unwrap_or_else(|| image.pixbuf().clone())
+            };
             (
-                image.pixbuf().new_subpixbuf(x, y, w, h),
+                composed.new_subpixbuf(x, y, w, h),
                 SourceImage {
                     path: image.source().path.clone(),
                     width: w,
