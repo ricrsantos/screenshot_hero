@@ -72,7 +72,7 @@ mod imp {
     use crate::capture::{CaptureError, CaptureService};
     use crate::resources;
     use crate::settings::AppSettings;
-    use crate::ui::dialogs::show_error_dialog;
+    use crate::ui::dialogs::{show_timed_error_dialog, show_timed_error_dialog_standalone};
     use crate::ui::MainWindow;
 
     #[derive(Default)]
@@ -206,22 +206,35 @@ mod imp {
                     }
                     Err(CaptureError::PortalUnavailable(msg))
                     | Err(CaptureError::ImageLoadFailed(msg)) => {
+                        if let Some(existing) = Self::existing_main_window(&app) {
+                            existing.present();
+                            show_timed_error_dialog(
+                                &existing,
+                                "Screenshot Failed",
+                                &msg,
+                                std::time::Duration::from_secs(4),
+                            );
+                            return;
+                        }
+
                         if behavior.skip_post_capture_editing {
                             log::error!(
                                 "Capture failed while post-capture editing is disabled: {msg}"
                             );
-                            app.quit();
-                            return;
                         }
-
-                        let window = if behavior.open_new_window_on_capture {
-                            MainWindow::new(app.as_ref())
-                        } else {
-                            Self::existing_main_window(&app)
-                                .unwrap_or_else(|| MainWindow::new(app.as_ref()))
-                        };
-                        window.present();
-                        show_error_dialog(&window, "Screenshot Failed", &msg);
+                        show_timed_error_dialog_standalone(
+                            "Screenshot Failed",
+                            &msg,
+                            std::time::Duration::from_secs(4),
+                            {
+                                let app_for_quit = app.clone();
+                                let hold_for_error_dialog = app.hold();
+                                move || {
+                                    drop(hold_for_error_dialog);
+                                    app_for_quit.quit();
+                                }
+                            },
+                        );
                     }
                 }
             });

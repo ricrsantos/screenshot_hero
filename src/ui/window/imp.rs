@@ -8,7 +8,7 @@ use gtk::prelude::*;
 use gtk::subclass::prelude::*;
 use libadwaita::prelude::AdwApplicationWindowExt;
 
-use crate::ui::dialogs::show_error_dialog;
+use crate::ui::dialogs::{show_error_dialog, show_timed_error_dialog};
 use libadwaita::subclass::application_window::AdwApplicationWindowImpl;
 use libadwaita::subclass::window::AdwWindowImpl;
 
@@ -170,11 +170,21 @@ impl ObjectImpl for MainWindow {
                     Ok(None) | Err(CaptureError::PortalCancelled) => {}
                     Err(CaptureError::PortalUnavailable(msg)) => {
                         log::error!("Screenshot portal unavailable: {msg}");
-                        show_error_dialog(&window, "Screenshot Failed", &msg);
+                        show_timed_error_dialog(
+                            &window,
+                            "Screenshot Failed",
+                            &msg,
+                            Duration::from_secs(4),
+                        );
                     }
                     Err(CaptureError::ImageLoadFailed(msg)) => {
                         log::error!("Screenshot image load failed: {msg}");
-                        show_error_dialog(&window, "Screenshot Failed", &msg);
+                        show_timed_error_dialog(
+                            &window,
+                            "Screenshot Failed",
+                            &msg,
+                            Duration::from_secs(4),
+                        );
                     }
                 }
             });
