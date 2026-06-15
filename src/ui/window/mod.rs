@@ -1,6 +1,9 @@
 mod imp;
 
+use std::time::Duration;
+
 use gtk::glib;
+use gtk::prelude::*;
 use gtk::subclass::prelude::*;
 
 use crate::canvas::Canvas;
@@ -33,7 +36,7 @@ impl MainWindow {
     pub fn set_loaded_image(&self, image: ImageData) {
         let canvas = self.canvas();
         canvas.set_image(image);
-        canvas.fit_to_window();
+        fit_to_window_when_ready(&canvas, 12);
         let enabled = canvas.source_image_path().is_some();
         if let Some(action) = self.imp().save_project_action.get() {
             action.set_enabled(enabled);
@@ -48,4 +51,20 @@ impl MainWindow {
             action.set_enabled(enabled);
         }
     }
+}
+
+fn fit_to_window_when_ready(canvas: &Canvas, retries_left: u8) {
+    if canvas.width() > 0 && canvas.height() > 0 {
+        canvas.fit_to_window();
+        return;
+    }
+
+    if retries_left == 0 {
+        return;
+    }
+
+    let canvas_clone = canvas.clone();
+    glib::timeout_add_local_once(Duration::from_millis(16), move || {
+        fit_to_window_when_ready(&canvas_clone, retries_left - 1);
+    });
 }

@@ -29,6 +29,8 @@ impl Canvas {
     const SCROLL_STEP: f64 = 1.1;
     const MIN_DRAG_DISTANCE: f64 = 4.0;
     const HANDLE_HIT_RADIUS: f64 = 8.0;
+    const HANDLE_HIT_SCALE_FACTOR: f64 = 1.5;
+    const HANDLE_DESELECT_GUARD_SCALE_FACTOR: f64 = 1.25;
     const MIN_BOUNDS_SIZE: f64 = 4.0;
     const NUMBER_MARKER_SIZE: f64 = 24.0;
 
@@ -193,6 +195,32 @@ impl Canvas {
             }
 
             if tool == ActiveTool::Select {
+                let selected_target = {
+                    let engine = c.imp().annotations.borrow();
+                    engine
+                        .selected_id()
+                        .and_then(|id| engine.annotation_at(id).map(|ann| (id, ann.bounds)))
+                };
+
+                if let Some((selected_id, selected_bounds)) = selected_target {
+                    if let Some(handle) = c.handle_at(&selected_bounds, p) {
+                        c.imp().drawing_state.replace(DrawingState::ResizingHandle {
+                            id: selected_id,
+                            handle,
+                            original_bounds: selected_bounds,
+                            drag_start: p,
+                        });
+                        c.queue_draw();
+                        return;
+                    }
+
+                    if c.handle_at_with_guard(&selected_bounds, p).is_some() {
+                        c.imp().drawing_state.replace(DrawingState::Idle);
+                        c.queue_draw();
+                        return;
+                    }
+                }
+
                 let mut engine = c.imp().annotations.borrow_mut();
                 if let Some(id) = engine.hit_test(p) {
                     if let Some(ann) = engine.annotation_at(id) {
@@ -789,7 +817,22 @@ impl Canvas {
     }
 
     fn handle_at(&self, bounds: &Rect, p: Point) -> Option<HandleIndex> {
-        let r = Self::HANDLE_HIT_RADIUS;
+        // Keep handle hit area stable in screen pixels regardless of zoom.
+        let zoom = self.imp().zoom.get().max(0.01);
+        let r = (Self::HANDLE_HIT_RADIUS * Self::HANDLE_HIT_SCALE_FACTOR) / zoom;
+        self.handle_at_with_radius(bounds, p, r)
+    }
+
+    fn handle_at_with_guard(&self, bounds: &Rect, p: Point) -> Option<HandleIndex> {
+        let zoom = self.imp().zoom.get().max(0.01);
+        let r = (Self::HANDLE_HIT_RADIUS
+            * Self::HANDLE_HIT_SCALE_FACTOR
+            * Self::HANDLE_DESELECT_GUARD_SCALE_FACTOR)
+            / zoom;
+        self.handle_at_with_radius(bounds, p, r)
+    }
+
+    fn handle_at_with_radius(&self, bounds: &Rect, p: Point, r: f64) -> Option<HandleIndex> {
         let corners = [
             (HandleIndex::TopLeft, bounds.x, bounds.y),
             (HandleIndex::TopRight, bounds.x + bounds.width, bounds.y),

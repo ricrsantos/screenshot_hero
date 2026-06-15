@@ -8,7 +8,8 @@
 ## Task Breakdown
 
 ### T1 - Extend GSettings schema
-- [x] Add 7 new keys for capture behavior, temporary mode, exit-after-paste, and window policy.
+- [x] Add capture behavior and window policy keys.
+- [x] Keep `exit-after-paste` out of current schema (deferred).
 - [x] Keep defaults aligned with requirements.
 - [x] Validate schema compilation.
 
@@ -31,7 +32,7 @@
 - [x] Add temporary disable switch.
 - [x] Add minutes/seconds duration inputs (default 1m0s).
 - [x] Add open-new-window switch.
-- [x] Add exit-after-paste switch.
+- [x] Keep `Exit After Paste` out of current preferences UI (deferred).
 
 **Gate:** `cargo build`
 
@@ -48,9 +49,8 @@
 ---
 
 ### T5 - Wire Exit After Paste runtime behavior
-- [x] In `--capture` edit session, copy image to clipboard automatically.
-- [x] Monitor clipboard changes and quit on change.
-- [x] Restrict behavior to startup capture flow with editor open.
+- [x] Feature disabled and removed from runtime.
+- [x] Marked as deferred in documentation for future implementation.
 
 **Gate:** `cargo build`
 

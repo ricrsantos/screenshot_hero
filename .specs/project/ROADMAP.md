@@ -92,8 +92,8 @@
 **Delivered:**
 - Capture behavior preferences for post-capture editing, temporary disable window, and window reuse policy
 - `--capture` runtime policy to capture-and-exit without opening editor when configured
-- Clipboard-exit automation (`Exit after paste`) for startup capture sessions
 - Default capture reuse behavior with optional per-capture new-window mode
+- `Exit After Paste` explicitly deferred to a future iteration
 
 ---
 

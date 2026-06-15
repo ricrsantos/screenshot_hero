@@ -189,20 +189,11 @@ impl PreferencesWindow {
             .bind("open-new-window-on-capture", &open_new_window, "active")
             .build();
 
-        let exit_after_paste = libadwaita::SwitchRow::builder()
-            .title("Exit After Paste")
-            .subtitle("Quit after captured image leaves clipboard")
-            .build();
-        settings
-            .bind("exit-after-paste", &exit_after_paste, "active")
-            .build();
-
         capture_behavior.add(&disable_post_capture);
         capture_behavior.add(&temporary_disable_post_capture);
         capture_behavior.add(&temporary_minutes_row);
         capture_behavior.add(&temporary_seconds_row);
         capture_behavior.add(&open_new_window);
-        capture_behavior.add(&exit_after_paste);
 
         let developer = libadwaita::PreferencesGroup::builder()
             .title("Developer")

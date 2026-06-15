@@ -23,7 +23,6 @@ Feature usa o padrão já existente:
 - `post-capture-editing-temporary-minutes` (`u`, default `1`)
 - `post-capture-editing-temporary-seconds` (`u`, default `0`)
 - `post-capture-editing-temporary-started-at` (`x`, default `0`)
-- `exit-after-paste` (`b`, default `true`)
 - `open-new-window-on-capture` (`b`, default `false`)
 
 ---
@@ -43,10 +42,8 @@ Feature usa o padrão já existente:
 
 ### Exit After Paste monitor
 
-- Em sessão `--capture` com editor aberto e `exit-after-paste = true`:
-  - app copia captura para clipboard;
-  - registra monitor por `clipboard.connect_changed`;
-  - ao detectar mudança no clipboard, chama `app.quit()`.
+- Funcionalidade removida da implementação atual e adiada para futura iteração.
+- Não há chave de configuração nem monitor runtime ativo no release atual.
 
 ### Reuse vs New Window (`src/ui/window/imp.rs` + `src/application.rs`)
 
@@ -60,4 +57,4 @@ Feature usa o padrão já existente:
 
 ## Validation Note (Clipboard Change Detection)
 
-A detecção de descarregamento/troca do clipboard foi validada tecnicamente usando o sinal nativo `gdk::Clipboard::connect_changed`, que notifica mudanças de proprietário/conteúdo no clipboard do display atual.
+A estratégia de fechamento via eventos de clipboard foi considerada, mas está adiada para revisão de UX/compatibilidade entre ambientes.

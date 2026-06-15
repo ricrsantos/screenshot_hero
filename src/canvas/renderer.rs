@@ -10,6 +10,7 @@ use crate::annotations::{
 };
 
 const HANDLE_SIZE: f64 = 8.0;
+const HANDLE_SCALE_FACTOR: f64 = 1.2;
 
 pub fn draw_all(
     cr: &cairo::Context,
@@ -392,7 +393,7 @@ fn draw_callout(cr: &cairo::Context, bounds: &Rect, data: &CalloutData, style: &
 }
 
 pub fn draw_selection_handles(cr: &cairo::Context, bounds: &Rect, zoom: f64) {
-    let half = HANDLE_SIZE / 2.0 / zoom;
+    let half = (HANDLE_SIZE * HANDLE_SCALE_FACTOR) / 2.0 / zoom;
     let corners = [
         (bounds.x, bounds.y),
         (bounds.x + bounds.width, bounds.y),

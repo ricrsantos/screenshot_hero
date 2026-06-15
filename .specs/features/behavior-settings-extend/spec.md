@@ -22,7 +22,7 @@ Isso afeta produtividade para fluxos rápidos de "capturar e colar" e gera abert
 
 - [x] Permitir desabilitar edição pós-captura em modo `--capture` (default desabilitado).
 - [x] Permitir desabilitar edição pós-captura por período configurável (minutos/segundos; default 1 minuto, opção desabilitada).
-- [x] Encerrar automaticamente o app após a imagem sair do clipboard quando em sessão `--capture` com editor aberto (default habilitado).
+- [ ] Encerrar automaticamente o app após a imagem sair do clipboard quando em sessão `--capture` com editor aberto (adiado).
 - [x] Permitir escolher entre reaproveitar janela atual ou abrir nova janela a cada captura (default reaproveitar).
 
 ---
@@ -62,22 +62,9 @@ Isso afeta produtividade para fluxos rápidos de "capturar e colar" e gera abert
 
 ---
 
-### P1: Exit After Paste
+### P1: Exit After Paste (Deferred)
 
-**Como** usuário em modo captura+cola  
-**Quero** que o app feche quando a imagem sair do clipboard  
-**Para** encerrar o fluxo automaticamente.
-
-**Acceptance Criteria**
-
-1. Default SHALL be enabled.
-2. Behavior SHALL be processed only when app was launched with `--capture` and post-capture editor is open.
-3. On successful capture in that mode, system SHALL copy rendered image to clipboard and start monitoring clipboard ownership/content change.
-4. WHEN clipboard content changes (image no longer controlled by app) THEN app SHALL quit automatically.
-
-**Requirement ID:** BSE-04
-
----
+**Status:** adiado para iteração futura devido inconsistências de UX entre ambientes.
 
 ### P1: Open New Window on Capture
 
@@ -102,5 +89,5 @@ Isso afeta produtividade para fluxos rápidos de "capturar e colar" e gera abert
 | BSE-01 | Disable post-capture editing toggle (`--capture`) | Implemented |
 | BSE-02 | Temporary disable toggle + duration settings | Implemented |
 | BSE-03 | Auto-expire temporary mode and restore normal behavior | Implemented |
-| BSE-04 | Exit after paste in `--capture` edit session | Implemented |
+| BSE-04 | Exit after paste in `--capture` edit session | Deferred |
 | BSE-05 | Open new window on capture toggle | Implemented |

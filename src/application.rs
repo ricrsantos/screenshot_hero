@@ -62,7 +62,6 @@ impl Default for Application {
 
 mod imp {
     use std::cell::Cell;
-    use std::time::Duration;
 
     use gtk::gio;
     use gtk::glib;
@@ -85,7 +84,6 @@ mod imp {
     struct CaptureBehavior {
         skip_post_capture_editing: bool,
         open_new_window_on_capture: bool,
-        exit_after_paste: bool,
     }
 
     #[glib::object_subclass]
@@ -195,14 +193,6 @@ mod imp {
                         window.set_loaded_image(image);
                         window.present();
 
-                        if behavior.exit_after_paste {
-                            if let Err(err) = window.activate_action("win.copy-to-clipboard", None)
-                            {
-                                log::warn!("Unable to copy startup capture to clipboard: {err}");
-                            } else {
-                                Self::arm_exit_after_paste_monitor(&app);
-                            }
-                        }
                     }
                     Ok(None) | Err(CaptureError::PortalCancelled) => {
                         if behavior.skip_post_capture_editing {
@@ -249,33 +239,13 @@ mod imp {
                     skip_post_capture_editing: settings
                         .is_post_capture_editing_effectively_disabled(),
                     open_new_window_on_capture: settings.open_new_window_on_capture(),
-                    exit_after_paste: settings.exit_after_paste(),
                 };
             }
 
             CaptureBehavior {
                 skip_post_capture_editing: false,
                 open_new_window_on_capture: false,
-                exit_after_paste: true,
             }
-        }
-
-        fn arm_exit_after_paste_monitor(app: &super::Application) {
-            let Some(display) = gtk::gdk::Display::default() else {
-                log::warn!("Exit-after-paste monitor unavailable: no display");
-                return;
-            };
-
-            let clipboard = display.clipboard();
-            let app_weak = app.downgrade();
-            glib::timeout_add_local_once(Duration::from_millis(250), move || {
-                let app_weak = app_weak.clone();
-                clipboard.connect_changed(move |_| {
-                    if let Some(app) = app_weak.upgrade() {
-                        app.quit();
-                    }
-                });
-            });
         }
     }
     impl GtkApplicationImpl for Application {}

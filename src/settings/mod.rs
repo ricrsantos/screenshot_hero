@@ -193,14 +193,6 @@ impl AppSettings {
             .set_int64("post-capture-editing-temporary-started-at", value);
     }
 
-    pub fn exit_after_paste(&self) -> bool {
-        self.inner.boolean("exit-after-paste")
-    }
-
-    pub fn set_exit_after_paste(&self, value: bool) {
-        let _ = self.inner.set_boolean("exit-after-paste", value);
-    }
-
     pub fn open_new_window_on_capture(&self) -> bool {
         self.inner.boolean("open-new-window-on-capture")
     }

@@ -8,7 +8,7 @@
 
 **Workstream:** behavior-settings-extend  
 **Phase:** Active  
-**Next action:** Run manual UAT for capture behavior settings (`--capture` with and without temporary mode, clipboard exit, and window reuse/new-window policy).
+**Next action:** Run manual UAT for capture behavior settings (`--capture` with and without temporary mode, and window reuse/new-window policy).
 
 ### Previous Focus
 
@@ -36,7 +36,7 @@
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
-| 2026-06-15 | Exit-after-paste implemented using `gdk::Clipboard::connect_changed` watcher | Native GTK signal reliably indicates clipboard ownership/content change; allows auto-quit without polling |
+| 2026-06-15 | Exit-after-paste removed from current release and deferred | Behavior proved inconsistent for current UX expectations; revisit in future iteration |
 | 2026-06-15 | Temporary post-capture disable state tracks `started-at` epoch and auto-resets on expiry | Ensures feature self-deactivates after configured duration and restores default behavior |
 | 2026-06-15 | Default behavior for in-app new capture is now window reuse (`open-new-window-on-capture=false`) | Reduces window proliferation and matches requested default UX |
 | 2026-06-06 | Off-screen render uses `cairo::Format::ARgb32` + manual BGRA→RGBA + un-premultiply conversion | Required for annotation alpha blending; avoids additional crate dependency; `Pixbuf::from_bytes` accepts raw RGBA |
@@ -109,6 +109,7 @@
 | Curved arrows | Straight arrow sufficient for v1 | Post-PRD-003 |
 | Annotation renumbering (auto-reorder on delete) | Gaps are acceptable per spec; renumbering adds complexity | Post-PRD-003 |
 | In-canvas text cursor (no dialog) | Requires custom Cairo text input state machine | Post-PRD-003 polish |
+| Exit After Paste | UX inconsistencies across environments; removed from current release | behavior-settings-extend follow-up |
 
 ---
 
