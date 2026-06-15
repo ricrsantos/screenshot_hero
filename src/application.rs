@@ -62,6 +62,7 @@ impl Default for Application {
 
 mod imp {
     use std::cell::Cell;
+    use std::time::Duration;
 
     use gtk::gio;
     use gtk::glib;
@@ -78,6 +79,13 @@ mod imp {
     #[derive(Default)]
     pub struct Application {
         pub start_with_capture: Cell<bool>,
+    }
+
+    #[derive(Clone, Copy)]
+    struct CaptureBehavior {
+        skip_post_capture_editing: bool,
+        open_new_window_on_capture: bool,
+        exit_after_paste: bool,
     }
 
     #[glib::object_subclass]
@@ -155,39 +163,118 @@ mod imp {
 
     impl Application {
         fn present_main_window(&self, start_with_capture: bool) {
+            if start_with_capture {
+                self.capture_first_then_present_window();
+                return;
+            }
+
             let app = self.obj();
             let window = MainWindow::new(app.as_ref());
             window.present();
-
-            if start_with_capture {
-                if let Err(err) = window.activate_action("win.new-screenshot", None) {
-                    log::warn!("Unable to trigger startup capture action: {err}");
-                }
-            }
         }
 
         fn capture_first_then_present_window(&self) {
             let app = self.obj().clone();
+            let behavior = Self::capture_behavior();
             let hold_guard = app.hold();
             glib::spawn_future_local(async move {
                 let _hold_guard = hold_guard;
                 match CaptureService::capture().await {
                     Ok(Some(image)) => {
-                        let window = MainWindow::new(app.as_ref());
+                        if behavior.skip_post_capture_editing {
+                            app.quit();
+                            return;
+                        }
+
+                        let window = if behavior.open_new_window_on_capture {
+                            MainWindow::new(app.as_ref())
+                        } else {
+                            Self::existing_main_window(&app)
+                                .unwrap_or_else(|| MainWindow::new(app.as_ref()))
+                        };
                         window.set_loaded_image(image);
                         window.present();
+
+                        if behavior.exit_after_paste {
+                            if let Err(err) = window.activate_action("win.copy-to-clipboard", None)
+                            {
+                                log::warn!("Unable to copy startup capture to clipboard: {err}");
+                            } else {
+                                Self::arm_exit_after_paste_monitor(&app);
+                            }
+                        }
                     }
                     Ok(None) | Err(CaptureError::PortalCancelled) => {
-                        let window = MainWindow::new(app.as_ref());
-                        window.present();
+                        if behavior.skip_post_capture_editing {
+                            app.quit();
+                        } else if let Some(existing) = Self::existing_main_window(&app) {
+                            existing.present();
+                        } else {
+                            let window = MainWindow::new(app.as_ref());
+                            window.present();
+                        }
                     }
                     Err(CaptureError::PortalUnavailable(msg))
                     | Err(CaptureError::ImageLoadFailed(msg)) => {
-                        let window = MainWindow::new(app.as_ref());
+                        if behavior.skip_post_capture_editing {
+                            log::error!(
+                                "Capture failed while post-capture editing is disabled: {msg}"
+                            );
+                            app.quit();
+                            return;
+                        }
+
+                        let window = if behavior.open_new_window_on_capture {
+                            MainWindow::new(app.as_ref())
+                        } else {
+                            Self::existing_main_window(&app)
+                                .unwrap_or_else(|| MainWindow::new(app.as_ref()))
+                        };
                         window.present();
                         show_error_dialog(&window, "Screenshot Failed", &msg);
                     }
                 }
+            });
+        }
+
+        fn existing_main_window(app: &super::Application) -> Option<MainWindow> {
+            app.windows()
+                .into_iter()
+                .find_map(|window| window.downcast::<MainWindow>().ok())
+        }
+
+        fn capture_behavior() -> CaptureBehavior {
+            if let Some(settings) = AppSettings::try_new() {
+                return CaptureBehavior {
+                    skip_post_capture_editing: settings
+                        .is_post_capture_editing_effectively_disabled(),
+                    open_new_window_on_capture: settings.open_new_window_on_capture(),
+                    exit_after_paste: settings.exit_after_paste(),
+                };
+            }
+
+            CaptureBehavior {
+                skip_post_capture_editing: false,
+                open_new_window_on_capture: false,
+                exit_after_paste: true,
+            }
+        }
+
+        fn arm_exit_after_paste_monitor(app: &super::Application) {
+            let Some(display) = gtk::gdk::Display::default() else {
+                log::warn!("Exit-after-paste monitor unavailable: no display");
+                return;
+            };
+
+            let clipboard = display.clipboard();
+            let app_weak = app.downgrade();
+            glib::timeout_add_local_once(Duration::from_millis(250), move || {
+                let app_weak = app_weak.clone();
+                clipboard.connect_changed(move |_| {
+                    if let Some(app) = app_weak.upgrade() {
+                        app.quit();
+                    }
+                });
             });
         }
     }

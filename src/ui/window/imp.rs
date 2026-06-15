@@ -132,15 +132,40 @@ impl ObjectImpl for MainWindow {
             glib::spawn_future_local(async move {
                 match CaptureService::capture().await {
                     Ok(Some(image)) => {
-                        canvas.set_image(image);
-                        canvas.fit_to_window();
-                        update_image_dependent_actions(
-                            &canvas,
-                            &save_project,
-                            &export_png,
-                            &export_jpeg,
-                            &copy_to_clipboard_action,
-                        );
+                        if settings_boolean(
+                            &window.imp().settings,
+                            "open-new-window-on-capture",
+                            false,
+                        ) {
+                            if let Some(app) = window
+                                .application()
+                                .and_then(|a| a.downcast::<crate::Application>().ok())
+                            {
+                                let new_window = super::MainWindow::new(&app);
+                                new_window.set_loaded_image(image);
+                                new_window.present();
+                            } else {
+                                canvas.set_image(image);
+                                canvas.fit_to_window();
+                                update_image_dependent_actions(
+                                    &canvas,
+                                    &save_project,
+                                    &export_png,
+                                    &export_jpeg,
+                                    &copy_to_clipboard_action,
+                                );
+                            }
+                        } else {
+                            canvas.set_image(image);
+                            canvas.fit_to_window();
+                            update_image_dependent_actions(
+                                &canvas,
+                                &save_project,
+                                &export_png,
+                                &export_jpeg,
+                                &copy_to_clipboard_action,
+                            );
+                        }
                     }
                     Ok(None) | Err(CaptureError::PortalCancelled) => {}
                     Err(CaptureError::PortalUnavailable(msg)) => {

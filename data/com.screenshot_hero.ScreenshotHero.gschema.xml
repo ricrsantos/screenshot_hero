@@ -35,6 +35,34 @@
       <default>true</default>
       <summary>Auto-copy annotated image to clipboard after each change</summary>
     </key>
+    <key name="post-capture-editing-disabled" type="b">
+      <default>false</default>
+      <summary>Skip opening editor after capture when launched with --capture</summary>
+    </key>
+    <key name="post-capture-editing-temporary-enabled" type="b">
+      <default>false</default>
+      <summary>Temporarily skip opening editor after capture</summary>
+    </key>
+    <key name="post-capture-editing-temporary-minutes" type="u">
+      <default>1</default>
+      <summary>Temporary skip duration (minutes)</summary>
+    </key>
+    <key name="post-capture-editing-temporary-seconds" type="u">
+      <default>0</default>
+      <summary>Temporary skip duration (seconds)</summary>
+    </key>
+    <key name="post-capture-editing-temporary-started-at" type="x">
+      <default>0</default>
+      <summary>Epoch seconds when temporary skip was enabled</summary>
+    </key>
+    <key name="exit-after-paste" type="b">
+      <default>true</default>
+      <summary>Quit app when captured image leaves clipboard</summary>
+    </key>
+    <key name="open-new-window-on-capture" type="b">
+      <default>false</default>
+      <summary>Open a new window instead of replacing current capture</summary>
+    </key>
     <key name="log-level" type="s">
       <choices>
         <choice value="error"/>

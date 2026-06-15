@@ -1,6 +1,7 @@
 use gtk::gio;
 use gtk::prelude::*;
 use log::LevelFilter;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 const SCHEMA_ID: &str = "com.screenshot_hero.ScreenshotHero";
 const SCHEMA_PATH: &str = "/com/screenshot_hero/ScreenshotHero/";
@@ -136,6 +137,114 @@ impl AppSettings {
         let _ = self.inner.set_boolean("auto-clipboard-enabled", value);
     }
 
+    pub fn post_capture_editing_disabled(&self) -> bool {
+        self.inner.boolean("post-capture-editing-disabled")
+    }
+
+    pub fn set_post_capture_editing_disabled(&self, value: bool) {
+        let _ = self
+            .inner
+            .set_boolean("post-capture-editing-disabled", value);
+    }
+
+    pub fn post_capture_editing_temporary_enabled(&self) -> bool {
+        self.inner.boolean("post-capture-editing-temporary-enabled")
+    }
+
+    pub fn set_post_capture_editing_temporary_enabled(&self, value: bool) {
+        let _ = self
+            .inner
+            .set_boolean("post-capture-editing-temporary-enabled", value);
+        if value {
+            self.set_post_capture_editing_temporary_started_at(current_epoch_seconds());
+        } else {
+            self.set_post_capture_editing_temporary_started_at(0);
+        }
+    }
+
+    pub fn post_capture_editing_temporary_minutes(&self) -> u32 {
+        self.inner.uint("post-capture-editing-temporary-minutes")
+    }
+
+    pub fn set_post_capture_editing_temporary_minutes(&self, value: u32) {
+        let _ = self
+            .inner
+            .set_uint("post-capture-editing-temporary-minutes", value);
+    }
+
+    pub fn post_capture_editing_temporary_seconds(&self) -> u32 {
+        self.inner.uint("post-capture-editing-temporary-seconds")
+    }
+
+    pub fn set_post_capture_editing_temporary_seconds(&self, value: u32) {
+        let _ = self
+            .inner
+            .set_uint("post-capture-editing-temporary-seconds", value);
+    }
+
+    pub fn post_capture_editing_temporary_started_at(&self) -> i64 {
+        self.inner
+            .int64("post-capture-editing-temporary-started-at")
+    }
+
+    pub fn set_post_capture_editing_temporary_started_at(&self, value: i64) {
+        let _ = self
+            .inner
+            .set_int64("post-capture-editing-temporary-started-at", value);
+    }
+
+    pub fn exit_after_paste(&self) -> bool {
+        self.inner.boolean("exit-after-paste")
+    }
+
+    pub fn set_exit_after_paste(&self, value: bool) {
+        let _ = self.inner.set_boolean("exit-after-paste", value);
+    }
+
+    pub fn open_new_window_on_capture(&self) -> bool {
+        self.inner.boolean("open-new-window-on-capture")
+    }
+
+    pub fn set_open_new_window_on_capture(&self, value: bool) {
+        let _ = self.inner.set_boolean("open-new-window-on-capture", value);
+    }
+
+    pub fn is_post_capture_editing_effectively_disabled(&self) -> bool {
+        if self.post_capture_editing_disabled() {
+            return true;
+        }
+
+        if !self.post_capture_editing_temporary_enabled() {
+            return false;
+        }
+
+        let duration = i64::from(self.post_capture_editing_temporary_minutes()) * 60
+            + i64::from(self.post_capture_editing_temporary_seconds());
+        let duration = duration.max(1);
+        let now = current_epoch_seconds();
+        let started_at = self.post_capture_editing_temporary_started_at();
+        let started_at = if started_at <= 0 {
+            let _ = self
+                .inner
+                .set_int64("post-capture-editing-temporary-started-at", now);
+            now
+        } else {
+            started_at
+        };
+
+        if now - started_at < duration {
+            true
+        } else {
+            let _ = self
+                .inner
+                .set_boolean("post-capture-editing-temporary-enabled", false);
+            let _ = self
+                .inner
+                .set_int64("post-capture-editing-temporary-started-at", 0);
+            false
+        }
+    }
+
     pub fn log_level(&self) -> LevelFilter {
         match self.inner.string("log-level").as_str() {
             "error" => LevelFilter::Error,
@@ -164,4 +273,10 @@ impl AppSettings {
             f(key);
         });
     }
+}
+
+fn current_epoch_seconds() -> i64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_or(0, |d| d.as_secs() as i64)
 }

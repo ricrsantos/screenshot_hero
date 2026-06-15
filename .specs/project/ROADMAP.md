@@ -84,6 +84,19 @@
 
 ---
 
+## Milestone 7: Behavior Settings Extend
+**Feature:** behavior-settings-extend  
+**Spec:** `.specs/features/behavior-settings-extend/`  
+**Status:** Implemented
+
+**Delivered:**
+- Capture behavior preferences for post-capture editing, temporary disable window, and window reuse policy
+- `--capture` runtime policy to capture-and-exit without opening editor when configured
+- Clipboard-exit automation (`Exit after paste`) for startup capture sessions
+- Default capture reuse behavior with optional per-capture new-window mode
+
+---
+
 ## Next Track
 
 - Stabilize Flatpak and native runtime behavior across environments

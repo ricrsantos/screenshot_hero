@@ -78,6 +78,15 @@ Start directly in capture mode (opens GNOME/XDG capture UI first, then loads res
 cargo run -- --capture
 ```
 
+### Capture behavior settings
+
+In **Preferences → Capture Behavior**, Screenshot Hero now supports:
+
+- **Disable Post-Capture Editing** (default: off): with `--capture`, runs portal capture and exits without opening editor.
+- **Temporary Disable Post-Capture Editing** (default: off, 1m0s): same behavior as above for a configured minutes/seconds window, then auto-disables.
+- **Exit After Paste** (default: on): in `--capture` sessions where editor opens, Screenshot Hero copies capture to clipboard, monitors clipboard changes, and quits when clipboard content changes.
+- **Open New Window on Capture** (default: off): when off, **New Screenshot** replaces current image; when on, each capture opens a new window.
+
 If you change `data/*.gschema.xml`, rebuild so the schema is recompiled:
 
 ```bash

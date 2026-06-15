@@ -6,9 +6,9 @@
 
 ## Current Focus
 
-**Workstream:** Documentation and stabilization sync  
+**Workstream:** behavior-settings-extend  
 **Phase:** Active  
-**Next action:** Keep `.specs` in sync with prompt-driven implementation updates and run focused manual UAT over capture → annotate → save/export.
+**Next action:** Run manual UAT for capture behavior settings (`--capture` with and without temporary mode, clipboard exit, and window reuse/new-window policy).
 
 ### Previous Focus
 
@@ -36,6 +36,9 @@
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-06-15 | Exit-after-paste implemented using `gdk::Clipboard::connect_changed` watcher | Native GTK signal reliably indicates clipboard ownership/content change; allows auto-quit without polling |
+| 2026-06-15 | Temporary post-capture disable state tracks `started-at` epoch and auto-resets on expiry | Ensures feature self-deactivates after configured duration and restores default behavior |
+| 2026-06-15 | Default behavior for in-app new capture is now window reuse (`open-new-window-on-capture=false`) | Reduces window proliferation and matches requested default UX |
 | 2026-06-06 | Off-screen render uses `cairo::Format::ARgb32` + manual BGRA→RGBA + un-premultiply conversion | Required for annotation alpha blending; avoids additional crate dependency; `Pixbuf::from_bytes` accepts raw RGBA |
 | 2026-06-06 | Auto-export always produces PNG (not JPEG) | ADR-001 specifies `original_name_shero.png`; PNG is lossless, appropriate for screenshots |
 | 2026-06-06 | GSettings schema ID: `com.screenshot_hero.ScreenshotHero`, path `/com/screenshot_hero/ScreenshotHero/` | Matches app-id in Flatpak manifest and `Application::new()` property |
