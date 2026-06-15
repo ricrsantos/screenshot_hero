@@ -1,7 +1,7 @@
 # Export and Clipboard Tasks
 
 **Design**: `.specs/features/export-and-clipboard/design.md`
-**Status**: Draft
+**Status**: Implemented in codebase (task checklist pending backfill)
 
 ---
 
@@ -54,14 +54,14 @@ T6 → T7 → T8 → T9
 
 **Done when**:
 
-- [ ] `pub fn render_to_pixbuf(source: &Pixbuf, annotations: &[Annotation]) -> Option<Pixbuf>` is implemented
-- [ ] Creates `cairo::ImageSurface` at source image dimensions with `Format::ARgb32`
-- [ ] Draws source pixbuf at (0, 0) then calls `renderer::draw_all` at zoom=1.0, pan=(0,0), selected_id=None
-- [ ] `fn surface_to_pixbuf(surface: &cairo::ImageSurface) -> Option<Pixbuf>` converts ARGB32 (premultiplied) → RGBA (straight alpha) via byte-swap + un-premultiply
-- [ ] `pub(crate) mod renderer;` in `src/canvas/mod.rs` (was `mod renderer;`)
-- [ ] Unit test: `test_render_to_pixbuf_dimensions` — creates 100×80 Pixbuf, renders with empty annotations, asserts output is 100×80
-- [ ] Gate check passes: `cargo test --lib`
-- [ ] Test count: at least 1 new test passes
+- [x] `pub fn render_to_pixbuf(source: &Pixbuf, annotations: &[Annotation]) -> Option<Pixbuf>` is implemented
+- [x] Creates `cairo::ImageSurface` at source image dimensions with `Format::ARgb32`
+- [x] Draws source pixbuf at (0, 0) then calls `renderer::draw_all` at zoom=1.0, pan=(0,0), selected_id=None
+- [x] `fn surface_to_pixbuf(surface: &cairo::ImageSurface) -> Option<Pixbuf>` converts ARGB32 (premultiplied) → RGBA (straight alpha) via byte-swap + un-premultiply
+- [x] `pub(crate) mod renderer;` in `src/canvas/mod.rs` (was `mod renderer;`)
+- [x] Unit test: `test_render_to_pixbuf_dimensions` — creates 100×80 Pixbuf, renders with empty annotations, asserts output is 100×80
+- [x] Gate check passes: `cargo test --lib`
+- [x] Test count: at least 1 new test passes
 
 **Tests**: unit
 **Gate**: quick
@@ -86,14 +86,14 @@ T6 → T7 → T8 → T9
 
 **Done when**:
 
-- [ ] `pub fn build_auto_export_path(source: &Path, suffix: &str) -> PathBuf` is implemented
-- [ ] Stem extraction: `source.file_stem()` used to build `{stem}{suffix}.png`
-- [ ] Result placed in the same directory as source (`source.with_file_name(new_name)`)
-- [ ] Unit test `test_build_auto_export_path_png`: `/home/u/Screenshots/shot.png` + `"_shero"` → `/home/u/Screenshots/shot_shero.png`
-- [ ] Unit test `test_build_auto_export_path_jpeg_source`: source is `.jpg` → output is `.png` (always PNG output)
-- [ ] Unit test `test_build_auto_export_path_no_extension`: source has no extension → `shot_shero.png`
-- [ ] Gate check passes: `cargo test --lib`
-- [ ] Test count: at least 3 new tests pass
+- [x] `pub fn build_auto_export_path(source: &Path, suffix: &str) -> PathBuf` is implemented
+- [x] Stem extraction: `source.file_stem()` used to build `{stem}{suffix}.png`
+- [x] Result placed in the same directory as source (`source.with_file_name(new_name)`)
+- [x] Unit test `test_build_auto_export_path_png`: `/home/u/Screenshots/shot.png` + `"_shero"` → `/home/u/Screenshots/shot_shero.png`
+- [x] Unit test `test_build_auto_export_path_jpeg_source`: source is `.jpg` → output is `.png` (always PNG output)
+- [x] Unit test `test_build_auto_export_path_no_extension`: source has no extension → `shot_shero.png`
+- [x] Gate check passes: `cargo test --lib`
+- [x] Test count: at least 3 new tests pass
 
 **Tests**: unit
 **Gate**: quick
@@ -118,14 +118,14 @@ T6 → T7 → T8 → T9
 
 **Done when**:
 
-- [ ] `pub enum ExportError { SaveFailed(String) }` defined with `Display` impl
-- [ ] `pub fn export_png(pixbuf: &Pixbuf, path: &Path) -> Result<(), ExportError>` uses `pixbuf.savev(path, "png", &[], &[])`
-- [ ] `pub fn export_jpeg(pixbuf: &Pixbuf, path: &Path) -> Result<(), ExportError>` uses `pixbuf.savev(path, "jpeg", &["quality"], &["90"])`
-- [ ] Both functions convert `glib::Error` from `savev` into `ExportError::SaveFailed(err.to_string())`
-- [ ] Unit test `test_export_png_writes_file`: create small Pixbuf, call `export_png`, assert file exists and `len > 0`, clean up
-- [ ] Unit test `test_export_jpeg_writes_file`: same for JPEG
-- [ ] Gate check passes: `cargo test --lib`
-- [ ] Test count: at least 2 new tests pass
+- [x] `pub enum ExportError { SaveFailed(String) }` defined with `Display` impl
+- [x] `pub fn export_png(pixbuf: &Pixbuf, path: &Path) -> Result<(), ExportError>` uses `pixbuf.savev(path, "png", &[], &[])`
+- [x] `pub fn export_jpeg(pixbuf: &Pixbuf, path: &Path) -> Result<(), ExportError>` uses `pixbuf.savev(path, "jpeg", &["quality"], &["90"])`
+- [x] Both functions convert `glib::Error` from `savev` into `ExportError::SaveFailed(err.to_string())`
+- [x] Unit test `test_export_png_writes_file`: create small Pixbuf, call `export_png`, assert file exists and `len > 0`, clean up
+- [x] Unit test `test_export_jpeg_writes_file`: same for JPEG
+- [x] Gate check passes: `cargo test --lib`
+- [x] Test count: at least 2 new tests pass
 
 **Tests**: unit
 **Gate**: quick
@@ -152,12 +152,12 @@ T6 → T7 → T8 → T9
 
 **Done when**:
 
-- [ ] `pub fn copy_to_clipboard(display: &gdk::Display, pixbuf: &Pixbuf)` implemented
-- [ ] Converts `Pixbuf` → `gdk::Texture` via `gdk::Texture::for_pixbuf(pixbuf)`
-- [ ] Calls `display.clipboard().set_texture(&texture)`
-- [ ] No panics — errors are logged via `log::error!` if any step returns an error
-- [ ] Gate check passes: `cargo build`
-- [ ] No compiler errors or warnings
+- [x] `pub fn copy_to_clipboard(display: &gdk::Display, pixbuf: &Pixbuf)` implemented
+- [x] Converts `Pixbuf` → `gdk::Texture` via `gdk::Texture::for_pixbuf(pixbuf)`
+- [x] Calls `display.clipboard().set_texture(&texture)`
+- [x] No panics — errors are logged via `log::error!` if any step returns an error
+- [x] Gate check passes: `cargo build`
+- [x] No compiler errors or warnings
 
 **Tests**: none (requires GDK display — manual validation only)
 **Gate**: build
@@ -186,11 +186,11 @@ T6 → T7 → T8 → T9
 
 **Done when**:
 
-- [ ] `src/export/mod.rs` declares `pub mod renderer; pub mod auto_export; pub mod exporter; mod clipboard;` plus `pub use` of public types
-- [ ] `ExportError` is re-exported as `crate::export::ExportError`
-- [ ] `src/lib.rs` has `pub mod export;`
-- [ ] Gate check passes: `cargo build`
-- [ ] No compiler errors or warnings
+- [x] `src/export/mod.rs` declares `pub mod renderer; pub mod auto_export; pub mod exporter; mod clipboard;` plus `pub use` of public types
+- [x] `ExportError` is re-exported as `crate::export::ExportError`
+- [x] `src/lib.rs` has `pub mod export;`
+- [x] Gate check passes: `cargo build`
+- [x] No compiler errors or warnings
 
 **Tests**: none
 **Gate**: build
@@ -215,10 +215,10 @@ T6 → T7 → T8 → T9
 
 **Done when**:
 
-- [ ] `pub fn source_pixbuf(&self) -> Option<gdk_pixbuf::Pixbuf>` added to `impl Canvas`
-- [ ] Returns `Some(img.pixbuf().clone())` when image is loaded, `None` otherwise
-- [ ] Gate check passes: `cargo build`
-- [ ] No compiler errors or warnings
+- [x] `pub fn source_pixbuf(&self) -> Option<gdk_pixbuf::Pixbuf>` added to `impl Canvas`
+- [x] Returns `Some(img.pixbuf().clone())` when image is loaded, `None` otherwise
+- [x] Gate check passes: `cargo build`
+- [x] No compiler errors or warnings
 
 **Tests**: none (UI layer — `Canvas` is a GTK widget)
 **Gate**: build
@@ -246,14 +246,14 @@ T6 → T7 → T8 → T9
 
 **Done when**:
 
-- [ ] `win.export-png` GAction: opens `gtk::FileDialog` (save, `.png` filter) → calls `export::renderer::render_to_pixbuf` → calls `export::exporter::export_png` → shows `show_error_dialog` on `Err`
-- [ ] `win.export-jpeg` GAction: same flow with `.jpg`/`.jpeg` filter and `export_jpeg`
-- [ ] `win.copy-to-clipboard` GAction: `canvas.source_pixbuf()` + `canvas.all_annotations()` → `render_to_pixbuf` → `clipboard::copy_to_clipboard(display, &pixbuf)` (synchronous, no dialog)
-- [ ] All three actions start disabled; enabled when `canvas.source_image_path().is_some()` — use existing `update_save_project_enabled` extension point
-- [ ] Header bar: "Export PNG", "Export JPEG", "Copy" buttons added using same builder pattern as existing buttons
-- [ ] `glib::spawn_future_local` used for export dialogs (async) per project pattern
-- [ ] Gate check passes: `cargo build`
-- [ ] No compiler errors or warnings
+- [x] `win.export-png` GAction: opens `gtk::FileDialog` (save, `.png` filter) → calls `export::renderer::render_to_pixbuf` → calls `export::exporter::export_png` → shows `show_error_dialog` on `Err`
+- [x] `win.export-jpeg` GAction: same flow with `.jpg`/`.jpeg` filter and `export_jpeg`
+- [x] `win.copy-to-clipboard` GAction: `canvas.source_pixbuf()` + `canvas.all_annotations()` → `render_to_pixbuf` → `clipboard::copy_to_clipboard(display, &pixbuf)` (synchronous, no dialog)
+- [x] All three actions start disabled; enabled when `canvas.source_image_path().is_some()` — use existing `update_save_project_enabled` extension point
+- [x] Header bar: "Export PNG", "Export JPEG", "Copy" buttons added using same builder pattern as existing buttons
+- [x] `glib::spawn_future_local` used for export dialogs (async) per project pattern
+- [x] Gate check passes: `cargo build`
+- [x] No compiler errors or warnings
 
 **Tests**: none (UI)
 **Gate**: build
@@ -272,6 +272,8 @@ T6 → T7 → T8 → T9
 
 **Requirement**: EXPRT-06, EXPRT-07, EXPRT-08, EXPRT-09, EXPRT-10
 
+> Note (2026-06-15): Part of this task was superseded by PRD-006 settings integration. Runtime behavior is implemented, but specific field-shape criteria below (`auto_clipboard_enabled: Cell<bool>`) no longer match the final architecture.
+
 **Tools**:
 - MCP: NONE
 - Skill: NONE
@@ -281,10 +283,10 @@ T6 → T7 → T8 → T9
 - [ ] `MainWindow` struct gains `clipboard_debounce: RefCell<Option<glib::SourceId>>` and `auto_clipboard_enabled: Cell<bool>`
 - [ ] `Default` impl initializes `clipboard_debounce: RefCell::new(None)`, `auto_clipboard_enabled: Cell::new(true)`
 - [ ] Inside `on_annotation_changed` callback: if `auto_clipboard_enabled` is true, cancel pending `SourceId` (if any) via `id.remove()`, then schedule new `glib::timeout_add_local_once(Duration::from_millis(300), ...)`
-- [ ] The debounce callback: calls `canvas.source_pixbuf()` + `canvas.all_annotations()` → `render_to_pixbuf` → `clipboard::copy_to_clipboard` — all on main thread
-- [ ] New `SourceId` stored in `window.imp().clipboard_debounce`
-- [ ] Gate check passes: `cargo build`
-- [ ] No compiler errors or warnings
+- [x] The debounce callback: calls `canvas.source_pixbuf()` + `canvas.all_annotations()` → `render_to_pixbuf` → `clipboard::copy_to_clipboard` — all on main thread
+- [x] New `SourceId` stored in `window.imp().clipboard_debounce`
+- [x] Gate check passes: `cargo build`
+- [x] No compiler errors or warnings
 
 **Tests**: none (requires GDK display + GLib main loop)
 **Gate**: build
@@ -303,6 +305,8 @@ T6 → T7 → T8 → T9
 
 **Requirement**: EXPRT-11, EXPRT-12, EXPRT-13, EXPRT-14
 
+> Note (2026-06-15): Part of this task was superseded by PRD-006 settings integration. Runtime behavior is implemented, but criteria that require persistent `Cell/RefCell` fields for auto-export no longer match the final architecture.
+
 **Tools**:
 - MCP: NONE
 - Skill: NONE
@@ -311,11 +315,11 @@ T6 → T7 → T8 → T9
 
 - [ ] `MainWindow` struct gains `auto_export_enabled: Cell<bool>` and `auto_export_suffix: RefCell<String>`
 - [ ] `Default` impl: `auto_export_enabled: Cell::new(false)`, `auto_export_suffix: RefCell::new("_shero".to_string())`
-- [ ] Inside `on_annotation_changed`: if `auto_export_enabled` → get `source_image_path` from canvas → `build_auto_export_path(path, &suffix)` → `render_to_pixbuf` → `export_png` → `log::warn!` on `Err`
-- [ ] Auto-export is skipped silently when `canvas.source_image_path()` is `None`
-- [ ] No user-facing dialog or feedback for auto-export (background operation)
-- [ ] Gate check passes: `cargo build && cargo test --lib`
-- [ ] All existing tests still pass (test count does not regress)
+- [x] Inside `on_annotation_changed`: if `auto_export_enabled` → get `source_image_path` from canvas → `build_auto_export_path(path, &suffix)` → `render_to_pixbuf` → `export_png` → `log::warn!` on `Err`
+- [x] Auto-export is skipped silently when `canvas.source_image_path()` is `None`
+- [x] No user-facing dialog or feedback for auto-export (background operation)
+- [x] Gate check passes: `cargo build && cargo test --lib`
+- [x] All existing tests still pass (test count does not regress)
 
 **Tests**: none (UI — requires display for manual validation)
 **Gate**: full

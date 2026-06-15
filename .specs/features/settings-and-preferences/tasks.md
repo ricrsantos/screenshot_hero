@@ -1,7 +1,7 @@
 # Settings and Preferences Tasks
 
 **Design**: `.specs/features/settings-and-preferences/design.md`  
-**Status**: Draft
+**Status**: Implemented in codebase (task checklist pending backfill)
 
 ---
 
@@ -77,12 +77,12 @@ T1 ──→ T10  (independent)
 
 **Done when**:
 
-- [ ] Schema file exists at `data/com.screenshot_hero.ScreenshotHero.gschema.xml`
-- [ ] Contains 8 keys: `color-scheme`, `timestamp-enabled`, `timestamp-format`, `auto-save-enabled`, `auto-export-enabled`, `auto-export-suffix`, `auto-clipboard-enabled`, `log-level`
-- [ ] Enum keys (`color-scheme`, `log-level`) have `<choices>` constraints
-- [ ] Default values match PRD-006 and ADR-001: color-scheme=follow-system, auto-save=true, auto-export=false, auto-clipboard=true, log-level=info, timestamp=false
-- [ ] `glib-compile-schemas data/` succeeds without errors
-- [ ] Gate check passes: `glib-compile-schemas data/ && echo OK`
+- [x] Schema file exists at `data/com.screenshot_hero.ScreenshotHero.gschema.xml`
+- [x] Contains 8 keys: `color-scheme`, `timestamp-enabled`, `timestamp-format`, `auto-save-enabled`, `auto-export-enabled`, `auto-export-suffix`, `auto-clipboard-enabled`, `log-level`
+- [x] Enum keys (`color-scheme`, `log-level`) have `<choices>` constraints
+- [x] Default values match PRD-006 and ADR-001: color-scheme=follow-system, auto-save=true, auto-export=false, auto-clipboard=true, log-level=info, timestamp=false
+- [x] `glib-compile-schemas data/` succeeds without errors
+- [x] Gate check passes: `glib-compile-schemas data/ && echo OK`
 
 **Tests**: none  
 **Gate**: build
@@ -104,16 +104,16 @@ T1 ──→ T10  (independent)
 
 **Done when**:
 
-- [ ] `src/settings/mod.rs` exists and compiles
-- [ ] `pub mod settings` added to `src/lib.rs`
-- [ ] `AppSettings::try_new() -> Option<Self>` returns `None` when schema is unavailable (no panic)
-- [ ] `AppSettings::new() -> Self` convenience wrapper (panics on missing schema — for use after schema is guaranteed installed)
-- [ ] All 8 typed getters implemented: `color_scheme()`, `timestamp_enabled()`, `timestamp_format()`, `auto_save_enabled()`, `auto_export_enabled()`, `auto_export_suffix()`, `auto_clipboard_enabled()`, `log_level()`
-- [ ] All 8 typed setters implemented
-- [ ] `ColorSchemePreference` enum with `FollowSystem | Light | Dark` and conversions: `as_str()`, `from_str()`, `to_adw_color_scheme()` → `libadwaita::ColorScheme`
-- [ ] `log_level()` maps GSettings string to `log::LevelFilter`; unknown strings default to `LevelFilter::Info`
-- [ ] `connect_changed<F: Fn(&str) + 'static>(&self, f: F)` forwards to `gio::Settings::connect_changed`
-- [ ] Gate check passes: `cargo build`
+- [x] `src/settings/mod.rs` exists and compiles
+- [x] `pub mod settings` added to `src/lib.rs`
+- [x] `AppSettings::try_new() -> Option<Self>` returns `None` when schema is unavailable (no panic)
+- [x] `AppSettings::new() -> Self` convenience wrapper (panics on missing schema — for use after schema is guaranteed installed)
+- [x] All 8 typed getters implemented: `color_scheme()`, `timestamp_enabled()`, `timestamp_format()`, `auto_save_enabled()`, `auto_export_enabled()`, `auto_export_suffix()`, `auto_clipboard_enabled()`, `log_level()`
+- [x] All 8 typed setters implemented
+- [x] `ColorSchemePreference` enum with `FollowSystem | Light | Dark` and conversions: `as_str()`, `from_str()`, `to_adw_color_scheme()` → `libadwaita::ColorScheme`
+- [x] `log_level()` maps GSettings string to `log::LevelFilter`; unknown strings default to `LevelFilter::Info`
+- [x] `connect_changed<F: Fn(&str) + 'static>(&self, f: F)` forwards to `gio::Settings::connect_changed`
+- [x] Gate check passes: `cargo build`
 
 **Tests**: none  
 **Gate**: build
@@ -139,13 +139,13 @@ T1 ──→ T10  (independent)
 
 **Done when**:
 
-- [ ] `PreferencesWindow::new(settings: &gio::Settings) -> adw::PreferencesWindow` builds and returns a valid window
-- [ ] Window title: "Preferences"
-- [ ] Appearance group present with title "Appearance"
-- [ ] `ComboRow` for Color Scheme with model items: "Follow System", "Light", "Dark"
-- [ ] ComboRow initial selection reflects current `color-scheme` GSettings value
-- [ ] ComboRow `connect_selected_notify` writes updated value back to GSettings
-- [ ] Gate check passes: `cargo build`
+- [x] `PreferencesWindow::new(settings: &gio::Settings) -> adw::PreferencesWindow` builds and returns a valid window
+- [x] Window title: "Preferences"
+- [x] Appearance group present with title "Appearance"
+- [x] `ComboRow` for Color Scheme with model items: "Follow System", "Light", "Dark"
+- [x] ComboRow initial selection reflects current `color-scheme` GSettings value
+- [x] ComboRow `connect_selected_notify` writes updated value back to GSettings
+- [x] Gate check passes: `cargo build`
 
 **Tests**: none  
 **Gate**: build
@@ -167,11 +167,11 @@ T1 ──→ T10  (independent)
 
 **Done when**:
 
-- [ ] Timestamps group visible in PreferencesWindow with title "Timestamps"
-- [ ] `SwitchRow` "Auto-Add Timestamp" bound to `timestamp-enabled` GSettings key via `gio::Settings::bind()`
-- [ ] `EntryRow` "Timestamp Format" bound to `timestamp-format` GSettings key via `gio::Settings::bind()`
-- [ ] `EntryRow` is insensitive (grayed out) when `timestamp-enabled` is false; sensitive when true
-- [ ] Gate check passes: `cargo build`
+- [x] Timestamps group visible in PreferencesWindow with title "Timestamps"
+- [x] `SwitchRow` "Auto-Add Timestamp" bound to `timestamp-enabled` GSettings key via `gio::Settings::bind()`
+- [x] `EntryRow` "Timestamp Format" bound to `timestamp-format` GSettings key via `gio::Settings::bind()`
+- [x] `EntryRow` is insensitive (grayed out) when `timestamp-enabled` is false; sensitive when true
+- [x] Gate check passes: `cargo build`
 
 **Tests**: none  
 **Gate**: build
@@ -193,12 +193,12 @@ T1 ──→ T10  (independent)
 
 **Done when**:
 
-- [ ] Automation group visible in PreferencesWindow with title "Automation"
-- [ ] `SwitchRow` "Auto Save" bound to `auto-save-enabled`
-- [ ] `SwitchRow` "Auto Export" bound to `auto-export-enabled`
-- [ ] `EntryRow` "Export Suffix" bound to `auto-export-suffix`; insensitive when `auto-export-enabled` is false
-- [ ] `SwitchRow` "Auto Clipboard" bound to `auto-clipboard-enabled`
-- [ ] Gate check passes: `cargo build`
+- [x] Automation group visible in PreferencesWindow with title "Automation"
+- [x] `SwitchRow` "Auto Save" bound to `auto-save-enabled`
+- [x] `SwitchRow` "Auto Export" bound to `auto-export-enabled`
+- [x] `EntryRow` "Export Suffix" bound to `auto-export-suffix`; insensitive when `auto-export-enabled` is false
+- [x] `SwitchRow` "Auto Clipboard" bound to `auto-clipboard-enabled`
+- [x] Gate check passes: `cargo build`
 
 **Tests**: none  
 **Gate**: build
@@ -220,11 +220,11 @@ T1 ──→ T10  (independent)
 
 **Done when**:
 
-- [ ] Developer group visible in PreferencesWindow with title "Developer"
-- [ ] `ComboRow` "Log Level" with model items: "Error", "Warn", "Info", "Debug", "Trace"
-- [ ] ComboRow initial selection reflects current `log-level` GSettings value
-- [ ] ComboRow `connect_selected_notify` writes updated string back to GSettings
-- [ ] Gate check passes: `cargo build`
+- [x] Developer group visible in PreferencesWindow with title "Developer"
+- [x] `ComboRow` "Log Level" with model items: "Error", "Warn", "Info", "Debug", "Trace"
+- [x] ComboRow initial selection reflects current `log-level` GSettings value
+- [x] ComboRow `connect_selected_notify` writes updated string back to GSettings
+- [x] Gate check passes: `cargo build`
 
 **Tests**: none  
 **Gate**: build
@@ -239,6 +239,8 @@ T1 ──→ T10  (independent)
 **Reuses**: `AppSettings` from T2; `libadwaita::StyleManager::default()`; `log::set_max_level()`; `env_logger::Builder`  
 **Requirement**: SETT-01, SETT-10, SETT-11, SETT-12
 
+> Note (2026-06-15): Two criteria remain open because current implementation intentionally differs: logger init currently uses `try_init()` with `Info` default, and startup does not early-return when schema is unavailable.
+
 **Tools**:
 
 - MCP: NONE
@@ -248,11 +250,11 @@ T1 ──→ T10  (independent)
 
 - [ ] `env_logger::Builder::new().filter_level(log::LevelFilter::Trace).init()` called once in `startup()` (ceiling at Trace; effective level controlled by `log::set_max_level`)
 - [ ] `AppSettings::try_new()` called; if `None`, logs warning and returns (graceful degradation — hardcoded defaults remain)
-- [ ] Initial `log_level()` read from settings and applied via `log::set_max_level()`
-- [ ] Initial `color_scheme()` read from settings and applied via `StyleManager::default().set_color_scheme()`
-- [ ] `settings.connect_changed` handler: on `"log-level"` change → `log::set_max_level(settings.log_level())`
-- [ ] `settings.connect_changed` handler: on `"color-scheme"` change → `StyleManager::default().set_color_scheme(settings.color_scheme().to_adw_color_scheme())`
-- [ ] Gate check passes: `cargo build`
+- [x] Initial `log_level()` read from settings and applied via `log::set_max_level()`
+- [x] Initial `color_scheme()` read from settings and applied via `StyleManager::default().set_color_scheme()`
+- [x] `settings.connect_changed` handler: on `"log-level"` change → `log::set_max_level(settings.log_level())`
+- [x] `settings.connect_changed` handler: on `"color-scheme"` change → `StyleManager::default().set_color_scheme(settings.color_scheme().to_adw_color_scheme())`
+- [x] Gate check passes: `cargo build`
 
 **Tests**: none  
 **Gate**: build
@@ -274,15 +276,15 @@ T1 ──→ T10  (independent)
 
 **Done when**:
 
-- [ ] `MainWindow` struct no longer has `auto_clipboard_enabled: Cell<bool>`, `auto_export_enabled: Cell<bool>`, `auto_export_suffix: RefCell<String>` fields
-- [ ] `MainWindow` struct has `settings: OnceCell<gio::Settings>` field
-- [ ] `Default::default()` for `MainWindow` initializes `settings` to `OnceCell::new()` (value set in `constructed()`)
-- [ ] In `constructed()`: `AppSettings::try_new()` — if Some, store `settings` in `OnceCell`; if None, log warning
-- [ ] In `on_annotation_changed`: `auto-clipboard-enabled` read from `settings.boolean("auto-clipboard-enabled")` (or fallback `true` when settings unavailable)
-- [ ] In `on_annotation_changed`: `auto-export-enabled` read from `settings.boolean("auto-export-enabled")` (fallback `false`)
-- [ ] In `on_annotation_changed`: `auto-export-suffix` read from `settings.string("auto-export-suffix")` (fallback `"_shero"`)
-- [ ] In `on_annotation_changed`: `maybe_auto_save` gated behind `settings.boolean("auto-save-enabled")` (fallback `true`)
-- [ ] Gate check passes: `cargo build`
+- [x] `MainWindow` struct no longer has `auto_clipboard_enabled: Cell<bool>`, `auto_export_enabled: Cell<bool>`, `auto_export_suffix: RefCell<String>` fields
+- [x] `MainWindow` struct has `settings: OnceCell<gio::Settings>` field
+- [x] `Default::default()` for `MainWindow` initializes `settings` to `OnceCell::new()` (value set in `constructed()`)
+- [x] In `constructed()`: `AppSettings::try_new()` — if Some, store `settings` in `OnceCell`; if None, log warning
+- [x] In `on_annotation_changed`: `auto-clipboard-enabled` read from `settings.boolean("auto-clipboard-enabled")` (or fallback `true` when settings unavailable)
+- [x] In `on_annotation_changed`: `auto-export-enabled` read from `settings.boolean("auto-export-enabled")` (fallback `false`)
+- [x] In `on_annotation_changed`: `auto-export-suffix` read from `settings.string("auto-export-suffix")` (fallback `"_shero"`)
+- [x] In `on_annotation_changed`: `maybe_auto_save` gated behind `settings.boolean("auto-save-enabled")` (fallback `true`)
+- [x] Gate check passes: `cargo build`
 
 **Tests**: none  
 **Gate**: build
@@ -297,6 +299,8 @@ T1 ──→ T10  (independent)
 **Reuses**: `gio::SimpleAction` pattern from existing actions; `PreferencesWindow::new()` from T3–T6  
 **Requirement**: SETT-06
 
+> Note (2026-06-15): Preferences is exposed through the file menu action and accelerator; a dedicated header gear button is not currently present.
+
 **Tools**:
 
 - MCP: NONE
@@ -304,11 +308,11 @@ T1 ──→ T10  (independent)
 
 **Done when**:
 
-- [ ] `gio::SimpleAction::new("show-preferences", None)` created and added to window action group
-- [ ] Action activate handler: creates `PreferencesWindow::new(&settings)` and calls `window.present()` on it; sets `PreferencesWindow` transient for main window
+- [x] `gio::SimpleAction::new("show-preferences", None)` created and added to window action group
+- [x] Action activate handler: creates `PreferencesWindow::new(&settings)` and calls `window.present()` on it; sets `PreferencesWindow` transient for main window
 - [ ] Header bar has a Settings button (gear icon via `gtk::Button` with `icon-name = "preferences-system-symbolic"`) with `action-name = "win.show-preferences"`
-- [ ] Accel `<Control>comma` registered for `win.show-preferences` in `Application::startup()`
-- [ ] Gate check passes: `cargo build`
+- [x] Accel `<Control>comma` registered for `win.show-preferences` in `Application::startup()`
+- [x] Gate check passes: `cargo build`
 
 **Tests**: none  
 **Gate**: build
@@ -323,6 +327,8 @@ T1 ──→ T10  (independent)
 **Reuses**: Existing Flatpak manifest structure  
 **Requirement**: SETT-07, SETT-12
 
+> Note (2026-06-15): Flatpak build/install manual validation remains pending.
+
 **Tools**:
 
 - MCP: NONE
@@ -330,16 +336,16 @@ T1 ──→ T10  (independent)
 
 **Done when**:
 
-- [ ] Flatpak manifest `build-commands` includes:
+- [x] Flatpak manifest `build-commands` includes:
   - `install -Dm0644 data/com.screenshot_hero.ScreenshotHero.gschema.xml ${FLATPAK_DEST}/share/glib-2.0/schemas/com.screenshot_hero.ScreenshotHero.gschema.xml`
   - `glib-compile-schemas ${FLATPAK_DEST}/share/glib-2.0/schemas/`
-- [ ] `README.md` dev setup section includes:
+- [x] `README.md` dev setup section includes:
   ```bash
   glib-compile-schemas data/
   GSETTINGS_SCHEMA_DIR=data/ cargo run
   ```
 - [ ] `flatpak-builder --install --user build-dir build/com.screenshot_hero.ScreenshotHero.yml --force-clean` completes without errors (manual validation)
-- [ ] Gate check passes: `cargo build` (no compilation dependency on manifest)
+- [x] Gate check passes: `cargo build` (no compilation dependency on manifest)
 
 **Tests**: none  
 **Gate**: build

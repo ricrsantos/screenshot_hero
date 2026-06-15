@@ -1,6 +1,7 @@
 # Testing Strategy - Screenshot Hero
 
 **Stack:** Rust + GTK4 + Libadwaita + Flatpak
+**Last updated:** 2026-06-15
 
 ---
 
@@ -52,8 +53,8 @@ cargo run
 
 **Flatpak (authoritative — per POC-003-03):**
 ```bash
-flatpak-builder --install --user build-dir build/com.example.ScreenshotHero.yml --force-clean
-flatpak run com.example.ScreenshotHero
+flatpak-builder --install --user build-dir build/com.screenshot_hero.ScreenshotHero.yml --force-clean
+flatpak run com.screenshot_hero.ScreenshotHero
 ```
 
 > ⚠️ Flatpak runner runtime differs from flatpak-builder runtime. Always validate with `flatpak run`, not just `flatpak-builder --build-only`.
@@ -73,3 +74,4 @@ flatpak run com.example.ScreenshotHero
 - GTK4 UI testing is deferred by design — requires Wayland/X11 compositor
 - If CI is added later, use Xvfb or a headless Wayland compositor for UI smoke tests
 - `ashpd` portal calls cannot be unit-tested without a running portal; test only the business logic around them
+- Current baseline (2026-06-15): `cargo test --lib` passes with 57 tests

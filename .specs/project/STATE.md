@@ -6,15 +6,14 @@
 
 ## Current Focus
 
-**Feature:** PRD-006 - Settings and Preferences  
-**Phase:** Planning complete → Ready to Execute (tasks in `.specs/features/settings-and-preferences/tasks.md`)  
-**Next action:** Execute T1 (GSettings schema) → T2 (AppSettings module); then T3–T6 (UI) sequential; T7+T8 parallel; T9 (wiring); T10 (build) independent after T1
+**Workstream:** Documentation and stabilization sync  
+**Phase:** Active  
+**Next action:** Keep `.specs` in sync with prompt-driven implementation updates and run focused manual UAT over capture → annotate → save/export.
 
 ### Previous Focus
 
-**Feature:** PRD-005 - Export and Clipboard  
-**Phase:** Planning complete → Ready to Execute (tasks in `.specs/features/export-and-clipboard/tasks.md`)  
-**Next action (deferred):** Execute T1–T4 in parallel (pure Rust export module), then T5–T9 sequentially
+**Feature:** PRD-006 - Settings and Preferences  
+**Phase:** Implemented
 
 **Feature:** PRD-004 - Project Management  
 **Phase:** Implemented (T1–T8 complete)  
@@ -85,29 +84,10 @@
 
 ## Todos
 
-### PRD-006 — Settings and Preferences
-
-- [ ] PRD-006 T2: Verify `gio::Settings::bind()` availability and parameter signature for string keys (EntryRow binding) in gio-rs 0.20
-- [ ] PRD-006 T2: Verify `adw::ComboRow` manual `connect_selected_notify` vs `gio::Settings::bind()` — enum-backed ComboRows may need custom position mapping
-- [ ] PRD-006 T7: Confirm `env_logger::Builder::filter_level(LevelFilter::Trace).init()` call order vs GLib initialization (must be after glib is ready but before any log call)
-- [ ] PRD-006 T8: Confirm `gio::Settings::boolean()` / `gio::Settings::string()` are available on `gio::Settings` (not just via `SettingsExt`) in gio-rs 0.20
-
-
-
-- [x] PRD-004 T7: Verify `gtk::FileDialog` filter API for `.shero` extension (pattern vs mime type) in gtk4-rs 0.9 — uses `add_pattern("*.shero")`
-- [x] PRD-004 T7: Confirm `Application::set_accels_for_action` is accessible at startup phase for `win.save-project` → Ctrl+S — wired in `application.rs`
-- [x] PRD-004 T8: Confirm `on_annotation_changed` single-callback limitation — extended existing closure (undo/redo + auto-save in one callback)
-- [ ] Verify exact crate versions for gtk4-rs ecosystem before T1 (use Context7 or crates.io)
-- [ ] Confirm Flatpak runtime version (GNOME SDK) used in POC-003 matches manifest in T12
-- [ ] Confirm `ashpd` async runtime compatibility (zbus + glib) during T6
-- [ ] PRD-003 T7: Verify `cairo-rs` API for pixbuf sub-region extraction + scale operations (for Blur/Pixelate renderers)
-- [ ] PRD-003 T12: Verify `adw::MessageDialog` with `gtk::Entry` API availability in current libadwaita-rs version
-- [ ] PRD-003 T14: Verify `gtk::ColorButton` vs `gtk::ColorDialog` availability in gtk4-rs version in use
-- [ ] PRD-005 T4: Verify `gdk::Clipboard::set_texture` method signature in gtk4-rs 0.9 (may need `ContentProvider` instead)
-- [ ] PRD-005 T4: Verify `gdk::Texture::for_pixbuf` availability in gtk4-rs 0.9
-- [ ] PRD-005 T8: Verify `glib::SourceId::remove()` consuming method signature in glib 0.20
-- [ ] PRD-005 T1: Verify `gdk_pixbuf::Pixbuf::from_bytes` constructor signature in gdk-pixbuf 0.20
-- [ ] PRD-005 T3: Confirm JPEG quality option key for `Pixbuf::savev` is `"quality"` (not `"jpeg-quality"`)
+- [ ] Run manual UAT checklist for all v1 flows in native Cargo runtime
+- [ ] Run manual UAT checklist for all v1 flows in Flatpak runtime
+- [ ] Decide whether to update feature task files (`tasks.md`) from `Draft` to executed/completed state
+- [ ] Add CI smoke strategy for `cargo build` + `cargo test --lib` (no display server)
 
 ---
 
@@ -131,10 +111,11 @@
 
 ## Lessons Learned
 
-*None yet — first session.*
+- Prompt-driven implementation can outpace planning docs quickly; the `ROADMAP.md` and `STATE.md` should be refreshed at the end of each implementation session.
+- Keeping `.specs/codebase/` complete (all 7 files) makes future planning phases faster and reduces re-discovery.
 
 ---
 
 ## Preferences
 
-*None recorded yet.*
+- Prefer objective status updates backed by commands (`cargo test --lib`, `cargo build`) before changing roadmap state.

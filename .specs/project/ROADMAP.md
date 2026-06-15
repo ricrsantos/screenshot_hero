@@ -1,18 +1,19 @@
 # Screenshot Hero - Roadmap
 
+**Last updated:** 2026-06-15  
+**Current program status:** v1 scope implemented; focus moved to stabilization, validation, and documentation hygiene.
+
 ## Milestone 1: Screenshot Capture and Loading
 **Feature:** PRD-001  
 **Spec:** `.specs/features/capture-and-loading/`  
 **Status:** Implemented
 
-**Deliverables:**
+**Delivered:**
 - Cargo project with GTK4 + Libadwaita + ashpd
 - Application shell (main window, header bar, GActions)
 - Screenshot capture via GNOME Screenshot Portal
-- Load existing PNG/JPEG via file picker
-- Basic canvas (image display, no zoom/pan yet)
-- Error handling (invalid file, portal unavailable)
-- Flatpak manifest with portal permissions
+- Open PNG/JPEG from file picker
+- Initial canvas load/fit behavior and error handling
 
 ---
 
@@ -21,66 +22,70 @@
 **Spec:** `.specs/features/canvas-and-navigation/`  
 **Status:** Implemented
 
-**Deliverables:**
-- Zoom (10% – 800%), scroll-wheel zoom
-- Pan (middle mouse button)
-- Fit-to-window / 100% zoom shortcuts
-- Zoom level indicator in header
+**Delivered:**
+- Zoom controls (buttons, shortcuts, and mouse wheel)
+- Middle-mouse pan
+- Fit-to-window and 100% zoom actions
+- Zoom percentage indicator
 
 ---
 
 ## Milestone 3: Annotations
 **Feature:** PRD-003  
 **Spec:** `.specs/features/annotations/`  
-**Status:** Planning complete → Ready to Execute
+**Status:** Implemented
 
-**Deliverables:**
-- `src/annotations/` module: data model, engine (CRUD + selection + hit-test), history (Command Pattern), tool state
-- `src/canvas/renderer.rs`: Cairo renderers for all 12 annotation types + selection handles
-- Canvas interaction: draw/select/move/resize/delete gestures + keyboard shortcuts
-- Text annotation editor (modal dialog)
-- Tool palette widget (left sidebar with tool buttons + color/stroke controls)
-- Undo/Redo (Ctrl+Z / Ctrl+Y) via GActions
-
-**Task summary:** 18 tasks (T1–T18); see `.specs/features/annotations/tasks.md`
-
-**P1 (MVP):** Rectangle, Ellipse, Arrow, Line + Select/Move/Resize/Delete + Undo/Redo + Style (T1–T17)  
-**P2:** Freehand, Text, Blur, Pixelate, Redaction, Timestamp, Number Marker (included in T1–T18)  
-**P3:** Callout (included in T7, T9, T12)
+**Delivered:**
+- `src/annotations/` domain module (model, engine, history, tool state)
+- Canvas renderers and interactions for annotation drawing/editing
+- Tool palette integration (selection, color, stroke width)
+- Undo/redo and keyboard shortcuts
+- Text and advanced annotation variants integrated into rendering flow
 
 ---
 
 ## Milestone 4: Project Management
 **Feature:** PRD-004  
-**Status:** Not started
+**Spec:** `.specs/features/project-management/`  
+**Status:** Implemented
 
-**Deliverables:**
-- Save/load `.shero` project files
-- Auto-save on change
-- Project metadata (created_at, modified_at, app_version)
+**Delivered:**
+- Save/open `.shero` project files
+- Auto-save on annotation change when enabled
+- Project metadata lifecycle (`created_at`, `modified_at`, `app_version`)
+- Persistence module with serializer/deserializer/manager separation
 
 ---
 
-## Milestone 5: Export and Clipboard ← current
+## Milestone 5: Export and Clipboard
 **Feature:** PRD-005  
 **Spec:** `.specs/features/export-and-clipboard/`  
-**Status:** Planning complete → Ready to Execute (9 tasks: T1–T4 parallel, T5–T9 sequential)
+**Status:** Implemented
 
-**Deliverables:**
-- `src/export/` module: off-screen renderer, file exporter (PNG/JPEG), clipboard writer, auto-export path logic
-- Manual export GActions: `win.export-png`, `win.export-jpeg`, `win.copy-to-clipboard`
-- Auto-clipboard update (debounced 300ms, enabled by default)
-- Auto-export (disabled by default, configurable suffix `_shero`, saves beside original)
+**Delivered:**
+- `src/export/` module (`renderer`, `exporter`, `clipboard`, `auto_export`)
+- Manual export actions: `win.export-png`, `win.export-jpeg`
+- Manual clipboard action: `win.copy-to-clipboard`
+- Auto-clipboard debounce (300ms)
+- Auto-export path strategy with configurable suffix
 
 ---
 
 ## Milestone 6: Settings and Preferences
 **Feature:** PRD-006  
-**Status:** Not started
+**Spec:** `.specs/features/settings-and-preferences/`  
+**Status:** Implemented
 
-**Deliverables:**
-- Appearance (Follow System / Light / Dark)
-- Timestamp toggle + format
-- Auto-save, auto-export, auto-clipboard toggles
-- Log level selector
-- GSettings-backed persistence
+**Delivered:**
+- GSettings schema and runtime binding (`com.screenshot_hero.ScreenshotHero`)
+- Preferences window with Appearance, Timestamps, Automation, and Developer groups
+- Runtime application of theme and log-level preferences
+- Settings-backed automation toggles consumed by window behavior
+
+---
+
+## Next Track
+
+- Stabilize Flatpak and native runtime behavior across environments
+- Expand manual UAT checklist for full end-to-end workflow
+- Keep `.specs` and implementation state aligned during future prompt-driven edits

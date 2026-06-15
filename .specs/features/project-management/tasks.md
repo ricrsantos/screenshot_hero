@@ -1,7 +1,7 @@
 # Project Management Tasks
 
 **Design**: `.specs/features/project-management/design.md`  
-**Status**: Draft
+**Status**: Implemented in codebase (task checklist pending backfill)
 
 ---
 
@@ -70,9 +70,9 @@ Phase 4 (Sequential after T5):
 
 **Done when**:
 
-- [ ] All 11 structs/enums have `#[derive(Serialize, Deserialize)]` added alongside existing derives
-- [ ] `cargo test --lib` passes with same test count as before (no silent deletions — currently 14 tests in `annotations` module)
-- [ ] `cargo build` compiles without errors
+- [x] All 11 structs/enums have `#[derive(Serialize, Deserialize)]` added alongside existing derives
+- [x] `cargo test --lib` passes with same test count as before (no silent deletions — currently 14 tests in `annotations` module)
+- [x] `cargo build` compiles without errors
 
 **Tests**: unit  
 **Gate**: quick  
@@ -95,12 +95,12 @@ Phase 4 (Sequential after T5):
 
 **Done when**:
 
-- [ ] `SheroProject` struct defined with all 5 fields (`version: u32`, `source_image: SourceImageRecord`, `annotations: Vec<Annotation>`, `view_state: ViewState`, `metadata: ProjectMetadata`)
-- [ ] All structs implement `#[derive(Debug, Serialize, Deserialize)]`
-- [ ] `PersistenceError` enum covers `Io`, `Json`, `UnsupportedVersion(u32)`, `MissingSourceImage(String)` variants with `Display` impl
-- [ ] `src/persistence/mod.rs` re-exports `ProjectManager`, `SheroProject`, `PersistenceError`
-- [ ] Unit test: `SheroProject::default()` or a manually constructed instance round-trips through `serde_json::to_string` + `from_str` without data loss
-- [ ] `cargo test --lib` passes (total test count ≥ previous + 1 new test)
+- [x] `SheroProject` struct defined with all 5 fields (`version: u32`, `source_image: SourceImageRecord`, `annotations: Vec<Annotation>`, `view_state: ViewState`, `metadata: ProjectMetadata`)
+- [x] All structs implement `#[derive(Debug, Serialize, Deserialize)]`
+- [x] `PersistenceError` enum covers `Io`, `Json`, `UnsupportedVersion(u32)`, `MissingSourceImage(String)` variants with `Display` impl
+- [x] `src/persistence/mod.rs` re-exports `ProjectManager`, `SheroProject`, `PersistenceError`
+- [x] Unit test: `SheroProject::default()` or a manually constructed instance round-trips through `serde_json::to_string` + `from_str` without data loss
+- [x] `cargo test --lib` passes (total test count ≥ previous + 1 new test)
 
 **Tests**: unit  
 **Gate**: quick  
@@ -118,12 +118,12 @@ Phase 4 (Sequential after T5):
 
 **Done when**:
 
-- [ ] `save_project` serializes `SheroProject` to pretty-printed JSON
-- [ ] Uses `{path}.tmp` + `fs::rename` for atomic write
-- [ ] `Io` errors from `fs::write` / `fs::rename` are wrapped as `PersistenceError::Io`
-- [ ] `Json` errors from `serde_json` are wrapped as `PersistenceError::Json`
-- [ ] Unit test: `save_project` writes a valid `.shero` to a temp directory; reading it back with `fs::read_to_string` + `serde_json::from_str` returns an equivalent `SheroProject`
-- [ ] `cargo test --lib` passes (total test count ≥ previous + 1 new test)
+- [x] `save_project` serializes `SheroProject` to pretty-printed JSON
+- [x] Uses `{path}.tmp` + `fs::rename` for atomic write
+- [x] `Io` errors from `fs::write` / `fs::rename` are wrapped as `PersistenceError::Io`
+- [x] `Json` errors from `serde_json` are wrapped as `PersistenceError::Json`
+- [x] Unit test: `save_project` writes a valid `.shero` to a temp directory; reading it back with `fs::read_to_string` + `serde_json::from_str` returns an equivalent `SheroProject`
+- [x] `cargo test --lib` passes (total test count ≥ previous + 1 new test)
 
 **Tests**: unit  
 **Gate**: quick  
@@ -141,14 +141,14 @@ Phase 4 (Sequential after T5):
 
 **Done when**:
 
-- [ ] `load_project` reads and parses a `.shero` JSON file into `SheroProject`
-- [ ] Returns `PersistenceError::UnsupportedVersion(v)` when `project.version != 1`
-- [ ] Returns `PersistenceError::Io` for file-not-found or read errors
-- [ ] Returns `PersistenceError::Json` for malformed JSON
-- [ ] Unit test: deserializing a valid sample `.shero` JSON string returns expected `SheroProject` fields
-- [ ] Unit test: deserializing JSON with `"version": 2` returns `PersistenceError::UnsupportedVersion(2)`
-- [ ] Unit test: deserializing malformed JSON returns `PersistenceError::Json`
-- [ ] `cargo test --lib` passes (total test count ≥ previous + 3 new tests)
+- [x] `load_project` reads and parses a `.shero` JSON file into `SheroProject`
+- [x] Returns `PersistenceError::UnsupportedVersion(v)` when `project.version != 1`
+- [x] Returns `PersistenceError::Io` for file-not-found or read errors
+- [x] Returns `PersistenceError::Json` for malformed JSON
+- [x] Unit test: deserializing a valid sample `.shero` JSON string returns expected `SheroProject` fields
+- [x] Unit test: deserializing JSON with `"version": 2` returns `PersistenceError::UnsupportedVersion(2)`
+- [x] Unit test: deserializing malformed JSON returns `PersistenceError::Json`
+- [x] `cargo test --lib` passes (total test count ≥ previous + 3 new tests)
 
 **Tests**: unit  
 **Gate**: quick  
@@ -166,14 +166,14 @@ Phase 4 (Sequential after T5):
 
 **Done when**:
 
-- [ ] `ProjectManager::new()` returns instance with `auto_save_enabled: true`, `current_path: None`, `created_at: None`
-- [ ] `save(path, project)`: sets `created_at` on first call; always updates `modified_at`; sets `current_path`; calls serializer
-- [ ] `save_as(path, project)`: same as `save` but always updates `current_path` to new path
-- [ ] `open(path)`: calls deserializer; on success sets `current_path` and `created_at` from project metadata
-- [ ] `maybe_auto_save(project)`: calls `save` only when `auto_save_enabled && current_path.is_some()`; logs `warn!` on error (no panic)
-- [ ] Unit test: `save` + re-read verifies `created_at` is set and stable across subsequent saves; `modified_at` advances
-- [ ] Unit test: `maybe_auto_save` with no path set does not write any file
-- [ ] `cargo test --lib` passes (total test count ≥ previous + 2 new tests)
+- [x] `ProjectManager::new()` returns instance with `auto_save_enabled: true`, `current_path: None`, `created_at: None`
+- [x] `save(path, project)`: sets `created_at` on first call; always updates `modified_at`; sets `current_path`; calls serializer
+- [x] `save_as(path, project)`: same as `save` but always updates `current_path` to new path
+- [x] `open(path)`: calls deserializer; on success sets `current_path` and `created_at` from project metadata
+- [x] `maybe_auto_save(project)`: calls `save` only when `auto_save_enabled && current_path.is_some()`; logs `warn!` on error (no panic)
+- [x] Unit test: `save` + re-read verifies `created_at` is set and stable across subsequent saves; `modified_at` advances
+- [x] Unit test: `maybe_auto_save` with no path set does not write any file
+- [x] `cargo test --lib` passes (total test count ≥ previous + 2 new tests)
 
 **Tests**: unit  
 **Gate**: quick  
@@ -194,15 +194,15 @@ Phase 4 (Sequential after T5):
 
 **Done when**:
 
-- [ ] `canvas.pan_offset() -> (f64, f64)` returns current pan offset from `imp().pan_offset`
-- [ ] `canvas.all_annotations() -> Vec<Annotation>` returns clone of all annotations from engine
-- [ ] `canvas.source_image_path() -> Option<PathBuf>` returns path from `imp().image` if loaded
-- [ ] `canvas.source_image_dimensions() -> Option<(u32, u32)>` returns `(width as u32, height as u32)` if image loaded
-- [ ] `canvas.restore_annotations(annotations: Vec<Annotation>)` replaces engine contents; calls `queue_draw()`
-- [ ] `canvas.restore_zoom_pan(zoom, pan_x, pan_y)` sets zoom + pan directly; calls `notify_zoom_changed(zoom)` + `queue_draw()`
-- [ ] `History::clear()` clears both `undo_stack` and `redo_stack`
-- [ ] Unit test: `History::clear()` on a non-empty history leaves `can_undo()` and `can_redo()` both false
-- [ ] `cargo build` passes (UI code — no unit tests for Canvas methods; `History::clear` is unit tested)
+- [x] `canvas.pan_offset() -> (f64, f64)` returns current pan offset from `imp().pan_offset`
+- [x] `canvas.all_annotations() -> Vec<Annotation>` returns clone of all annotations from engine
+- [x] `canvas.source_image_path() -> Option<PathBuf>` returns path from `imp().image` if loaded
+- [x] `canvas.source_image_dimensions() -> Option<(u32, u32)>` returns `(width as u32, height as u32)` if image loaded
+- [x] `canvas.restore_annotations(annotations: Vec<Annotation>)` replaces engine contents; calls `queue_draw()`
+- [x] `canvas.restore_zoom_pan(zoom, pan_x, pan_y)` sets zoom + pan directly; calls `notify_zoom_changed(zoom)` + `queue_draw()`
+- [x] `History::clear()` clears both `undo_stack` and `redo_stack`
+- [x] Unit test: `History::clear()` on a non-empty history leaves `can_undo()` and `can_redo()` both false
+- [x] `cargo build` passes (UI code — no unit tests for Canvas methods; `History::clear` is unit tested)
 
 **Tests**: unit (for `History::clear`), none (for Canvas methods — UI layer)  
 **Gate**: build  
@@ -220,14 +220,14 @@ Phase 4 (Sequential after T5):
 
 **Done when**:
 
-- [ ] `MainWindow` struct has `project_manager: RefCell<ProjectManager>` field
-- [ ] `win.save-project` GAction registered; handler collects state from canvas, calls `manager.save()` or shows file dialog + error dialog on failure; updates window title on success
-- [ ] `win.save-project-as` GAction registered; handler always shows file dialog, then saves
-- [ ] `win.open-project` GAction registered; handler shows `.shero`-filtered file dialog, calls `load_project()` + `FileLoader`, restores canvas, clears history, updates window title; shows error dialog on any failure
-- [ ] "Save" button and "Open Project" button visible in header bar
-- [ ] `win.save-project` bound to Ctrl+S keyboard accelerator in application startup
-- [ ] `win.save-project` is disabled when no source image is loaded; enabled when canvas has an image
-- [ ] `cargo build` passes
+- [x] `MainWindow` struct has `project_manager: RefCell<ProjectManager>` field
+- [x] `win.save-project` GAction registered; handler collects state from canvas, calls `manager.save()` or shows file dialog + error dialog on failure; updates window title on success
+- [x] `win.save-project-as` GAction registered; handler always shows file dialog, then saves
+- [x] `win.open-project` GAction registered; handler shows `.shero`-filtered file dialog, calls `load_project()` + `FileLoader`, restores canvas, clears history, updates window title; shows error dialog on any failure
+- [x] "Save" button and "Open Project" button visible in header bar
+- [x] `win.save-project` bound to Ctrl+S keyboard accelerator in application startup
+- [x] `win.save-project` is disabled when no source image is loaded; enabled when canvas has an image
+- [x] `cargo build` passes
 
 **Tests**: none (UI)  
 **Gate**: build  
@@ -243,14 +243,16 @@ Phase 4 (Sequential after T5):
 **Reuses**: Existing `on_annotation_changed` callback wiring; canvas accessor methods from T6  
 **Requirement**: PROJ-06, PROJ-07, PROJ-08, PROJ-09
 
+> Note (2026-06-15): Manual end-to-end confirmation of auto-save behavior after editing remains pending.
+
 **Done when**:
 
-- [ ] `on_annotation_changed` closure calls `project_manager.borrow().maybe_auto_save(snapshot)` after updating undo/redo button states
-- [ ] `snapshot` is built by collecting `all_annotations()`, `zoom_level()`, `pan_offset()`, `source_image_path()`, `source_image_dimensions()` from canvas
-- [ ] Auto-save fires only when project has an established path (covered by `maybe_auto_save` internal check)
-- [ ] `win.save-project` enabled/disabled state tracks canvas image presence (enabled when image loaded, disabled when not)
+- [x] `on_annotation_changed` closure calls `project_manager.borrow().maybe_auto_save(snapshot)` after updating undo/redo button states
+- [x] `snapshot` is built by collecting `all_annotations()`, `zoom_level()`, `pan_offset()`, `source_image_path()`, `source_image_dimensions()` from canvas
+- [x] Auto-save fires only when project has an established path (covered by `maybe_auto_save` internal check)
+- [x] `win.save-project` enabled/disabled state tracks canvas image presence (enabled when image loaded, disabled when not)
 - [ ] Manual test: save a project, add an annotation, confirm `.shero` file updates without pressing Ctrl+S
-- [ ] `cargo build` passes
+- [x] `cargo build` passes
 
 **Tests**: none (UI)  
 **Gate**: build  
