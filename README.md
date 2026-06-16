@@ -1,55 +1,98 @@
-# Screenshot Hero
+<p align="center">
+  <a href="#english">🇺🇸 English</a> |
+  <a href="#portugues-br">🇧🇷 Português</a>
+</p>
 
-Linux-native screenshot annotation application built with **Rust**, **GTK4**, and **Libadwaita**.
+<h1 align="center">Screenshot Hero</h1>
 
-Screenshot Hero lets you capture a screen region via the GNOME/XDG Screenshot Portal or open an existing PNG/JPEG file, then view the image in the app canvas — the first step in the **Capture → Annotate → Paste** workflow.
+<p align="center">
+  Capture, annotate, and share screenshots on Linux. Full compatible 
+</p>
 
-The app is **Flatpak-first**, **offline-only**, and **privacy-first**: screenshots stay on your machine.
+<p align="center">
+  <img src="https://img.shields.io/badge/platform-Linux%20%7C%20GNOME-blue" alt="Linux GNOME">
+  <img src="https://img.shields.io/badge/built%20with-Rust%20%7C%20GTK4%20%7C%20Libadwaita-orange" alt="Rust GTK4 Libadwaita">
+  <img src="https://img.shields.io/badge/distribution-Flatpak-4A86CF" alt="Flatpak">
+  <img src="https://img.shields.io/badge/license-BSD--2--Clause-green" alt="BSD-2-Clause">
+</p>
 
-## Requirements
+![Screenshot Hero logo](./pictures/azul_transparente_1254.png)
 
-### Native development (Cargo)
+![Screenshot Hero in action](./pictures/export.png)
 
-- Rust toolchain (stable), via [rustup](https://rustup.rs/)
-- GTK 4 and Libadwaita development libraries
-- A GNOME/Wayland (or X11) desktop session for running the UI
-- XDG Desktop Portals (for screenshot capture)
+---
 
-**Fedora:**
+<a id="english"></a>
+
+## 🇺🇸 English
+
+Screenshot Hero is a Linux-native screenshot annotation app built with Rust, GTK4, and Libadwaita.
+
+Designed for an open source workflow, it helps you move fast through:
+**Capture -> Annotate -> Export/Copy**.
+
+### Features
+
+- Region capture through GNOME/XDG Screenshot Portal
+- Open local PNG/JPEG files
+- Annotation toolkit (text, shapes, arrows, blur, pixelate, redaction, and more)
+- Zoom, pan, crop, undo/redo
+- Export to PNG/JPEG and copy to clipboard
+- Save and load `.shero` project files
+- Offline-first and privacy-first: your screenshots stay on your machine
+
+### Project Images
+
+![Screenshot Hero editor screenshot](./pictures/export.png)
+
+![Screenshot Hero brand image](./pictures/azul_transparente_1254.png)
+
+![Screenshot Hero app icon](./data/icons/hicolor/256x256/apps/com.screenshot_hero.ScreenshotHero.png)
+
+### Quick Start
+
+```bash
+git clone https://github.com/ricrsantos/screenshot_hero.git
+cd screenshot_hero
+cargo run
+```
+
+Run directly in capture mode:
+
+```bash
+cargo run -- --capture
+```
+
+### Requirements (Development)
+
+- Rust stable (via [rustup](https://rustup.rs/))
+- GTK4 and Libadwaita development libraries
+- GNOME/Wayland (or X11)
+- XDG Desktop Portals (`org.freedesktop.portal.Desktop`)
+
+**Fedora**
 
 ```bash
 sudo dnf install gtk4-devel libadwaita-devel gdk-pixbuf2-devel gcc pkg-config
 ```
 
-**Debian / Ubuntu:**
+**Debian / Ubuntu**
 
 ```bash
 sudo apt install libgtk-4-dev libadwaita-1-dev libgdk-pixbuf-2.0-dev build-essential pkg-config
 ```
 
-**Arch Linux:**
+**Arch Linux**
 
 ```bash
 sudo pacman -S gtk4 libadwaita gdk-pixbuf-2.0 base-devel
 ```
 
-### Flatpak
-
-- [Flatpak](https://flatpak.org/) with the Flathub remote configured
-- GNOME Platform and SDK 50
+### Build and Test
 
 ```bash
-flatpak install flathub org.gnome.Platform//50 org.gnome.Sdk//50
-```
-
-## Build
-
-Clone the repository and build with Cargo:
-
-```bash
-git clone <repository-url>
-cd screenshot_hero
 cargo build
+cargo test --lib
 ```
 
 Release build:
@@ -58,122 +101,201 @@ Release build:
 cargo build --release
 ```
 
-Run unit tests:
+### Flatpak (Primary Distribution Target)
+
+Manifest: `build/com.screenshot_hero.ScreenshotHero.yml`
+
+Install required runtime/SDK:
 
 ```bash
-cargo test --lib
+flatpak install flathub org.gnome.Platform//50 org.gnome.Sdk//50
 ```
 
-## Run with Cargo (development)
-
-`cargo run` compiles the GSettings schema automatically during the build. No extra setup is required for preferences and persisted settings to work.
-
-```bash
-cargo run
-```
-
-Start directly in capture mode (opens GNOME/XDG capture UI first, then loads result in Screenshot Hero):
-
-```bash
-cargo run -- --capture
-```
-
-### Capture behavior settings
-
-In **Preferences → Capture Behavior**, Screenshot Hero now supports:
-
-- **Disable Post-Capture Editing** (default: off): with `--capture`, runs portal capture and exits without opening editor.
-- **Temporary Disable Post-Capture Editing** (default: off, 1m0s): same behavior as above for a configured minutes/seconds window, then auto-disables.
-- **Open New Window on Capture** (default: off): when off, **New Screenshot** replaces current image; when on, each capture opens a new window.
-
-> `Exit After Paste` was removed from the current release plan and is deferred for a future iteration.
-
-If you change `data/*.gschema.xml`, rebuild so the schema is recompiled:
-
-```bash
-cargo build
-cargo run
-```
-
-For manual schema compilation (optional):
-
-```bash
-glib-compile-schemas data/
-GSETTINGS_SCHEMA_DIR=data/ cargo run
-```
-
-With logging enabled:
-
-```bash
-RUST_LOG=info cargo run
-```
-
-With capture mode and logging:
-
-```bash
-RUST_LOG=info cargo run -- --capture
-```
-
-Use **New Screenshot** to capture via the portal, or **Open File** to load a PNG/JPEG image.
-
-> Screenshot capture requires a running portal (`org.freedesktop.portal.Desktop`) and works best on GNOME/Wayland.
-
-## Flatpak: build, install, and run
-
-Flatpak is the primary distribution target. The manifest lives at `build/com.screenshot_hero.ScreenshotHero.yml`.
-
-### Update vendored Cargo sources (when dependencies change)
-
-If you modify `Cargo.toml` or `Cargo.lock`, regenerate the offline sources before building the Flatpak:
-
-```bash
-curl -LO https://raw.githubusercontent.com/flatpak/flatpak-builder-tools/master/cargo/flatpak-cargo-generator.py
-python3 flatpak-cargo-generator.py Cargo.lock -o build/cargo-sources.json
-```
-
-### Build only (validation)
-
-```bash
-flatpak-builder --build-only build-dir build/com.screenshot_hero.ScreenshotHero.yml --force-clean
-```
-
-### Install and run
+Build, install, and run:
 
 ```bash
 flatpak-builder --user --install build-dir build/com.screenshot_hero.ScreenshotHero.yml --force-clean
 flatpak run com.screenshot_hero.ScreenshotHero
 ```
 
-Run the installed Flatpak directly in capture mode:
+Capture mode with Flatpak:
 
 ```bash
 flatpak run com.screenshot_hero.ScreenshotHero --capture
 ```
 
-> Always validate the installed app with `flatpak run`, not only `flatpak-builder --build-only`. The installed runtime matches what end users get.
+### Contributing
 
-## Run compiled binary
+Contributions are welcome.
 
-After `cargo build`:
+1. Open an issue for bugs, UX feedback, or feature requests.
+2. Fork the repo and create a branch from `main`.
+3. Keep changes focused and include tests when possible.
+4. Run:
 
 ```bash
-./target/debug/screenshot-hero --capture
+cargo build
+cargo test --lib
 ```
 
-## Project layout
+5. Open a Pull Request with a clear description and screenshots/GIFs when UI changes are involved.
 
-```
+### Project Structure
+
+```text
 src/
-├── main.rs              # Entry point
-├── application.rs       # GApplication subclass
-├── ui/window/           # Main window and actions
-├── canvas/              # Image display widget
-├── capture/             # Portal capture and file loading
-└── models/              # ImageData model
+├── main.rs
+├── application.rs
+├── capture/
+├── annotations/
+├── canvas/
+├── export/
+├── persistence/
+└── ui/
 build/
-└── com.screenshot_hero.ScreenshotHero.yml   # Flatpak manifest
+└── com.screenshot_hero.ScreenshotHero.yml
 ```
 
-## License
+### License
 
-MIT — see [LICENSE](LICENSE).
+BSD 2-Clause. See [LICENSE](LICENSE).
+
+---
+
+<a id="portugues-br"></a>
+
+## 🇧🇷 Português (BR)
+
+O Screenshot Hero é um aplicativo nativo Linux para anotação de capturas de tela, desenvolvido com Rust, GTK4 e Libadwaita.
+
+Pensado para fluxo open source, ele acelera o processo:
+**Capturar -> Anotar -> Exportar/Copiar**.
+
+### Recursos
+
+- Captura de região via portal de screenshot do GNOME/XDG
+- Abertura de arquivos locais PNG/JPEG
+- Ferramentas de anotação (texto, formas, setas, blur, pixelate, redaction e mais)
+- Zoom, pan, crop, desfazer/refazer
+- Exportação em PNG/JPEG e cópia para a área de transferência
+- Salvamento e carregamento de projetos `.shero`
+- Offline e com privacidade: as imagens ficam na sua máquina
+
+### Imagens do Projeto
+
+![Captura do editor do Screenshot Hero](./pictures/export.png)
+
+![Imagem de marca do Screenshot Hero](./pictures/azul_transparente_1254.png)
+
+![Icone do app Screenshot Hero](./data/icons/hicolor/256x256/apps/com.screenshot_hero.ScreenshotHero.png)
+
+### Início Rápido
+
+```bash
+git clone https://github.com/ricrsantos/screenshot_hero.git
+cd screenshot_hero
+cargo run
+```
+
+Para iniciar direto no modo de captura:
+
+```bash
+cargo run -- --capture
+```
+
+### Requisitos (Desenvolvimento)
+
+- Rust estável (via [rustup](https://rustup.rs/))
+- Bibliotecas de desenvolvimento GTK4 e Libadwaita
+- Sessão GNOME/Wayland (ou X11)
+- XDG Desktop Portals (`org.freedesktop.portal.Desktop`)
+
+**Fedora**
+
+```bash
+sudo dnf install gtk4-devel libadwaita-devel gdk-pixbuf2-devel gcc pkg-config
+```
+
+**Debian / Ubuntu**
+
+```bash
+sudo apt install libgtk-4-dev libadwaita-1-dev libgdk-pixbuf-2.0-dev build-essential pkg-config
+```
+
+**Arch Linux**
+
+```bash
+sudo pacman -S gtk4 libadwaita gdk-pixbuf-2.0 base-devel
+```
+
+### Build e Testes
+
+```bash
+cargo build
+cargo test --lib
+```
+
+Build de release:
+
+```bash
+cargo build --release
+```
+
+### Flatpak (Distribuição Principal)
+
+Manifesto: `build/com.screenshot_hero.ScreenshotHero.yml`
+
+Instale runtime/SDK necessários:
+
+```bash
+flatpak install flathub org.gnome.Platform//50 org.gnome.Sdk//50
+```
+
+Build, instalação e execução:
+
+```bash
+flatpak-builder --user --install build-dir build/com.screenshot_hero.ScreenshotHero.yml --force-clean
+flatpak run com.screenshot_hero.ScreenshotHero
+```
+
+Modo captura com Flatpak:
+
+```bash
+flatpak run com.screenshot_hero.ScreenshotHero --capture
+```
+
+### Como Contribuir
+
+Contribuições são muito bem-vindas.
+
+1. Abra uma issue para bugs, feedback de UX ou sugestões.
+2. Faça fork do repositório e crie uma branch a partir da `main`.
+3. Mantenha alterações focadas e inclua testes quando possível.
+4. Execute:
+
+```bash
+cargo build
+cargo test --lib
+```
+
+5. Abra um Pull Request com descrição clara e screenshots/GIFs quando houver alteração de interface.
+
+### Estrutura do Projeto
+
+```text
+src/
+├── main.rs
+├── application.rs
+├── capture/
+├── annotations/
+├── canvas/
+├── export/
+├── persistence/
+└── ui/
+build/
+└── com.screenshot_hero.ScreenshotHero.yml
+```
+
+### Licença
+
+BSD 2-Clause. Veja [LICENSE](LICENSE).
