@@ -6,17 +6,16 @@
 <h1 align="center">Screenshot Hero</h1>
 
 <p align="center">
-  Capture, annotate, and share screenshots on Linux. Full compatible 
+  Capture, annotate, and share screenshots on Linux. Fully compatible with GNOME and Wayland.
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/platform-Linux%20%7C%20GNOME-blue" alt="Linux GNOME">
+  <img src="https://img.shields.io/badge/display-Wayland-purple" alt="Wayland">
   <img src="https://img.shields.io/badge/built%20with-Rust%20%7C%20GTK4%20%7C%20Libadwaita-orange" alt="Rust GTK4 Libadwaita">
   <img src="https://img.shields.io/badge/distribution-Flatpak-4A86CF" alt="Flatpak">
   <img src="https://img.shields.io/badge/license-BSD--2--Clause-green" alt="BSD-2-Clause">
 </p>
-
-![Screenshot Hero logo](./pictures/azul_transparente_1254.png)
 
 ![Screenshot Hero in action](./pictures/export.png)
 
@@ -28,7 +27,11 @@
 
 Screenshot Hero is a Linux-native screenshot annotation app built with Rust, GTK4, and Libadwaita.
 
-Designed for an open source workflow, it helps you move fast through:
+The idea for this application came from a simple gap: at the time of writing, there is no screenshot and annotation app that works seamlessly with GNOME + Wayland because of Wayland's security and privacy model.
+
+Screenshot Hero does not try to bypass Wayland directly. Instead, it integrates with GNOME's native capture tool.
+
+Designed for an open-source workflow, it helps you move fast through:
 **Capture -> Annotate -> Export/Copy**.
 
 ### Features
@@ -40,12 +43,6 @@ Designed for an open source workflow, it helps you move fast through:
 - Export to PNG/JPEG and copy to clipboard
 - Save and load `.shero` project files
 - Offline-first and privacy-first: your screenshots stay on your machine
-
-### Project Images
-
-![Screenshot Hero editor screenshot](./pictures/export.png)
-
-![Screenshot Hero brand image](./pictures/azul_transparente_1254.png)
 
 ![Screenshot Hero app icon](./data/icons/hicolor/256x256/apps/com.screenshot_hero.ScreenshotHero.png)
 
@@ -62,6 +59,50 @@ Run directly in capture mode:
 ```bash
 cargo run -- --capture
 ```
+
+### Installation
+
+#### Flathub (Recommended)
+
+```bash
+flatpak install flathub com.screenshot_hero.ScreenshotHero
+flatpak run com.screenshot_hero.ScreenshotHero
+```
+
+> Coming soon: the Flathub listing is being prepared. Until then, use the local Flatpak build steps below.
+
+#### Local Flatpak build
+
+Manifest: `build/com.screenshot_hero.ScreenshotHero.yml`
+
+Install required runtime/SDK:
+
+```bash
+flatpak install flathub org.gnome.Platform//50 org.gnome.Sdk//50
+```
+
+Build, install, and run:
+
+```bash
+flatpak-builder --user --install build-dir build/com.screenshot_hero.ScreenshotHero.yml --force-clean
+flatpak run com.screenshot_hero.ScreenshotHero
+```
+
+Capture mode with Flatpak:
+
+```bash
+flatpak run com.screenshot_hero.ScreenshotHero --capture
+```
+
+### GNOME Shortcut Tip
+
+You can assign Screenshot Hero capture mode to a GNOME custom keyboard shortcut:
+
+```bash
+flatpak run com.screenshot_hero.ScreenshotHero --capture
+```
+
+If you prefer, you can even replace GNOME's default screenshot shortcut and bind Screenshot Hero to `[PrintScr]`.
 
 ### Requirements (Development)
 
@@ -99,29 +140,6 @@ Release build:
 
 ```bash
 cargo build --release
-```
-
-### Flatpak (Primary Distribution Target)
-
-Manifest: `build/com.screenshot_hero.ScreenshotHero.yml`
-
-Install required runtime/SDK:
-
-```bash
-flatpak install flathub org.gnome.Platform//50 org.gnome.Sdk//50
-```
-
-Build, install, and run:
-
-```bash
-flatpak-builder --user --install build-dir build/com.screenshot_hero.ScreenshotHero.yml --force-clean
-flatpak run com.screenshot_hero.ScreenshotHero
-```
-
-Capture mode with Flatpak:
-
-```bash
-flatpak run com.screenshot_hero.ScreenshotHero --capture
 ```
 
 ### Contributing
@@ -168,12 +186,16 @@ BSD 2-Clause. See [LICENSE](LICENSE).
 
 O Screenshot Hero é um aplicativo nativo Linux para anotação de capturas de tela, desenvolvido com Rust, GTK4 e Libadwaita.
 
-Pensado para fluxo open source, ele acelera o processo:
+A ideia deste aplicativo surgiu de uma lacuna simples: até o momento desta escrita, não existe um app de captura e anotação de tela que funcione de forma fluida com GNOME + Wayland por causa do modelo de segurança e privacidade do Wayland.
+
+O Screenshot Hero não tenta contornar o Wayland diretamente. Em vez disso, integra-se com a ferramenta nativa de captura do GNOME.
+
+Projetado para um fluxo open source, ele ajuda você a avançar rapidamente em:
 **Capturar -> Anotar -> Exportar/Copiar**.
 
 ### Recursos
 
-- Captura de região via portal de screenshot do GNOME/XDG
+- Captura de região via GNOME/XDG Screenshot Portal
 - Abertura de arquivos locais PNG/JPEG
 - Ferramentas de anotação (texto, formas, setas, blur, pixelate, redaction e mais)
 - Zoom, pan, crop, desfazer/refazer
@@ -181,13 +203,7 @@ Pensado para fluxo open source, ele acelera o processo:
 - Salvamento e carregamento de projetos `.shero`
 - Offline e com privacidade: as imagens ficam na sua máquina
 
-### Imagens do Projeto
-
-![Captura do editor do Screenshot Hero](./pictures/export.png)
-
-![Imagem de marca do Screenshot Hero](./pictures/azul_transparente_1254.png)
-
-![Icone do app Screenshot Hero](./data/icons/hicolor/256x256/apps/com.screenshot_hero.ScreenshotHero.png)
+![Ícone do app Screenshot Hero](./data/icons/hicolor/256x256/apps/com.screenshot_hero.ScreenshotHero.png)
 
 ### Início Rápido
 
@@ -202,6 +218,50 @@ Para iniciar direto no modo de captura:
 ```bash
 cargo run -- --capture
 ```
+
+### Instalação
+
+#### Flathub (Recomendado)
+
+```bash
+flatpak install flathub com.screenshot_hero.ScreenshotHero
+flatpak run com.screenshot_hero.ScreenshotHero
+```
+
+> Em breve: a publicação no Flathub está em preparação. Até lá, use os passos de build local com Flatpak abaixo.
+
+#### Build local com Flatpak
+
+Manifesto: `build/com.screenshot_hero.ScreenshotHero.yml`
+
+Instale o runtime/SDK necessários:
+
+```bash
+flatpak install flathub org.gnome.Platform//50 org.gnome.Sdk//50
+```
+
+Build, instalação e execução:
+
+```bash
+flatpak-builder --user --install build-dir build/com.screenshot_hero.ScreenshotHero.yml --force-clean
+flatpak run com.screenshot_hero.ScreenshotHero
+```
+
+Modo de captura com Flatpak:
+
+```bash
+flatpak run com.screenshot_hero.ScreenshotHero --capture
+```
+
+### Dica de Atalho no GNOME
+
+Você pode atribuir o modo de captura do Screenshot Hero a um atalho de teclado personalizado no GNOME:
+
+```bash
+flatpak run com.screenshot_hero.ScreenshotHero --capture
+```
+
+Se quiser, você pode inclusive substituir o atalho padrão de captura do GNOME e vincular o Screenshot Hero à tecla `[PrintScr]`.
 
 ### Requisitos (Desenvolvimento)
 
@@ -241,36 +301,13 @@ Build de release:
 cargo build --release
 ```
 
-### Flatpak (Distribuição Principal)
-
-Manifesto: `build/com.screenshot_hero.ScreenshotHero.yml`
-
-Instale runtime/SDK necessários:
-
-```bash
-flatpak install flathub org.gnome.Platform//50 org.gnome.Sdk//50
-```
-
-Build, instalação e execução:
-
-```bash
-flatpak-builder --user --install build-dir build/com.screenshot_hero.ScreenshotHero.yml --force-clean
-flatpak run com.screenshot_hero.ScreenshotHero
-```
-
-Modo captura com Flatpak:
-
-```bash
-flatpak run com.screenshot_hero.ScreenshotHero --capture
-```
-
 ### Como Contribuir
 
 Contribuições são muito bem-vindas.
 
-1. Abra uma issue para bugs, feedback de UX ou sugestões.
+1. Abra uma issue para bugs, feedback de UX ou solicitações de funcionalidade.
 2. Faça fork do repositório e crie uma branch a partir da `main`.
-3. Mantenha alterações focadas e inclua testes quando possível.
+3. Mantenha as alterações focadas e inclua testes quando possível.
 4. Execute:
 
 ```bash
@@ -278,7 +315,7 @@ cargo build
 cargo test --lib
 ```
 
-5. Abra um Pull Request com descrição clara e screenshots/GIFs quando houver alteração de interface.
+5. Abra um Pull Request com uma descrição clara e screenshots/GIFs quando houver alterações na interface.
 
 ### Estrutura do Projeto
 
