@@ -6,6 +6,7 @@ command: screenshot-hero
 
 finish-args:
   - --share=ipc
+  - --device=dri
   - --socket=fallback-x11
   - --socket=wayland
   - --talk-name=org.freedesktop.portal.Screenshot

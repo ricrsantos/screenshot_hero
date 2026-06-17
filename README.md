@@ -94,6 +94,32 @@ Capture mode with Flatpak:
 flatpak run com.screenshot_hero.ScreenshotHero --capture
 ```
 
+#### EGL/Mesa warnings in Flatpak
+
+If you see warnings like `libEGL warning` or `MESA: ZINK` in the terminal, the app can still work normally. These messages usually indicate a GPU driver/acceleration mismatch between host and sandbox.
+
+- The Flatpak manifest already enables GPU access with `--device=dri`.
+- Check permissions with:
+
+```bash
+flatpak info --show-permissions com.screenshot_hero.ScreenshotHero
+```
+
+- If warnings persist, try forcing a specific GTK renderer (test one at a time):
+
+```bash
+# OpenGL (often best when GPU acceleration works)
+flatpak run --env=GSK_RENDERER=gl com.screenshot_hero.ScreenshotHero
+
+# Native OpenGL (alternative GL backend on some stacks)
+flatpak run --env=GSK_RENDERER=ngl com.screenshot_hero.ScreenshotHero
+
+# Software rendering (eliminates EGL/Mesa warnings; slower, no GPU)
+flatpak run --env=GSK_RENDERER=cairo com.screenshot_hero.ScreenshotHero
+```
+
+These overrides are optional and useful for troubleshooting; keep the default renderer when hardware acceleration is working.
+
 ### GNOME Shortcut Tip
 
 You can assign Screenshot Hero capture mode to a GNOME custom keyboard shortcut:
@@ -252,6 +278,32 @@ Modo de captura com Flatpak:
 ```bash
 flatpak run com.screenshot_hero.ScreenshotHero --capture
 ```
+
+#### Warnings EGL/Mesa no Flatpak
+
+Se aparecerem avisos como `libEGL warning` ou `MESA: ZINK` no terminal, o app ainda pode funcionar normalmente. Essas mensagens geralmente indicam incompatibilidade de aceleração/driver entre host e sandbox.
+
+- O manifesto Flatpak já habilita acesso à GPU com `--device=dri`.
+- Verifique as permissões com:
+
+```bash
+flatpak info --show-permissions com.screenshot_hero.ScreenshotHero
+```
+
+- Se os warnings persistirem, tente forçar um renderer GTK específico (teste um de cada vez):
+
+```bash
+# OpenGL (geralmente o melhor quando a aceleração por GPU funciona)
+flatpak run --env=GSK_RENDERER=gl com.screenshot_hero.ScreenshotHero
+
+# OpenGL nativo (backend GL alternativo em algumas stacks)
+flatpak run --env=GSK_RENDERER=ngl com.screenshot_hero.ScreenshotHero
+
+# Renderização por software (elimina warnings EGL/Mesa; mais lento, sem GPU)
+flatpak run --env=GSK_RENDERER=cairo com.screenshot_hero.ScreenshotHero
+```
+
+Esses overrides são opcionais e úteis para troubleshooting; mantenha o renderer padrão quando a aceleração por hardware estiver funcionando.
 
 ### Dica de Atalho no GNOME
 
