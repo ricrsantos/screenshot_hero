@@ -39,4 +39,4 @@ modules:
     sources:
       - cargo-sources.json
       - type: dir
-        path: ..
+        path: .

@@ -73,7 +73,7 @@ flatpak run com.screenshot_hero.ScreenshotHero
 
 #### Local Flatpak build
 
-Manifest: `build/com.screenshot_hero.ScreenshotHero.yml`
+Manifest: `com.screenshot_hero.ScreenshotHero.yml`
 
 Install required runtime/SDK:
 
@@ -84,7 +84,7 @@ flatpak install flathub org.gnome.Platform//50 org.gnome.Sdk//50
 Build, install, and run:
 
 ```bash
-flatpak-builder --user --install build-dir build/com.screenshot_hero.ScreenshotHero.yml --force-clean
+flatpak-builder --user --install build-dir com.screenshot_hero.ScreenshotHero.yml --force-clean
 flatpak run com.screenshot_hero.ScreenshotHero
 ```
 
@@ -196,8 +196,8 @@ src/
 ├── export/
 ├── persistence/
 └── ui/
-build/
-└── com.screenshot_hero.ScreenshotHero.yml
+com.screenshot_hero.ScreenshotHero.yml
+cargo-sources.json
 ```
 
 ### License
@@ -258,7 +258,7 @@ flatpak run com.screenshot_hero.ScreenshotHero
 
 #### Build local com Flatpak
 
-Manifesto: `build/com.screenshot_hero.ScreenshotHero.yml`
+Manifesto: `com.screenshot_hero.ScreenshotHero.yml`
 
 Instale o runtime/SDK necessários:
 
@@ -269,7 +269,7 @@ flatpak install flathub org.gnome.Platform//50 org.gnome.Sdk//50
 Build, instalação e execução:
 
 ```bash
-flatpak-builder --user --install build-dir build/com.screenshot_hero.ScreenshotHero.yml --force-clean
+flatpak-builder --user --install build-dir com.screenshot_hero.ScreenshotHero.yml --force-clean
 flatpak run com.screenshot_hero.ScreenshotHero
 ```
 
@@ -381,8 +381,8 @@ src/
 ├── export/
 ├── persistence/
 └── ui/
-build/
-└── com.screenshot_hero.ScreenshotHero.yml
+com.screenshot_hero.ScreenshotHero.yml
+cargo-sources.json
 ```
 
 ### Licença
