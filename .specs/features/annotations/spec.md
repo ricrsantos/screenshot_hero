@@ -24,16 +24,18 @@ After capturing or loading a screenshot (PRD-001) and navigating it (PRD-002), u
 
 ## Out of Scope
 
-| Feature | Reason |
-|---------|--------|
-| Export annotated image | PRD-005 (Export and Clipboard) |
-| Save/load annotations | PRD-004 (Project Management) |
-| Multi-selection | ADR-003 explicitly defers this |
-| Copy/paste annotations | Not in PRD-003 |
-| Layer / Z-order management | Not in PRD-003 |
-| Snap-to-grid | Not in PRD-003 |
-| Curved arrows | Straight arrow only for v1 |
-| Annotation grouping | Not in PRD-003 |
+
+| Feature                    | Reason                         |
+| -------------------------- | ------------------------------ |
+| Export annotated image     | PRD-005 (Export and Clipboard) |
+| Save/load annotations      | PRD-004 (Project Management)   |
+| Multi-selection            | ADR-003 explicitly defers this |
+| Copy/paste annotations     | Not in PRD-003                 |
+| Layer / Z-order management | Not in PRD-003                 |
+| Snap-to-grid               | Not in PRD-003                 |
+| Curved arrows              | Straight arrow only for v1     |
+| Annotation grouping        | Not in PRD-003                 |
+
 
 ---
 
@@ -231,28 +233,30 @@ After capturing or loading a screenshot (PRD-001) and navigating it (PRD-002), u
 
 ## Requirement Traceability
 
-| Requirement ID | Story | PRD Ref | Status |
-|---|---|---|---|
-| ANNO-01 | P1: Draw basic shapes — Rectangle | FR-001 | Pending |
-| ANNO-02 | P1: Draw basic shapes — Ellipse | FR-001 | Pending |
-| ANNO-03 | P1: Draw basic shapes — Arrow | FR-001 | Pending |
-| ANNO-04 | P1: Draw basic shapes — Line | FR-001 | Pending |
-| ANNO-05 | P1: Select annotation | FR-002 | Pending |
-| ANNO-06 | P1: Move annotation | FR-003 | Pending |
-| ANNO-07 | P1: Resize annotation | FR-004 | Pending |
-| ANNO-08 | P1: Delete annotation | FR-005 | Pending |
-| ANNO-09 | P1: Undo | — | Pending |
-| ANNO-10 | P1: Redo | — | Pending |
-| ANNO-11 | P1: Style — color | FR-006 | Pending |
-| ANNO-12 | P1: Style — stroke width | FR-007 | Pending |
-| ANNO-13 | P2: Freehand drawing | FR-001 | Pending |
-| ANNO-14 | P2: Text annotation | FR-001, FR-008 | Pending |
-| ANNO-15 | P2: Blur effect | FR-001 | Pending |
-| ANNO-16 | P2: Pixelate effect | FR-001 | Pending |
-| ANNO-17 | P2: Redaction | FR-001 | Pending |
-| ANNO-18 | P2: Timestamp | FR-001, FR-010 | Pending |
-| ANNO-19 | P2: Number Marker | FR-001, FR-009 | Pending |
-| ANNO-20 | P3: Callout | FR-001 | Pending |
+
+| Requirement ID | Story                             | PRD Ref        | Status  |
+| -------------- | --------------------------------- | -------------- | ------- |
+| ANNO-01        | P1: Draw basic shapes — Rectangle | FR-001         | Pending |
+| ANNO-02        | P1: Draw basic shapes — Ellipse   | FR-001         | Pending |
+| ANNO-03        | P1: Draw basic shapes — Arrow     | FR-001         | Pending |
+| ANNO-04        | P1: Draw basic shapes — Line      | FR-001         | Pending |
+| ANNO-05        | P1: Select annotation             | FR-002         | Pending |
+| ANNO-06        | P1: Move annotation               | FR-003         | Pending |
+| ANNO-07        | P1: Resize annotation             | FR-004         | Pending |
+| ANNO-08        | P1: Delete annotation             | FR-005         | Pending |
+| ANNO-09        | P1: Undo                          | —              | Pending |
+| ANNO-10        | P1: Redo                          | —              | Pending |
+| ANNO-11        | P1: Style — color                 | FR-006         | Pending |
+| ANNO-12        | P1: Style — stroke width          | FR-007         | Pending |
+| ANNO-13        | P2: Freehand drawing              | FR-001         | Pending |
+| ANNO-14        | P2: Text annotation               | FR-001, FR-008 | Pending |
+| ANNO-15        | P2: Blur effect                   | FR-001         | Pending |
+| ANNO-16        | P2: Pixelate effect               | FR-001         | Pending |
+| ANNO-17        | P2: Redaction                     | FR-001         | Pending |
+| ANNO-18        | P2: Timestamp                     | FR-001, FR-010 | Pending |
+| ANNO-19        | P2: Number Marker                 | FR-001, FR-009 | Pending |
+| ANNO-20        | P3: Callout                       | FR-001         | Pending |
+
 
 **Coverage:** 20 total, 0 mapped to tasks, 20 unmapped ⚠️
 
