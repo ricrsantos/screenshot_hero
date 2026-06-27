@@ -39,4 +39,23 @@ modules:
     sources:
       - cargo-sources.json
       - type: dir
-        path: .
+        path: ..
+        skip:
+          - .git
+          - .github
+
+          - .idea
+          - .vscode
+          - .zed
+
+          - target
+          - flatpak_artifacts
+
+          - build-dir
+          - repo
+
+          - docs
+
+          - pictures
+
+          - "*.md"
