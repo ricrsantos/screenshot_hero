@@ -58,4 +58,6 @@ modules:
 
           - pictures
 
+          - libgsk-4.so
+
           - "*.md"
