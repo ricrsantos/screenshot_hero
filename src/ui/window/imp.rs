@@ -20,6 +20,7 @@ use crate::persistence::{
     SourceImageRecord, ViewState,
 };
 use crate::settings::AppSettings;
+use crate::ui::about::{AboutWindow, create_header_button};
 use crate::ui::preferences::PreferencesWindow;
 use crate::ui::ToolPalette;
 
@@ -517,6 +518,13 @@ impl ObjectImpl for MainWindow {
         });
         actions.add_action(&show_preferences);
 
+        let show_about = gio::SimpleAction::new("show-about", None);
+        let window_for_about = window.clone();
+        show_about.connect_activate(move |_, _| {
+            AboutWindow::show(&window_for_about);
+        });
+        actions.add_action(&show_about);
+
         let undo_for_cb = undo.clone();
         let redo_for_cb = redo.clone();
         let canvas_for_annotation_cb = canvas.clone();
@@ -599,17 +607,21 @@ impl ObjectImpl for MainWindow {
 
         let preferences_section = gio::Menu::new();
         preferences_section.append(Some("Preferences"), Some("win.show-preferences"));
+        preferences_section.append(Some("About"), Some("win.show-about"));
 
         let file_menu = gio::Menu::new();
         file_menu.append_section(Some("Image"), &image_section);
         file_menu.append_section(Some("Project"), &project_section);
         file_menu.append_section(None, &preferences_section);
 
+        let about_button = create_header_button();
+
         let menu_button = gtk::MenuButton::builder()
             .icon_name("open-menu-symbolic")
             .menu_model(&file_menu)
             .build();
 
+        header.pack_end(&about_button);
         header.pack_end(&menu_button);
 
         let tool_palette = ToolPalette::new();
@@ -1032,6 +1044,30 @@ fn load_app_css() {
         .tool-stroke-value {
             font-size: 1.125em;
             min-width: 0;
+        }
+
+        /* ── About dialog ── */
+        .about-dialog {
+            background: @window_bg_color;
+        }
+        .about-version {
+            padding: 4px 14px;
+            border-radius: 999px;
+            border: 1px solid @accent_bg_color;
+            color: @accent_color;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        .about-links {
+            background: alpha(@window_fg_color, 0.06);
+            border-radius: 12px;
+            padding: 4px;
+        }
+        .about-link-row {
+            border-radius: 8px;
+        }
+        .about-link-row:hover {
+            background: alpha(@window_fg_color, 0.08);
         }
         ",
     );

@@ -39,10 +39,15 @@ glib::wrapper! {
 
 impl Application {
     pub fn new(start_with_capture: bool) -> Self {
+        let mut flags = gio::ApplicationFlags::HANDLES_COMMAND_LINE;
+        if cfg!(debug_assertions) {
+            flags.insert(gio::ApplicationFlags::NON_UNIQUE);
+        }
+
         let app: Self = glib::Object::builder()
             .property("application-id", "com.screenshot_hero.ScreenshotHero")
             .property("resource-base-path", crate::resources::RESOURCE_BASE_PATH)
-            .property("flags", gio::ApplicationFlags::HANDLES_COMMAND_LINE)
+            .property("flags", flags)
             .build();
 
         app.imp().start_with_capture.set(start_with_capture);

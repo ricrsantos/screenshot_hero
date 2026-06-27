@@ -2,8 +2,6 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use gtk::gdk;
-use gtk::gio;
-use gtk::glib;
 use gtk::prelude::*;
 
 use crate::annotations::{ActiveTool, Color};
@@ -228,19 +226,10 @@ fn build_tool_button(tooltip: &str) -> (gtk::ToggleButton, gtk::Image) {
 
 fn apply_tool_icon_theme(tool_images: &[(String, gtk::Image)], dark_mode: bool) {
     for (icon_file, image) in tool_images {
-        if let Some(texture) = themed_svg_texture(icon_file, dark_mode) {
+        if let Some(texture) = resources::themed_svg_texture(icon_file, dark_mode) {
             image.set_paintable(Some(&texture));
         }
     }
-}
-
-fn themed_svg_texture(icon_file: &str, dark_mode: bool) -> Option<gdk::Texture> {
-    let icon_path = format!("{}/{}", resources::TOOL_ICON_DIR, icon_file);
-    let svg_data = gio::resources_lookup_data(&icon_path, gio::ResourceLookupFlags::NONE).ok()?;
-    let icon_color = if dark_mode { "#FFFFFF" } else { "#000000" };
-    let themed_svg = String::from_utf8_lossy(svg_data.as_ref()).replace("currentColor", icon_color);
-    let bytes = glib::Bytes::from_owned(themed_svg.into_bytes());
-    gdk::Texture::from_bytes(&bytes).ok()
 }
 
 fn set_stroke_value(

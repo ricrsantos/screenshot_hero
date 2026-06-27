@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/com/screenshot_hero/ScreenshotHero">
+    <file>resources/icons/about.svg</file>
     <file>resources/icons/arrow.svg</file>
+    <file>resources/icons/github.svg</file>
     <file>resources/icons/blur.svg</file>
     <file>resources/icons/callout.svg</file>
     <file>resources/icons/crop.svg</file>

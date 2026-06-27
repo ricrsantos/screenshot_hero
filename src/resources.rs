@@ -3,6 +3,7 @@ use std::sync::OnceLock;
 use gtk::gdk;
 use gtk::gio;
 use gtk::glib;
+use gtk::prelude::*;
 
 pub const RESOURCE_BASE_PATH: &str = "/com/screenshot_hero/ScreenshotHero";
 pub const TOOL_ICON_DIR: &str = "/com/screenshot_hero/ScreenshotHero/resources/icons";
@@ -21,6 +22,33 @@ pub fn register() -> Result<(), String> {
             Ok(())
         })
         .clone()
+}
+
+pub fn themed_svg_texture(icon_file: &str, dark_mode: bool) -> Option<gdk::Texture> {
+    let icon_path = format!("{}/{}", TOOL_ICON_DIR, icon_file);
+    let svg_data = gio::resources_lookup_data(&icon_path, gio::ResourceLookupFlags::NONE).ok()?;
+    let icon_color = if dark_mode { "#FFFFFF" } else { "#000000" };
+    let themed_svg = String::from_utf8_lossy(svg_data.as_ref()).replace("currentColor", icon_color);
+    let bytes = glib::Bytes::from_owned(themed_svg.into_bytes());
+    gdk::Texture::from_bytes(&bytes).ok()
+}
+
+pub fn set_themed_svg_image(image: &gtk::Image, icon_file: &str, fallback_icon_name: &str) {
+    let image = image.clone();
+    let icon_file = icon_file.to_string();
+    let fallback_icon_name = fallback_icon_name.to_string();
+
+    let apply = move || {
+        let dark_mode = libadwaita::StyleManager::default().is_dark();
+        if let Some(texture) = themed_svg_texture(&icon_file, dark_mode) {
+            image.set_paintable(Some(&texture));
+        } else {
+            image.set_icon_name(Some(&fallback_icon_name));
+        }
+    };
+
+    apply();
+    libadwaita::StyleManager::default().connect_dark_notify(move |_| apply());
 }
 
 pub fn configure_icon_theme() {
