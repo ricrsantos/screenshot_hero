@@ -3,7 +3,6 @@ use std::sync::OnceLock;
 use gtk::gdk;
 use gtk::gio;
 use gtk::glib;
-use gtk::prelude::*;
 
 pub const RESOURCE_BASE_PATH: &str = "/com/screenshot_hero/ScreenshotHero";
 pub const TOOL_ICON_DIR: &str = "/com/screenshot_hero/ScreenshotHero/resources/icons";

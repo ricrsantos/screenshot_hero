@@ -22,7 +22,7 @@ modules:
         CARGO_HOME: /run/build/screenshot-hero/cargo
         CARGO_NET_OFFLINE: 'true'
     build-commands:
-      - install -Dm0644 cargo/config .cargo/config.toml
+      - install -Dm0644 cargo/config.toml .cargo/config.toml
       - cargo --offline fetch --manifest-path Cargo.toml --verbose
       - cargo --offline build --release --bin screenshot-hero
       - install -Dm755 target/release/screenshot-hero ${FLATPAK_DEST}/bin/screenshot-hero
