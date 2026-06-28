@@ -199,17 +199,37 @@ If you prefer, use the Flatpak helper scripts:
 ### Project Structure
 
 ```text
-src/
-├── main.rs
-├── application.rs
-├── capture/
-├── annotations/
-├── canvas/
-├── export/
-├── persistence/
-└── ui/
-flatpak/dev.codethings.schero.yml
-cargo-sources.json
+.
+├── src/
+│   ├── main.rs
+│   ├── lib.rs
+│   ├── application.rs
+│   ├── resources.rs
+│   ├── annotations/
+│   ├── canvas/
+│   ├── capture/
+│   ├── export/
+│   ├── models/
+│   ├── persistence/
+│   ├── settings/
+│   └── ui/
+├── data/
+│   ├── dev.codethings.schero.desktop
+│   ├── dev.codethings.schero.metainfo.xml
+│   ├── dev.codethings.schero.gschema.xml
+│   ├── dev.codethings.schero.gresource.xml
+│   ├── icons/
+│   └── resources/
+├── flatpak/
+│   ├── dev.codethings.schero.yml
+│   ├── dev.codethings.schero.flathub.yml
+│   ├── cargo-sources.json
+│   └── scripts/
+├── docs/
+├── tests/
+├── Cargo.toml
+├── build.rs
+└── README.md
 ```
 
 ### License
@@ -396,17 +416,37 @@ Caso voce prefira, utilize os scripts auxiliares do Flatpak:
 ### Estrutura do Projeto
 
 ```text
-src/
-├── main.rs
-├── application.rs
-├── capture/
-├── annotations/
-├── canvas/
-├── export/
-├── persistence/
-└── ui/
-flatpak/dev.codethings.schero.yml
-cargo-sources.json
+.
+├── src/
+│   ├── main.rs
+│   ├── lib.rs
+│   ├── application.rs
+│   ├── resources.rs
+│   ├── annotations/
+│   ├── canvas/
+│   ├── capture/
+│   ├── export/
+│   ├── models/
+│   ├── persistence/
+│   ├── settings/
+│   └── ui/
+├── data/
+│   ├── dev.codethings.schero.desktop
+│   ├── dev.codethings.schero.metainfo.xml
+│   ├── dev.codethings.schero.gschema.xml
+│   ├── dev.codethings.schero.gresource.xml
+│   ├── icons/
+│   └── resources/
+├── flatpak/
+│   ├── dev.codethings.schero.yml
+│   ├── dev.codethings.schero.flathub.yml
+│   ├── cargo-sources.json
+│   └── scripts/
+├── docs/
+├── tests/
+├── Cargo.toml
+├── build.rs
+└── README.md
 ```
 
 ### Licença
