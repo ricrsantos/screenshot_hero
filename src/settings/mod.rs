@@ -3,8 +3,8 @@ use gtk::prelude::*;
 use log::LevelFilter;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-const SCHEMA_ID: &str = "com.screenshot_hero.ScreenshotHero";
-const SCHEMA_PATH: &str = "/com/screenshot_hero/ScreenshotHero/";
+const SCHEMA_ID: &str = "dev.codethings.schero";
+const SCHEMA_PATH: &str = "/dev/codethings/schero/";
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ColorSchemePreference {

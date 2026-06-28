@@ -65,15 +65,15 @@ cargo run -- --capture
 #### Flathub (Recommended)
 
 ```bash
-flatpak install flathub com.screenshot_hero.ScreenshotHero
-flatpak run com.screenshot_hero.ScreenshotHero
+flatpak install flathub dev.codethings.schero
+flatpak run dev.codethings.schero
 ```
 
 > Coming soon: the Flathub listing is being prepared. Until then, use the local Flatpak build steps below.
 
 #### Local Flatpak build
 
-Manifest: `com.screenshot_hero.ScreenshotHero.yml`
+Manifest: `flatpak/dev.codethings.schero.yml`
 
 Install required runtime/SDK:
 
@@ -84,14 +84,18 @@ flatpak install flathub org.gnome.Platform//50 org.gnome.Sdk//50
 Build, install, and run:
 
 ```bash
-flatpak-builder --user --install build-dir com.screenshot_hero.ScreenshotHero.yml --force-clean
-flatpak run com.screenshot_hero.ScreenshotHero
+flatpak-builder --user --install build-dir flatpak/dev.codethings.schero.yml --force-clean
+flatpak run dev.codethings.schero
 ```
+
+Flathub PR-ready manifest (for `flathub/flathub` submissions):
+
+`flatpak/dev.codethings.schero.flathub.yml`
 
 Capture mode with Flatpak:
 
 ```bash
-flatpak run com.screenshot_hero.ScreenshotHero --capture
+flatpak run dev.codethings.schero --capture
 ```
 
 #### EGL/Mesa warnings in Flatpak
@@ -102,20 +106,20 @@ If you see warnings like `libEGL warning` or `MESA: ZINK` in the terminal, the a
 - Check permissions with:
 
 ```bash
-flatpak info --show-permissions com.screenshot_hero.ScreenshotHero
+flatpak info --show-permissions dev.codethings.schero
 ```
 
 - If warnings persist, try forcing a specific GTK renderer (test one at a time):
 
 ```bash
 # OpenGL (often best when GPU acceleration works)
-flatpak run --env=GSK_RENDERER=gl com.screenshot_hero.ScreenshotHero
+flatpak run --env=GSK_RENDERER=gl dev.codethings.schero
 
 # Native OpenGL (alternative GL backend on some stacks)
-flatpak run --env=GSK_RENDERER=ngl com.screenshot_hero.ScreenshotHero
+flatpak run --env=GSK_RENDERER=ngl dev.codethings.schero
 
 # Software rendering (eliminates EGL/Mesa warnings; slower, no GPU)
-flatpak run --env=GSK_RENDERER=cairo com.screenshot_hero.ScreenshotHero
+flatpak run --env=GSK_RENDERER=cairo dev.codethings.schero
 ```
 
 These overrides are optional and useful for troubleshooting; keep the default renderer when hardware acceleration is working.
@@ -125,7 +129,7 @@ These overrides are optional and useful for troubleshooting; keep the default re
 You can assign Screenshot Hero capture mode to a GNOME custom keyboard shortcut:
 
 ```bash
-flatpak run com.screenshot_hero.ScreenshotHero --capture
+flatpak run dev.codethings.schero --capture
 ```
 
 If you prefer, you can even replace GNOME's default screenshot shortcut and bind Screenshot Hero to `[PrintScr]`.
@@ -182,6 +186,14 @@ cargo build
 cargo test --lib
 ```
 
+If you prefer, use the Flatpak helper scripts:
+
+- `./flatpak/scripts/clean.sh` to remove local Flatpak build/repo/release artifacts
+- `./flatpak/scripts/build-dev.sh` to build and install a development Flatpak locally
+- `./flatpak/scripts/build-release.sh` to build a release-style Flatpak repository
+- `./flatpak/scripts/package.sh` to create a `.flatpak` bundle and SHA256 checksum
+- `./flatpak/scripts/run.sh` to run the installed Flatpak app (`dev.codethings.schero`)
+
 5. Open a Pull Request with a clear description and screenshots/GIFs when UI changes are involved.
 
 ### Project Structure
@@ -196,7 +208,7 @@ src/
 ├── export/
 ├── persistence/
 └── ui/
-com.screenshot_hero.ScreenshotHero.yml
+flatpak/dev.codethings.schero.yml
 cargo-sources.json
 ```
 
@@ -250,15 +262,15 @@ cargo run -- --capture
 #### Flathub (Recomendado)
 
 ```bash
-flatpak install flathub com.screenshot_hero.ScreenshotHero
-flatpak run com.screenshot_hero.ScreenshotHero
+flatpak install flathub dev.codethings.schero
+flatpak run dev.codethings.schero
 ```
 
 > Em breve: a publicação no Flathub está em preparação. Até lá, use os passos de build local com Flatpak abaixo.
 
 #### Build local com Flatpak
 
-Manifesto: `com.screenshot_hero.ScreenshotHero.yml`
+Manifesto: `flatpak/dev.codethings.schero.yml`
 
 Instale o runtime/SDK necessários:
 
@@ -269,14 +281,18 @@ flatpak install flathub org.gnome.Platform//50 org.gnome.Sdk//50
 Build, instalação e execução:
 
 ```bash
-flatpak-builder --user --install build-dir com.screenshot_hero.ScreenshotHero.yml --force-clean
-flatpak run com.screenshot_hero.ScreenshotHero
+flatpak-builder --user --install build-dir flatpak/dev.codethings.schero.yml --force-clean
+flatpak run dev.codethings.schero
 ```
+
+Manifesto pronto para PR no Flathub (submissao em `flathub/flathub`):
+
+`flatpak/dev.codethings.schero.flathub.yml`
 
 Modo de captura com Flatpak:
 
 ```bash
-flatpak run com.screenshot_hero.ScreenshotHero --capture
+flatpak run dev.codethings.schero --capture
 ```
 
 #### Warnings EGL/Mesa no Flatpak
@@ -287,20 +303,20 @@ Se aparecerem avisos como `libEGL warning` ou `MESA: ZINK` no terminal, o app ai
 - Verifique as permissões com:
 
 ```bash
-flatpak info --show-permissions com.screenshot_hero.ScreenshotHero
+flatpak info --show-permissions dev.codethings.schero
 ```
 
 - Se os warnings persistirem, tente forçar um renderer GTK específico (teste um de cada vez):
 
 ```bash
 # OpenGL (geralmente o melhor quando a aceleração por GPU funciona)
-flatpak run --env=GSK_RENDERER=gl com.screenshot_hero.ScreenshotHero
+flatpak run --env=GSK_RENDERER=gl dev.codethings.schero
 
 # OpenGL nativo (backend GL alternativo em algumas stacks)
-flatpak run --env=GSK_RENDERER=ngl com.screenshot_hero.ScreenshotHero
+flatpak run --env=GSK_RENDERER=ngl dev.codethings.schero
 
 # Renderização por software (elimina warnings EGL/Mesa; mais lento, sem GPU)
-flatpak run --env=GSK_RENDERER=cairo com.screenshot_hero.ScreenshotHero
+flatpak run --env=GSK_RENDERER=cairo dev.codethings.schero
 ```
 
 Esses overrides são opcionais e úteis para troubleshooting; mantenha o renderer padrão quando a aceleração por hardware estiver funcionando.
@@ -310,7 +326,7 @@ Esses overrides são opcionais e úteis para troubleshooting; mantenha o rendere
 Você pode atribuir o modo de captura do Screenshot Hero a um atalho de teclado personalizado no GNOME:
 
 ```bash
-flatpak run com.screenshot_hero.ScreenshotHero --capture
+flatpak run dev.codethings.schero --capture
 ```
 
 Se quiser, você pode inclusive substituir o atalho padrão de captura do GNOME e vincular o Screenshot Hero à tecla `[PrintScr]`.
@@ -367,6 +383,14 @@ cargo build
 cargo test --lib
 ```
 
+Caso voce prefira, utilize os scripts auxiliares do Flatpak:
+
+- `./flatpak/scripts/clean.sh` para remover os artefatos locais de build/repo/release do Flatpak
+- `./flatpak/scripts/build-dev.sh` para fazer build e instalar o Flatpak de desenvolvimento localmente
+- `./flatpak/scripts/build-release.sh` para gerar um repositorio Flatpak no modo release
+- `./flatpak/scripts/package.sh` para criar o bundle `.flatpak` e o checksum SHA256
+- `./flatpak/scripts/run.sh` para executar o app Flatpak instalado (`dev.codethings.schero`)
+
 5. Abra um Pull Request com uma descrição clara e screenshots/GIFs quando houver alterações na interface.
 
 ### Estrutura do Projeto
@@ -381,7 +405,7 @@ src/
 ├── export/
 ├── persistence/
 └── ui/
-com.screenshot_hero.ScreenshotHero.yml
+flatpak/dev.codethings.schero.yml
 cargo-sources.json
 ```
 

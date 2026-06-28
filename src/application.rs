@@ -45,7 +45,7 @@ impl Application {
         }
 
         let app: Self = glib::Object::builder()
-            .property("application-id", "com.screenshot_hero.ScreenshotHero")
+            .property("application-id", "dev.codethings.schero")
             .property("resource-base-path", crate::resources::RESOURCE_BASE_PATH)
             .property("flags", flags)
             .build();
