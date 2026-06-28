@@ -1,0 +1,9 @@
+target/
+build-dir/
+repo/
+.flatpak-builder/
+build/
+flatpak_artifacts/
+
+# local GTK library workaround (do not commit)
+libgsk-4.so

@@ -1,0 +1,9 @@
+# Flatpak build dirs com possíveis symlinks circulares
+.flatpak-builder/
+build-dir/
+repo/
+target/
+
+# Evitar loops em qualquer subdiretório
+**/.flatpak-builder/
+**/target/
