@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <schema id="com.screenshot_hero.ScreenshotHero"
-          path="/com/screenshot_hero/ScreenshotHero/">
+  <schema id="dev.codethings.schero"
+          path="/dev/codethings/schero/">
     <key name="color-scheme" type="s">
       <choices>
         <choice value="follow-system"/>

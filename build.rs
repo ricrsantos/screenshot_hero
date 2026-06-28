@@ -10,7 +10,7 @@ fn main() {
 }
 
 fn compile_gsettings(manifest_dir: &Path) {
-    let schema_xml = manifest_dir.join("data/com.screenshot_hero.ScreenshotHero.gschema.xml");
+    let schema_xml = manifest_dir.join("data/dev.codethings.schero.gschema.xml");
     if !schema_xml.exists() {
         return;
     }
@@ -21,7 +21,7 @@ fn compile_gsettings(manifest_dir: &Path) {
     let schema_dir = out_dir.join("schemas");
     fs::create_dir_all(&schema_dir).expect("create schema output directory");
 
-    let installed_xml = schema_dir.join("com.screenshot_hero.ScreenshotHero.gschema.xml");
+    let installed_xml = schema_dir.join("dev.codethings.schero.gschema.xml");
     fs::copy(&schema_xml, &installed_xml).expect("copy gschema.xml into build output");
 
     let compiled = Command::new("glib-compile-schemas")
@@ -49,7 +49,7 @@ fn compile_gsettings(manifest_dir: &Path) {
 }
 
 fn compile_gresources(manifest_dir: &Path) {
-    let resource_xml = manifest_dir.join("data/com.screenshot_hero.ScreenshotHero.gresource.xml");
+    let resource_xml = manifest_dir.join("data/dev.codethings.schero.gresource.xml");
     if !resource_xml.exists() {
         return;
     }
@@ -59,7 +59,7 @@ fn compile_gresources(manifest_dir: &Path) {
     emit_rerun_if_changed_for_dir(&manifest_dir.join("data/icons/hicolor"));
 
     let out_dir = PathBuf::from(env::var("OUT_DIR").expect("OUT_DIR"));
-    let output_resource = out_dir.join("com.screenshot_hero.ScreenshotHero.gresource");
+    let output_resource = out_dir.join("dev.codethings.schero.gresource");
 
     let compiled = Command::new("glib-compile-resources")
         .arg(&resource_xml)

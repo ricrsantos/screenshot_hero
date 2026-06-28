@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>dev.codethings.schero</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Screenshot Hero</name>
+  <summary>Capture, annotate, and share screenshots on Linux</summary>
+  <description>
+    <p>
+      Screenshot Hero is a Linux-native screenshot and annotation app built with Rust, GTK4 and
+      Libadwaita. Fully compatible with GNOME and Wayland.
+    </p>
+    <p>
+      It integrates with desktop portals to capture screenshots, then offers tools to annotate,
+      redact, blur, pixelate, export and copy the result.
+    </p>
+  </description>
+  <developer id="dev.codethings">
+    <name>CodeThings</name>
+  </developer>
+  <launchable type="desktop-id">dev.codethings.schero.desktop</launchable>
+  <provides>
+    <binary>screenshot-hero</binary>
+  </provides>
+  <url type="homepage">https://github.com/ricrsantos/screenshot_hero</url>
+  <url type="bugtracker">https://github.com/ricrsantos/screenshot_hero/issues</url>
+  <url type="vcs-browser">https://github.com/ricrsantos/screenshot_hero</url>
+  <content_rating type="oars-1.1" />
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/ricrsantos/screenshot_hero/main/pictures/export.png</image>
+      <caption>Screenshot Hero editing a captured image</caption>
+    </screenshot>
+  </screenshots>
+  <releases>
+    <release version="0.1.0" date="2026-06-27" />
+  </releases>
+</component>

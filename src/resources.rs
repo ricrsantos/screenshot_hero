@@ -4,10 +4,10 @@ use gtk::gdk;
 use gtk::gio;
 use gtk::glib;
 
-pub const RESOURCE_BASE_PATH: &str = "/com/screenshot_hero/ScreenshotHero";
-pub const TOOL_ICON_DIR: &str = "/com/screenshot_hero/ScreenshotHero/resources/icons";
-pub const APP_ICON_THEME_PATH: &str = "/com/screenshot_hero/ScreenshotHero/icons";
-pub const APP_ICON_NAME: &str = "com.screenshot_hero.ScreenshotHero";
+pub const RESOURCE_BASE_PATH: &str = "/dev/codethings/schero";
+pub const TOOL_ICON_DIR: &str = "/dev/codethings/schero/resources/icons";
+pub const APP_ICON_THEME_PATH: &str = "/dev/codethings/schero/icons";
+pub const APP_ICON_NAME: &str = "dev.codethings.schero";
 
 pub fn register() -> Result<(), String> {
     static REGISTER_RESULT: OnceLock<Result<(), String>> = OnceLock::new();

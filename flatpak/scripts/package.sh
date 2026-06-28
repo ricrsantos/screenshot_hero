@@ -3,7 +3,7 @@ set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
-APP_ID="com.screenshot_hero.ScreenshotHero"
+APP_ID="dev.codethings.schero"
 
 REPO_DIR="$PROJECT_ROOT/flatpak_artifacts/repo"
 RELEASE_DIR="$PROJECT_ROOT/flatpak_artifacts/release"
