@@ -41,6 +41,4 @@ modules:
       - cargo-sources.json
       - type: git
         url: https://github.com/ricrsantos/screenshot_hero.git
-        # Replace with the upstream commit that already contains:
-        # data/dev.codethings.schero.{desktop,metainfo.xml,gschema.xml,gresource.xml}
-        commit: REPLACE_WITH_RELEASE_COMMIT
+        commit: d815a7c54547edd541da2b8f48326b1c69657ad0

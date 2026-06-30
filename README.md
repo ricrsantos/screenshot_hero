@@ -1,27 +1,16 @@
-<p align="center">
-  <a href="#english">🇺🇸 English</a> |
-  <a href="#portugues-br">🇧🇷 Português</a>
-</p>
+[🇺🇸 English](#english) | [🇧🇷 Português](#portugues-br)
 
-<h1 align="center">Screenshot Hero</h1>
+# Screenshot Hero
 
-<p align="center">
-  Capture, annotate, and share screenshots on Linux. Fully compatible with GNOME and Wayland.
-</p>
+Capture, annotate, and share screenshots on Linux. Fully compatible with GNOME and Wayland.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/platform-Linux%20%7C%20GNOME-blue" alt="Linux GNOME">
-  <img src="https://img.shields.io/badge/display-Wayland-purple" alt="Wayland">
-  <img src="https://img.shields.io/badge/built%20with-Rust%20%7C%20GTK4%20%7C%20Libadwaita-orange" alt="Rust GTK4 Libadwaita">
-  <img src="https://img.shields.io/badge/distribution-Flatpak-4A86CF" alt="Flatpak">
-  <img src="https://img.shields.io/badge/license-BSD--2--Clause-green" alt="BSD-2-Clause">
-</p>
 
-![Screenshot Hero in action](./pictures/export.png)
+
+Screenshot Hero in action
 
 ---
 
-<a id="english"></a>
+
 
 ## 🇺🇸 English
 
@@ -44,7 +33,7 @@ Designed for an open-source workflow, it helps you move fast through:
 - Save and load `.shero` project files
 - Offline-first and privacy-first: your screenshots stay on your machine
 
-![Screenshot Hero app icon](./data/icons/hicolor/256x256/apps/com.screenshot_hero.ScreenshotHero.png)
+Screenshot Hero app icon
 
 ### Quick Start
 
@@ -60,7 +49,11 @@ Run directly in capture mode:
 cargo run -- --capture
 ```
 
+
+
 ### Installation
+
+
 
 #### Flathub (Recommended)
 
@@ -70,6 +63,8 @@ flatpak run dev.codethings.schero
 ```
 
 > Coming soon: the Flathub listing is being prepared. Until then, use the local Flatpak build steps below.
+
+
 
 #### Local Flatpak build
 
@@ -97,6 +92,8 @@ Capture mode with Flatpak:
 ```bash
 flatpak run dev.codethings.schero --capture
 ```
+
+
 
 #### EGL/Mesa warnings in Flatpak
 
@@ -159,6 +156,8 @@ sudo apt install libgtk-4-dev libadwaita-1-dev libgdk-pixbuf-2.0-dev build-essen
 sudo pacman -S gtk4 libadwaita gdk-pixbuf-2.0 base-devel
 ```
 
+
+
 ### Build and Test
 
 ```bash
@@ -171,6 +170,8 @@ Release build:
 ```bash
 cargo build --release
 ```
+
+
 
 ### Contributing
 
@@ -194,7 +195,9 @@ If you prefer, use the Flatpak helper scripts:
 - `./flatpak/scripts/package.sh` to create a `.flatpak` bundle and SHA256 checksum
 - `./flatpak/scripts/run.sh` to run the installed Flatpak app (`dev.codethings.schero`)
 
-5. Open a Pull Request with a clear description and screenshots/GIFs when UI changes are involved.
+1. Open a Pull Request with a clear description and screenshots/GIFs when UI changes are involved.
+
+
 
 ### Project Structure
 
@@ -232,19 +235,21 @@ If you prefer, use the Flatpak helper scripts:
 └── README.md
 ```
 
+
+
 ### License
 
 BSD 2-Clause. See [LICENSE](LICENSE).
 
 ---
 
-<a id="portugues-br"></a>
+
 
 ## 🇧🇷 Português (BR)
 
 O Screenshot Hero é um aplicativo nativo Linux para anotação de capturas de tela, desenvolvido com Rust, GTK4 e Libadwaita.
 
-A ideia deste aplicativo surgiu de uma lacuna simples: até o momento desta escrita, não existe um app de captura e anotação de tela que funcione de forma fluida com GNOME + Wayland por causa do modelo de segurança e privacidade do Wayland.
+A ideia deste aplicativo surgiu de uma necessidade pessoal, pelo fato de que os aplicativos famosos do mundo Linux para captura de tela, pararam de funcionar quando o Gnome migrou do Xorg para o Wayland. Isto ocorre devido as regras de segurança e privacidade do Wayland.
 
 O Screenshot Hero não tenta contornar o Wayland diretamente. Em vez disso, integra-se com a ferramenta nativa de captura do GNOME.
 
@@ -261,7 +266,7 @@ Projetado para um fluxo open source, ele ajuda você a avançar rapidamente em:
 - Salvamento e carregamento de projetos `.shero`
 - Offline e com privacidade: as imagens ficam na sua máquina
 
-![Ícone do app Screenshot Hero](./data/icons/hicolor/256x256/apps/com.screenshot_hero.ScreenshotHero.png)
+Ícone do app Screenshot Hero
 
 ### Início Rápido
 
@@ -277,7 +282,53 @@ Para iniciar direto no modo de captura:
 cargo run -- --capture
 ```
 
+
+
 ### Instalação
+
+Os arquivos prontos para instação estão na seção de Release do repositório.
+
+#### A partir do binário (screenshot-hero.tar.gz)
+
+Em uma pasta temporaria, descompacte o arquivo `screenshot-hero.tar.gz`:
+
+```bash
+tar -xzvf screenshot-hero.tar.gz
+```
+O contéudo descompactado deve ser:
+```bash
+screenshot-hero
+screenshot-hero.desktop
+screenshot-hero.png
+``` 
+Onde:
+- screenshot-hero: Binário executável;
+- screenshot-hero.desktop: Arquivo para adicionar a aplicação no menu do Gnome;
+- screenshot-hero.png: Ícone da aplicação.
+
+De permissão de execução para o binário:
+```bash
+chmod +x screenshot-hero
+```
+Crie uma pasta em `/usr/local/` e copie os arquivos necessários:  
+```bash
+sudo mkdir /usr/local/screenshot-hero
+sudo cp screenshot-hero /usr/local/screenshot-hero/screenshot-hero
+sudo cp screenshot-hero.png /usr/local/screenshot-hero/screenshot-hero.png
+``` 
+
+Copie o arquivo desktop para a pasta `/usr/share/applications/`
+```bash
+sudo cp screenshot-hero.desktop /usr/share/applications/screenshot-hero.desktop
+```  
+Se tudo ocorrer corretamente, a aplicação já deve estar disponível no menu do Gnome.
+
+##### Caso você queira adicionar o Screenshot Hero como seu software de captura através da tecla de atalho [printscreen] (Recomendado).
+
+1. Acesse a seção de atalhos customizados no menu de configuração do Gnome:
+
+
+
 
 #### Flathub (Recomendado)
 
@@ -287,6 +338,8 @@ flatpak run dev.codethings.schero
 ```
 
 > Em breve: a publicação no Flathub está em preparação. Até lá, use os passos de build local com Flatpak abaixo.
+
+
 
 #### Build local com Flatpak
 
@@ -314,6 +367,8 @@ Modo de captura com Flatpak:
 ```bash
 flatpak run dev.codethings.schero --capture
 ```
+
+
 
 #### Warnings EGL/Mesa no Flatpak
 
@@ -376,6 +431,8 @@ sudo apt install libgtk-4-dev libadwaita-1-dev libgdk-pixbuf-2.0-dev build-essen
 sudo pacman -S gtk4 libadwaita gdk-pixbuf-2.0 base-devel
 ```
 
+
+
 ### Build e Testes
 
 ```bash
@@ -388,6 +445,8 @@ Build de release:
 ```bash
 cargo build --release
 ```
+
+
 
 ### Como Contribuir
 
@@ -411,7 +470,9 @@ Caso voce prefira, utilize os scripts auxiliares do Flatpak:
 - `./flatpak/scripts/package.sh` para criar o bundle `.flatpak` e o checksum SHA256
 - `./flatpak/scripts/run.sh` para executar o app Flatpak instalado (`dev.codethings.schero`)
 
-5. Abra um Pull Request com uma descrição clara e screenshots/GIFs quando houver alterações na interface.
+1. Abra um Pull Request com uma descrição clara e screenshots/GIFs quando houver alterações na interface.
+
+
 
 ### Estrutura do Projeto
 
@@ -448,6 +509,8 @@ Caso voce prefira, utilize os scripts auxiliares do Flatpak:
 ├── build.rs
 └── README.md
 ```
+
+
 
 ### Licença
 
