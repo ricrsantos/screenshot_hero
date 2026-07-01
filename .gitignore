@@ -4,6 +4,7 @@ repo/
 .flatpak-builder/
 build/
 flatpak_artifacts/
+dist/
 
 # local GTK library workaround (do not commit)
 libgsk-4.so

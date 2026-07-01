@@ -1,0 +1,18 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+
+Name=Screenshot Hero
+GenericName=Screenshot Tool
+Comment=Linux-native screenshot annotation application
+
+Exec=screenshot-hero
+Icon=dev.codethings.schero
+
+Terminal=false
+StartupNotify=true
+
+Categories=Graphics;Utility;
+Keywords=screenshot;capture;annotate;schero;
+
+DBusActivatable=false
