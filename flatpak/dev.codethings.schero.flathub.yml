@@ -29,12 +29,12 @@ modules:
       - install -Dm0644 data/dev.codethings.schero.desktop ${FLATPAK_DEST}/share/applications/dev.codethings.schero.desktop
       - install -Dm0644 data/dev.codethings.schero.metainfo.xml ${FLATPAK_DEST}/share/metainfo/dev.codethings.schero.metainfo.xml
       - install -Dm0644 data/dev.codethings.schero.gschema.xml ${FLATPAK_DEST}/share/glib-2.0/schemas/dev.codethings.schero.gschema.xml
-      - install -Dm0644 data/icons/hicolor/32x32/apps/com.screenshot_hero.ScreenshotHero.png ${FLATPAK_DEST}/share/icons/hicolor/32x32/apps/dev.codethings.schero.png
-      - install -Dm0644 data/icons/hicolor/48x48/apps/com.screenshot_hero.ScreenshotHero.png ${FLATPAK_DEST}/share/icons/hicolor/48x48/apps/dev.codethings.schero.png
-      - install -Dm0644 data/icons/hicolor/64x64/apps/com.screenshot_hero.ScreenshotHero.png ${FLATPAK_DEST}/share/icons/hicolor/64x64/apps/dev.codethings.schero.png
-      - install -Dm0644 data/icons/hicolor/128x128/apps/com.screenshot_hero.ScreenshotHero.png ${FLATPAK_DEST}/share/icons/hicolor/128x128/apps/dev.codethings.schero.png
-      - install -Dm0644 data/icons/hicolor/256x256/apps/com.screenshot_hero.ScreenshotHero.png ${FLATPAK_DEST}/share/icons/hicolor/256x256/apps/dev.codethings.schero.png
-      - install -Dm0644 data/icons/hicolor/512x512/apps/com.screenshot_hero.ScreenshotHero.png ${FLATPAK_DEST}/share/icons/hicolor/512x512/apps/dev.codethings.schero.png
+      - install -Dm0644 data/icons/hicolor/32x32/apps/dev.codethings.schero.png ${FLATPAK_DEST}/share/icons/hicolor/32x32/apps/dev.codethings.schero.png
+      - install -Dm0644 data/icons/hicolor/48x48/apps/dev.codethings.schero.png ${FLATPAK_DEST}/share/icons/hicolor/48x48/apps/dev.codethings.schero.png
+      - install -Dm0644 data/icons/hicolor/64x64/apps/dev.codethings.schero.png ${FLATPAK_DEST}/share/icons/hicolor/64x64/apps/dev.codethings.schero.png
+      - install -Dm0644 data/icons/hicolor/128x128/apps/dev.codethings.schero.png ${FLATPAK_DEST}/share/icons/hicolor/128x128/apps/dev.codethings.schero.png
+      - install -Dm0644 data/icons/hicolor/256x256/apps/dev.codethings.schero.png ${FLATPAK_DEST}/share/icons/hicolor/256x256/apps/dev.codethings.schero.png
+      - install -Dm0644 data/icons/hicolor/512x512/apps/dev.codethings.schero.png ${FLATPAK_DEST}/share/icons/hicolor/512x512/apps/dev.codethings.schero.png
       - gtk4-update-icon-cache -q -t -f ${FLATPAK_DEST}/share/icons/hicolor || true
       - glib-compile-schemas ${FLATPAK_DEST}/share/glib-2.0/schemas/
     sources:
