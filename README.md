@@ -7,7 +7,8 @@
 
 <p align="center">
   Capture, annotate, and share screenshots on Linux. Fully compatible with GNOME and Wayland.
-  <a href="https://schero.codethings.dev">Visit our website</a>
+  <br>
+  <a href="https://schero.codethings.dev">Visit our website: schero.codethings.dev</a>
 </p>
 
 <p align="center">
@@ -57,7 +58,7 @@ Ready-to-install files are available for download in the repository's Releases s
 
 ### From the native binary installation package (Recommended):
 
-Download the file `dev.codethings.schero-xxxxxxx-linux-x86_64.tar.gz`
+Download the file `dev.codethings.schero-xxxxxxx-linux-x86_64.tar.gz` at <https://github.com/ricrsantos/screenshot_hero/releases>.
 
 Note: **xxxxxxx** represents the file version. When you download the installation package, the **x** values will be replaced by something like `dev.codethings.schero-54e8cc0-linux-x86_64.tar.gz`
 
@@ -92,7 +93,7 @@ sudo ./uninstall.sh
 
 ### From the Flatpak package
 
-Download the `scHero.flatpak` file to a temporary folder.
+Download the `scHero.flatpak` at <https://github.com/ricrsantos/screenshot_hero/releases>.
 
 Run the flatpak install command:
 ```bash
@@ -336,7 +337,7 @@ Os arquivos prontos para instação estão disponíveis para download na seção
 
 ### A partir do pacote de instalação do binário nativo (Recomendado):
 
-Baixar o arquivo `dev.codethings.schero-xxxxxxx-linux-x86_64.tar.gz`
+Baixar o arquivo `dev.codethings.schero-xxxxxxx-linux-x86_64.tar.gz` em <https://github.com/ricrsantos/screenshot_hero/releases>.
 
 obs: **xxxxxxx**, representa a versão do arquivo, quando você baixar o pacote de instalação, o valor de **x** será substituído por algo como `dev.codethings.schero-54e8cc0-linux-x86_64.tar.gz` 
 
@@ -371,7 +372,7 @@ sudo ./uninstall.sh
 
 ### A partir do pacote Flapak
 
-Baixar em uma pasta temporária o arquivo `scHero.flatpak`.
+Baixar em uma pasta temporária o arquivo `scHero.flatpak` em em <https://github.com/ricrsantos/screenshot_hero/releases>.
 
 Execute o comando de instalação do flatpak
 ```bash
