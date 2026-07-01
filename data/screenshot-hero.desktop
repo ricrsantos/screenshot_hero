@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Screenshot Hero
+Comment=Linux-native screenshot annotation application
+Exec=screenshot-hero
+Icon=screenshot-hero.png
+Terminal=false
+Categories=Graphics;
+StartupNotify=true

@@ -7,6 +7,7 @@
 
 <p align="center">
   Capture, annotate, and share screenshots on Linux. Fully compatible with GNOME and Wayland.
+  <a href="https://schero.codethings.dev">Visit our website</a>
 </p>
 
 <p align="center">
@@ -23,82 +24,140 @@
 
 <a id="english"></a>
 
-## 🇺🇸 English
+# 🇺🇸 English
 
-Screenshot Hero is a Linux-native screenshot annotation app built with Rust, GTK4, and Libadwaita.
+Screenshot Hero is a native Linux application for screenshot annotation, built with Rust, GTK4, and Libadwaita.
 
-The idea for this application came from a simple gap: at the time of writing, there is no screenshot and annotation app that works seamlessly with GNOME + Wayland because of Wayland's security and privacy model.
+The idea for this application came from a personal need: well-known Linux screenshot apps stopped working when GNOME migrated from Xorg to Wayland. This happens because of Wayland's security and privacy rules.
 
 Screenshot Hero does not try to bypass Wayland directly. Instead, it integrates with GNOME's native capture tool.
 
-Designed for an open-source workflow, it helps you move fast through:
+Designed for an open-source workflow, it helps you move quickly through:
 **Capture -> Annotate -> Export/Copy**.
 
-### Features
+---
 
-- Region capture through GNOME/XDG Screenshot Portal
+## Features
+
+- Region capture via GNOME/XDG Screenshot Portal
 - Open local PNG/JPEG files
 - Annotation toolkit (text, shapes, arrows, blur, pixelate, redaction, and more)
 - Zoom, pan, crop, undo/redo
 - Export to PNG/JPEG and copy to clipboard
 - Save and load `.shero` project files
-- Offline-first and privacy-first: your screenshots stay on your machine
+- Offline-first and privacy-first: your images stay on your machine
 
-![Screenshot Hero app icon](./data/icons/hicolor/256x256/apps/com.screenshot_hero.ScreenshotHero.png)
+![Screenshot Hero app icon](./data/icons/hicolor/256x256/apps/dev.codethings.schero.png)
 
-### Quick Start
+---
+
+## Installation
+
+Ready-to-install files are available for download in the repository's Releases section.
+
+### From the native binary installation package (Recommended):
+
+Download the file `dev.codethings.schero-xxxxxxx-linux-x86_64.tar.gz`
+
+Note: **xxxxxxx** represents the file version. When you download the installation package, the **x** values will be replaced by something like `dev.codethings.schero-54e8cc0-linux-x86_64.tar.gz`
+
+In a temporary folder, extract the downloaded file:
+
+```bash
+tar -xzvf dev.codethings.schero-xxxxxxx-linux-x86_64.tar.gz
+```
+
+The extracted contents should look something like this:
+
+```bash
+── dev.codethings.schero-54e8cc0
+    ├── bin
+    ├── dev.codethings.schero.desktop
+    ├── icons
+    ├── install.sh
+    └── uninstall.sh
+```
+
+To install Screenshot Hero, enter the created folder and run the installation script:
+```bash
+cd dev.codethings.schero-54e8cc0
+sudo ./install.sh
+```
+If everything goes as expected, the application should already be available in the GNOME menu.
+
+If you wish to uninstall Screenshot Hero, run the removal script:
+```bash
+sudo ./uninstall.sh
+```
+
+### From the Flatpak package
+
+Download the `scHero.flatpak` file to a temporary folder.
+
+Run the flatpak install command:
+```bash
+flatpak install ./scHero.flatpak
+```
+
+If you receive an error indicating that the GNOME 50 Flatpak runtime is not installed, run the commands below and then repeat the installation:
+```bash
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak install flathub org.gnome.Platform//50
+flatpak install flathub org.gnome.Sdk//50
+```
+
+If everything went as expected, Screenshot Hero should already be available in the GNOME menu.
+
+### If you want to add Screenshot Hero as your screenshot software via the [PrintScreen] shortcut key (Recommended).
+
+1. Go to the custom shortcuts section in the GNOME settings menu:
+![Gnome Config](./pictures/gnome_config.png)
+
+2. Create a shortcut for the [PrintScreen] key or another key of your choice:
+![Gnome Config](./pictures/gnome_custom_shortcut.png)
+![Gnome Config](./pictures/shortcut.png)
+
+3. In the **Command** field, add:
+- If you installed via binary package: `screenshot-hero --capture`
+- If you installed via Flatpak: `flatpak run dev.codethings.schero --capture`
+
+---
+
+## Quick Start for Development
 
 ```bash
 git clone https://github.com/ricrsantos/screenshot_hero.git
 cd screenshot_hero
 cargo run
 ```
-
-Run directly in capture mode:
+To start directly in capture mode:
 
 ```bash
 cargo run -- --capture
 ```
 
-### Installation
-
-#### Flathub (Recommended)
-
-```bash
-flatpak install flathub dev.codethings.schero
-flatpak run dev.codethings.schero
-```
-
-> Coming soon: the Flathub listing is being prepared. Until then, use the local Flatpak build steps below.
-
-#### Local Flatpak build
+### Local Flatpak Build
 
 Manifest: `flatpak/dev.codethings.schero.yml`
 
-Install required runtime/SDK:
+Install the required runtime/SDK:
 
 ```bash
 flatpak install flathub org.gnome.Platform//50 org.gnome.Sdk//50
 ```
 
 Build, install, and run:
-
 ```bash
 flatpak-builder --user --install build-dir flatpak/dev.codethings.schero.yml --force-clean
 flatpak run dev.codethings.schero
 ```
 
-Flathub PR-ready manifest (for `flathub/flathub` submissions):
-
-`flatpak/dev.codethings.schero.flathub.yml`
-
 Capture mode with Flatpak:
-
 ```bash
 flatpak run dev.codethings.schero --capture
 ```
 
-#### EGL/Mesa warnings in Flatpak
+### EGL/Mesa Warnings in Flatpak
 
 If you see warnings like `libEGL warning` or `MESA: ZINK` in the terminal, the app can still work normally. These messages usually indicate a GPU driver/acceleration mismatch between host and sandbox.
 
@@ -110,7 +169,6 @@ flatpak info --show-permissions dev.codethings.schero
 ```
 
 - If warnings persist, try forcing a specific GTK renderer (test one at a time):
-
 ```bash
 # OpenGL (often best when GPU acceleration works)
 flatpak run --env=GSK_RENDERER=gl dev.codethings.schero
@@ -124,21 +182,13 @@ flatpak run --env=GSK_RENDERER=cairo dev.codethings.schero
 
 These overrides are optional and useful for troubleshooting; keep the default renderer when hardware acceleration is working.
 
-### GNOME Shortcut Tip
+---
 
-You can assign Screenshot Hero capture mode to a GNOME custom keyboard shortcut:
-
-```bash
-flatpak run dev.codethings.schero --capture
-```
-
-If you prefer, you can even replace GNOME's default screenshot shortcut and bind Screenshot Hero to `[PrintScr]`.
-
-### Requirements (Development)
+## Requirements (Development)
 
 - Rust stable (via [rustup](https://rustup.rs/))
 - GTK4 and Libadwaita development libraries
-- GNOME/Wayland (or X11)
+- GNOME/Wayland session (or X11)
 - XDG Desktop Portals (`org.freedesktop.portal.Desktop`)
 
 **Fedora**
@@ -159,7 +209,9 @@ sudo apt install libgtk-4-dev libadwaita-1-dev libgdk-pixbuf-2.0-dev build-essen
 sudo pacman -S gtk4 libadwaita gdk-pixbuf-2.0 base-devel
 ```
 
-### Build and Test
+---
+
+## Build and Test
 
 ```bash
 cargo build
@@ -167,17 +219,22 @@ cargo test --lib
 ```
 
 Release build:
-
 ```bash
 cargo build --release
 ```
+To create the installation package with the native binary:
+```bash
+package/build-package.sh
+```
 
-### Contributing
+---
 
-Contributions are welcome.
+## Contributing
+
+Contributions are very welcome.
 
 1. Open an issue for bugs, UX feedback, or feature requests.
-2. Fork the repo and create a branch from `main`.
+2. Fork the repository and create a branch from `main`.
 3. Keep changes focused and include tests when possible.
 4. Run:
 
@@ -194,9 +251,11 @@ If you prefer, use the Flatpak helper scripts:
 - `./flatpak/scripts/package.sh` to create a `.flatpak` bundle and SHA256 checksum
 - `./flatpak/scripts/run.sh` to run the installed Flatpak app (`dev.codethings.schero`)
 
-5. Open a Pull Request with a clear description and screenshots/GIFs when UI changes are involved.
+1. Open a Pull Request with a clear description and screenshots/GIFs when UI changes are involved.
 
-### Project Structure
+---
+
+## Project Structure
 
 ```text
 .
@@ -232,26 +291,32 @@ If you prefer, use the Flatpak helper scripts:
 └── README.md
 ```
 
-### License
+---
+
+## License
 
 BSD 2-Clause. See [LICENSE](LICENSE).
 
 ---
 
+
+
 <a id="portugues-br"></a>
 
-## 🇧🇷 Português (BR)
+# 🇧🇷 Português (BR)
 
 O Screenshot Hero é um aplicativo nativo Linux para anotação de capturas de tela, desenvolvido com Rust, GTK4 e Libadwaita.
 
-A ideia deste aplicativo surgiu de uma lacuna simples: até o momento desta escrita, não existe um app de captura e anotação de tela que funcione de forma fluida com GNOME + Wayland por causa do modelo de segurança e privacidade do Wayland.
+A ideia deste aplicativo surgiu de uma necessidade pessoal, pelo fato de que os aplicativos famosos do mundo Linux para captura de tela, pararam de funcionar quando o Gnome migrou do Xorg para o Wayland. Isto ocorre devido as regras de segurança e privacidade do Wayland.
 
 O Screenshot Hero não tenta contornar o Wayland diretamente. Em vez disso, integra-se com a ferramenta nativa de captura do GNOME.
 
 Projetado para um fluxo open source, ele ajuda você a avançar rapidamente em:
 **Capturar -> Anotar -> Exportar/Copiar**.
 
-### Recursos
+---
+
+## Recursos
 
 - Captura de região via GNOME/XDG Screenshot Portal
 - Abertura de arquivos locais PNG/JPEG
@@ -261,34 +326,96 @@ Projetado para um fluxo open source, ele ajuda você a avançar rapidamente em:
 - Salvamento e carregamento de projetos `.shero`
 - Offline e com privacidade: as imagens ficam na sua máquina
 
-![Ícone do app Screenshot Hero](./data/icons/hicolor/256x256/apps/com.screenshot_hero.ScreenshotHero.png)
+![Ícone do app Screenshot Hero](./data/icons/hicolor/256x256/apps/dev.codethings.schero.png)
 
-### Início Rápido
+---
+
+## Instalação
+
+Os arquivos prontos para instação estão disponíveis para download na seção de Releases do repositório.
+
+### A partir do pacote de instalação do binário nativo (Recomendado):
+
+Baixar o arquivo `dev.codethings.schero-xxxxxxx-linux-x86_64.tar.gz`
+
+obs: **xxxxxxx**, representa a versão do arquivo, quando você baixar o pacote de instalação, o valor de **x** será substituído por algo como `dev.codethings.schero-54e8cc0-linux-x86_64.tar.gz` 
+
+Em uma pasta temporaria, descompacte o arquivo baixado:
+
+```bash
+tar -xzvf dev.codethings.schero-xxxxxxx-linux-x86_64.tar.gz
+```
+
+O contéudo descompactado deve ser algo semelhante a isso:
+
+```bash
+── dev.codethings.schero-54e8cc0
+    ├── bin
+    ├── dev.codethings.schero.desktop
+    ├── icons
+    ├── install.sh
+    └── uninstall.sh
+``` 
+
+Para instalar o Screenshot Hero, acesse a pasta criada e execute o script de instalação:
+```bash
+cd dev.codethings.schero-54e8cc0
+sudo ./install.sh
+```
+Se tudo ocorrer conforme o previsto, a aplicação já deve estar disponível no menu do Gnome.
+
+Caso deseje desinstalar o Screenshot Hero, execute o scrip de remoção:
+```bash
+sudo ./uninstall.sh
+```
+
+### A partir do pacote Flapak
+
+Baixar em uma pasta temporária o arquivo `scHero.flatpak`.
+
+Execute o comando de instalação do flatpak
+```bash
+flatpak install ./scHero.flatpak
+```
+
+Caso você receba um erro indicando que o runtime do Flatpak do Gnome 50 não está instado, execute os comandos abaixo e posteriormente repita a instalação:
+```bash
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak install flathub org.gnome.Platform//50
+flatpak install flathub org.gnome.Sdk//50
+```
+
+Se tudo ocorreu conforme o esperado, o Screenshot Hero já deve estar disponível no menu do Gnome.
+
+### Caso você queira adicionar o Screenshot Hero como seu software de captura através da tecla de atalho [printscreen] (Recomendado).
+
+1. Acesse a seção de atalhos customizados no menu de configuração do Gnome:
+![Gnome Config](./pictures/gnome_config.png)
+
+2. Crie um atalho para a tecla [printscreen] ou alguma outra tecla desejada:
+![Gnome Config](./pictures/gnome_custom_shortcut.png)
+![Gnome Config](./pictures/shortcut.png)
+
+3. No campo **Command** adicione:
+- Se vc instalou via pacote binário: `screenshot-hero --capture`
+- Se vc instalou via flatpak: `flatpak run dev.codethings.schero --capture`
+
+---
+
+## Início Rápido para desenvolvimento:
 
 ```bash
 git clone https://github.com/ricrsantos/screenshot_hero.git
 cd screenshot_hero
 cargo run
 ```
-
 Para iniciar direto no modo de captura:
 
 ```bash
 cargo run -- --capture
 ```
 
-### Instalação
-
-#### Flathub (Recomendado)
-
-```bash
-flatpak install flathub dev.codethings.schero
-flatpak run dev.codethings.schero
-```
-
-> Em breve: a publicação no Flathub está em preparação. Até lá, use os passos de build local com Flatpak abaixo.
-
-#### Build local com Flatpak
+### Build local com Flatpak
 
 Manifesto: `flatpak/dev.codethings.schero.yml`
 
@@ -299,23 +426,17 @@ flatpak install flathub org.gnome.Platform//50 org.gnome.Sdk//50
 ```
 
 Build, instalação e execução:
-
 ```bash
 flatpak-builder --user --install build-dir flatpak/dev.codethings.schero.yml --force-clean
 flatpak run dev.codethings.schero
 ```
 
-Manifesto pronto para PR no Flathub (submissao em `flathub/flathub`):
-
-`flatpak/dev.codethings.schero.flathub.yml`
-
 Modo de captura com Flatpak:
-
 ```bash
 flatpak run dev.codethings.schero --capture
 ```
 
-#### Warnings EGL/Mesa no Flatpak
+### Warnings EGL/Mesa no Flatpak
 
 Se aparecerem avisos como `libEGL warning` ou `MESA: ZINK` no terminal, o app ainda pode funcionar normalmente. Essas mensagens geralmente indicam incompatibilidade de aceleração/driver entre host e sandbox.
 
@@ -327,7 +448,6 @@ flatpak info --show-permissions dev.codethings.schero
 ```
 
 - Se os warnings persistirem, tente forçar um renderer GTK específico (teste um de cada vez):
-
 ```bash
 # OpenGL (geralmente o melhor quando a aceleração por GPU funciona)
 flatpak run --env=GSK_RENDERER=gl dev.codethings.schero
@@ -341,17 +461,9 @@ flatpak run --env=GSK_RENDERER=cairo dev.codethings.schero
 
 Esses overrides são opcionais e úteis para troubleshooting; mantenha o renderer padrão quando a aceleração por hardware estiver funcionando.
 
-### Dica de Atalho no GNOME
+---
 
-Você pode atribuir o modo de captura do Screenshot Hero a um atalho de teclado personalizado no GNOME:
-
-```bash
-flatpak run dev.codethings.schero --capture
-```
-
-Se quiser, você pode inclusive substituir o atalho padrão de captura do GNOME e vincular o Screenshot Hero à tecla `[PrintScr]`.
-
-### Requisitos (Desenvolvimento)
+## Requisitos (Desenvolvimento)
 
 - Rust estável (via [rustup](https://rustup.rs/))
 - Bibliotecas de desenvolvimento GTK4 e Libadwaita
@@ -376,7 +488,9 @@ sudo apt install libgtk-4-dev libadwaita-1-dev libgdk-pixbuf-2.0-dev build-essen
 sudo pacman -S gtk4 libadwaita gdk-pixbuf-2.0 base-devel
 ```
 
-### Build e Testes
+---
+
+## Build e Testes
 
 ```bash
 cargo build
@@ -384,12 +498,17 @@ cargo test --lib
 ```
 
 Build de release:
-
 ```bash
 cargo build --release
 ```
+Para criar o pacote de instalação com o binário nativo:
+```bash
+package/build-package.sh
+```
 
-### Como Contribuir
+---
+
+## Como Contribuir
 
 Contribuições são muito bem-vindas.
 
@@ -411,9 +530,11 @@ Caso voce prefira, utilize os scripts auxiliares do Flatpak:
 - `./flatpak/scripts/package.sh` para criar o bundle `.flatpak` e o checksum SHA256
 - `./flatpak/scripts/run.sh` para executar o app Flatpak instalado (`dev.codethings.schero`)
 
-5. Abra um Pull Request com uma descrição clara e screenshots/GIFs quando houver alterações na interface.
+1. Abra um Pull Request com uma descrição clara e screenshots/GIFs quando houver alterações na interface.
 
-### Estrutura do Projeto
+---
+
+## Estrutura do Projeto
 
 ```text
 .
@@ -449,6 +570,8 @@ Caso voce prefira, utilize os scripts auxiliares do Flatpak:
 └── README.md
 ```
 
-### Licença
+---
+
+## Licença
 
 BSD 2-Clause. Veja [LICENSE](LICENSE).
